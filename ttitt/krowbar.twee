@@ -1,0 +1,43 @@
+:: krowbar-start [start inv]
+<<Init>>
+<<if visited("krowbar-start") is 1>>Welcome to the adventure!<<endif>>
+There is a sealed door on the wall.
+<<if not visited("Get McGuffin")>>You see a McGuffin<br><<endif>>\
+<<if not visited("Get Coins")>>You see a few coins on the floor<br><<endif>>\
+<<actions "Get McGuffin" "Get Coins">>\
+<<if $items['McGuffin'] is true>><<actions "Use McGuffin on door">><<endif>>\
+<<if visited("Use McGuffin on door")>>[[Go through door|Room2]]<<endif>>
+[[PlayerProfile]]
+[[Return to Hub|Start]]
+
+:: Get McGuffin
+You pick up the McGuffin.
+<<set $items['McGuffin'] to true>>
+[[Return|previous()]]
+
+:: Get Coins
+You find <<$items['gold'] += random(2,5)>> coins
+[[Return|previous()]]
+
+:: Use McGuffin on door
+You use the McGuffin on the door.
+The McGuffin crumbles and the door opens.
+<<set $items['McGuffin'] to false>>
+[[Return|previous()]]
+
+:: Room2 [inv]
+This is room2. There is a cake on the ground.
+The door ahead is blocked.
+<<actions "Eat cake">>
+<<if $stats['strength'] gte 3>>[[Break through the door|Room3]]
+<<else>>You are not strong enough to break this door.<<endif>>
+
+::Eat cake
+You feel incredibly stronger!
+Strength increased to <<$stats['strength'] += 3>>
+[[Return|previous()]]
+
+:: Room3 [inv]
+Seriously, nothing here.
+Return to [[the start|Start]]
+

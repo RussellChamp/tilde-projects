@@ -1,0 +1,7 @@
+TopicBot
+ - !settopic - sets the current topic
+ - !topic - prints the current topic
+ - Saves all topics set from !settopic to a text file along with a timestamp
+   and who set the topic
+ - On load, sets the last topic in the topics file as the current topic
+ - Current topic will time out after X hours (or just display the time)

@@ -1,0 +1,45 @@
+:: Start
+<<display "krowbar-start">>
+
+:: krowbar-start [start]
+<<set $items = {} >>
+<<set $items['gold'] to 5 >>
+
+Here is the start page.
+There is a door on the wall.
+<<display "item_mcguffin">>
+<<if visited("Get McGuffin") and $state_startDoor_isOpen neq true>>
+<<actions "Use McGuffin on door">>
+<<endif>>
+<<if $state_startDoor_isOpen is true>>
+[[Go through door|Room2]]
+<<endif>>
+<<display "Inventory">>
+
+:: item_mcguffin
+<<if not visited("Get McGuffin") >>
+You see a McGuffin.
+<<actions "Get McGuffin">>
+<<endif>>
+
+:: Get McGuffin
+You pick up the McGuffin.
+[[Return|previous()]]
+
+:: Use McGuffin on door
+You use the McGuffin on the door.
+The McGuffin crumbles and the door opens.
+<<set $state_startDoor_isOpen to true>>
+[[Return|Start]]
+[[Go through door|Room2]]
+
+:: Room2
+This is room2. There is nothing here.
+[[Go back to the start|Start]]
+
+:: Inventory
+Inventory:
+<<print $items['gold'] + " gold">>
+<<if visited("Get McGuffin")>>
+<<print "McGuffin">>
+<<endif>>

@@ -1,0 +1,168 @@
+:: Inventory
+<br>
+<strong>Inventory:</strong>
+<<Inventory>>
+
+:: ShowInventory [script]
+try {
+  version.extensions['Inventory'] = {
+    major:0, minor:1, revision:0
+    };
+  macros['Inventory'] =
+  {
+    handler: function(place, macroName, params, parser)
+    {
+      var msg = "";
+      var items = state.history[0].variables.items;
+      if (items == undefined) {
+        new Wikifier(place, "nothing");
+        return;
+        }
+      for(var name in items) {
+        if(!isNaN(parseFloat(items[name])) && isFinite(items[name])) {
+          msg += name + "(" + items[name] + "), ";
+        }
+        else if(items[name] != false) {
+          msg += name + ", ";
+        }
+      };
+      new Wikifier(place, msg.slice(0,-2));
+    },
+    init: function() { },
+  };
+} catch(e) {
+  throwError(place,"Inventory Setup Error: " + e.message);
+}
+
+:: PlayerStats
+<br>
+<strong>Player Stats:</strong>
+<<PlayerStats>>
+
+:: ShowPlayerStats [script]
+try {
+  version.extensions['PlayerStats'] = {
+    major:0, minor:1, revision:0
+    };
+  macros['PlayerStats'] =
+  {
+    handler: function(place, macroName, params, parser)
+    {
+      var msg = "";
+      var stats = state.history[0].variables.stats;
+      if (stats == undefined) {
+        new Wikifier(place, "no stats");
+        return;
+        }
+      for(var stat in stats) {
+        if(stat.slice(-4) == "_max") {
+          continue;
+        }
+        msg += stat + ": " + stats[stat];
+        if(stats[stat+"_max"] != undefined) {
+          msg += " / " + stats[stat+"_max"];
+        }
+        msg += "<br>";
+      }
+    new Wikifier(place, msg);
+  },
+  init: function() { },
+  };
+} catch(e) {
+  throwError(place,"PlayerStats Setup Error: " + e.message);
+}
+
+:: PlayerSkills
+<br>
+<strong>Player Skills:</strong>
+<<PlayerSkills>>
+
+:: ShowPlayerSkills [script]
+try {
+  version.extensions['PlayerSkills'] = {
+    major:0, minor:1, revision:0
+    };
+  macros['PlayerSkills'] =
+  {
+    handler: function(place, macroName, params, parser)
+    {
+      var msg = "";
+      var stats = state.history[0].variables.skills;
+      if (stats == undefined) {
+        new Wikifier(place, "no skills");
+        return;
+      }
+      for(var stat in stats) {
+        msg += stat + ": " + stats[stat]+"<br>";
+      }
+    new Wikifier(place, msg);
+  },
+  init: function() { },
+  };
+} catch(e) {
+  throwError(place,"PlayerSkills Setup Error: " + e.message);
+}
+
+:: PlayerProfile
+[[Return|previous()]]
+-~-~-~-~-~-
+<<display PlayerStats>>
+<<display PlayerSkills>>
+<<display Inventory>>
+
+:: postrender [script]
+postrender.tagInventory = function(place) {
+  var inv = tale.get("Inventory");
+  if (inv.id !== undefined && ~this.tags.indexOf("inv")) {
+    new Wikifier(place, inv.processText());
+  };
+  var stats = tale.get("PlayerStats");
+  if(stats.id !== undefined && ~this.tags.indexOf("stats")) {
+    new Wikifier(place, stats.processText());
+  };
+  var skills = tale.get("PlayerSkills");
+  if(skills.id !== undefined && ~this.tags.indexOf("skills")) {
+    new Wikifier(place, skills.processText());
+  };
+}
+
+:: core-init
+<<nobr>>
+<<set $items = {} >>
+<<set $events = {} >>
+<<set $stats = {} >>
+<<set $stats['health'] to 10 >>
+<<set $stats['health_max'] to 10 >>
+<<set $stats['mana'] to 5 >>
+<<set $stats['mana_max'] to 5 >>
+<<set $stats['intelligence'] to 3 >>
+<<set $stats['strength'] to 1 >>
+<<set $skills = {} >>
+<<set $skills['adventuring'] = 2 >>
+<<set $items['gold'] to 0 >>
+<<endnobr>>
+
+:: GetInit [script]
+try {
+  version.extensions['GetInit'] = {
+    major:0, minor:1, revision:0
+    };
+  macros['Init'] =
+  {
+    handler: function(place, macroName, params, parser)
+    {
+      var msg = "<<nobr>><<if visited(passage()) eq 1>>";
+      for(var p in tale.passages) {
+        /%if(~tale.passages[p].tags.indexOf("init")) {%/
+        if(p.slice(-5) == "-init") {
+          msg += "<<display \"" + p + "\">>";
+        }
+      }
+      msg += "<<endif>><<endnobr>>";
+    new Wikifier(place, msg);
+  },
+  init: function() { },
+  };
+} catch(e) {
+  throwError(place,"GetInit Setup Error: " + e.message);
+}

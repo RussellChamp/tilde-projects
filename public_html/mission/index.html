@@ -1,0 +1,15 @@
+<html>
+<head>
+<title>Secret Mission Name Generator</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+<script src="./js/lodash.js"></script>
+<script src="./js/mission.js"></script>
+</head>
+<body ng-app="MissionApp">
+<div ng-controller="MissionController as m">
+<label>Click for a super secret mission name:</label>
+  <input type="button" ng-click="name = m.getMissionName();" ng-init="name=''" value="Get Mission Name"/>
+  <div><h3><em>{{name}}</em><h3></div>
+</div>
+</body>
+</html>
