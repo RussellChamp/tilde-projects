@@ -10,7 +10,7 @@ Despite its omnious aura, you feel a strange impulse that compels you to [[enter
 [[The Portal|krowbar-ExaminePortal]] you stepped through is in a forest of [[tropical trees|krowbar-ExamineTrees]].
 The heat and humidity hit you in contrast to the cool, dry environment of the Hub.
 As you listen, you hear the sounds of gunfire and muffled explosions in the distance.
-There is [[a dirt path leading downward|krowbar-FollowPath1]].
+There is [[a beaten dirt path leading downward|krowbar-FollowPath1]].
 <<if $events["krowbar-PortalRestored"]>>[[Enter the portal|Start]]<<endif>>
 [[Player Profile|PlayerProfile]]
 
@@ -27,11 +27,9 @@ How curious!
 [[Return|previous()]]
 
 :: krowbar-FollowPath1 [inv]
-You are on a dirt path on a hill.
-[[The path up|krowbar-start]] leads to the Portal.
+You are on a dirt path on a hill that [[leads to the Portal|krowbar-start]].
 The path [[continues downward|krowbar-FollowPath2]].
-<<if not visited("krowbar-PressButton")>>You see a button on the ground
-[[Press Button|krowbar-PressButton]]<<endif>>
+<<if not visited("krowbar-PressButton")>>You see [[a button|krowbar-PressButton]] on the ground<<endif>>
 
 :: krowbar-PressButton
 After you press the button, you hear a 'click' and feel a thrum in the air.
@@ -50,14 +48,16 @@ This cottage appears to be made from the native trees.
 
 :: krowbar-EnterCottage [inv]
 There is a thick layer of dust on everything within the cottage. Very little light is able to make its way inward.
-<<if not visited("krowbar-CottageOpenWindows")>>The [[wooded window blinds|krowbar-CottageOpenWindows]] are closed.
-<<else>>The windows are now letting in enough light to let you see [[some cubbards|krowbar-CottageSearchCubbards]].
-<<endif>>
+<<if not $events["krowbar-cottageOpenWindows"]>>The [[window frames|krowbar-CottageOpenWindows]] have been boarded up.
+<<if not $items["crowbar"]>> If you had the right tool, you could probably remove them.
+<<else>>[[Open windows with crowbar|krowbar-CottageOpenWindows]]<<endif>>
+<<else>>The windows are now letting in enough light to let you see [[some cubbards|krowbar-CottageSearchCubbards]].<<endif>>
 [[Leave cottage|krowbar-FollowPath2]]
 
 :: krowbar-CottageOpenWindows
-After a few moments of effort, you manage to yank open the old blinds.
+After a few minutes of effort, you manage to use the crowbar to remove the boards from the windows.
 [[Return|previous()]]
+<<set $events["krowbar-cottageOpenWindows"] to true>>
 
 :: krowbar-CottageSearchCubbards
 <<if visited("krowbar-CottageSearchCubbards") lte 1>>

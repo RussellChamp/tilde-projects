@@ -206,3 +206,35 @@ try {
 } catch(e) {
   throwError(place,"GetInit Setup Error: " + e.message);
 }
+
+:: GetStarts [script]
+try {
+  version.extensions['GetStarts'] = {
+    major:0, minor:1, revision:0
+    };
+  macros['Starts'] =
+  {
+    handler: function(place, macroName, params, parser)
+    {
+      var msg = "";
+      for(var p in tale.passages) {
+        /%if(~tale.passages[p].tags.indexOf("init")) {%/
+        if(p.slice(-6) == "-start") {
+          if(tale.passages[p+"Description"]) {
+            console.log("Found " + p + "Description");
+            msg += "<<display \"" + p + "Description\">>";
+          }
+          else {
+            console.log("Found " + p);
+            msg += "[[" + p + "]]"
+          }
+          msg += "\n\n";
+        }
+      }
+    new Wikifier(place, msg);
+  },
+  init: function() { },
+  };
+} catch(e) {
+  throwError(place,"GetInit Setup Error: " + e.message);
+}

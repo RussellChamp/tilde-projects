@@ -20,7 +20,6 @@ Written by ~krowbar, managed by ~jumblesale
 * or items.
 :: NAME-start                  - the start page for your story
 :: NAME-startDescription       - an optional description for your story start
-  (~jumblesale todo)
 :: NAME-init                   - initialize any values for your story
 :: ITEM-itemDescription [item] - provide a description for your item
 
@@ -72,6 +71,13 @@ USERNAME.twee - contains all your core story passages
 macros.twee   - contains any macros and *-init passages you write
 items.twee    - contains *-itemDescription passages
               - optionally contains item getting passages
+* Prepend ALL your passage names with "USER-"
+  eg "krowbar-FollowPath"
+* Prepend ALL your events with "USER-"
+  eg $events["krowbar-PortalRestored"]
+* Remember that items and events can be checked before they are set!
+* You don't need to initialize everything beforehand
+eg You can check "<<If $events["krowbar-PortalRestored"] is true>>" before you set "<<set $events["krowbar-PortalRestored"] to true>>"
 
 ## Story-telling Guidelines ##
 * All stories should have a path that leads back to the Hub
