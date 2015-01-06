@@ -20,10 +20,20 @@ try {
         }
       for(var name in items) {
         if(!isNaN(parseFloat(items[name])) && isFinite(items[name])) {
-          msg += name + "(" + items[name] + "), ";
+          if(tale.passages[name+"-itemDescription"]) {
+            msg += "[["+name+"|"+name+"-itemDescription]](" + items[name] + "), ";
+          }
+          else {
+            msg += name + "(" + items[name] + "), ";
+          }
         }
         else if(items[name] != false) {
-          msg += name + ", ";
+          if(tale.passages[name+"-itemDescription"]) {
+            msg += "[["+name+"|"+name+"-itemDescription]], ";
+          }
+          else {
+            msg += name + ", ";
+          }
         }
       };
       new Wikifier(place, msg.slice(0,-2));
@@ -103,8 +113,35 @@ try {
   throwError(place,"PlayerSkills Setup Error: " + e.message);
 }
 
+:: GetPreviousNonItem [script]
+try {
+  version.extensions['PreviousNonItem'] = {
+    major:0, minor:1, revision:0
+    };
+  macros['PreviousNonItem'] =
+  {
+    handler: function(place, macroName, params, parser)
+    {
+      var msg = "";
+      for(var h in state.history) {
+        if(state.history[h].passage.title == "PlayerProfile" ||
+           state.history[h].passage.title.slice(-16) == "-itemDescription")
+           continue; //skip all the inventory items
+
+        msg += state.history[h].passage.title;
+        break; //we only want the first instance of a non-item passage
+
+      }
+    new Wikifier(place, "[[Return|" + msg + "]]");
+  },
+  init: function() { },
+  };
+} catch(e) {
+  throwError(place,"PreviousNonItem Setup Error: " + e.message);
+}
+
 :: PlayerProfile
-[[Return|previous()]]
+<<PreviousNonItem>>
 -~-~-~-~-~-
 <<display PlayerStats>>
 <<display PlayerSkills>>
@@ -124,6 +161,9 @@ postrender.tagInventory = function(place) {
   if(skills.id !== undefined && ~this.tags.indexOf("skills")) {
     new Wikifier(place, skills.processText());
   };
+  if(~this.tags.indexOf("item")) {
+    new Wikifier(place, "\n[[Return|previous()]]");
+  };
 }
 
 :: core-init
@@ -135,10 +175,7 @@ postrender.tagInventory = function(place) {
 <<set $stats['health_max'] to 10 >>
 <<set $stats['mana'] to 5 >>
 <<set $stats['mana_max'] to 5 >>
-<<set $stats['intelligence'] to 3 >>
-<<set $stats['strength'] to 1 >>
 <<set $skills = {} >>
-<<set $skills['adventuring'] = 2 >>
 <<set $items['gold'] to 0 >>
 <<endnobr>>
 
@@ -152,10 +189,13 @@ try {
     handler: function(place, macroName, params, parser)
     {
       var msg = "<<nobr>><<if visited(passage()) eq 1>>";
+      msg += "<<display \"core-init\">>"; //manually add core-init first
+      console.log("Initializing core-init");
       for(var p in tale.passages) {
         /%if(~tale.passages[p].tags.indexOf("init")) {%/
-        if(p.slice(-5) == "-init") {
+        if(p.slice(-5) == "-init" && p != "core-init") {
           msg += "<<display \"" + p + "\">>";
+          console.log("Initializing " + p);
         }
       }
       msg += "<<endif>><<endnobr>>";

@@ -1,0 +1,84 @@
+Tilde.town shared Twine story guidelines
+Written by ~krowbar, managed by ~jumblesale
+
+## Reserved Passages ##
+* These passages are reserved for use by the core shared system
+:: Start            - Acts as the core hub
+:: core-init        - Initializes core variables
+:: GetInit          - Provides the <<Init>> macro used by core
+:: Inventory        - Displays the player inventory
+:: ShowInventory    - Provides the <<Inventory>> macro
+:: PlayerStats      - Displays the player stats
+:: ShowPlayerStats  - Provides the <<PlayerStats>> macro
+:: PlayerSkills     - Displays the player skills
+:: ShowPlayerSkills - Provides the <<PlayerSkills>> macro
+:: PlayerProfile    - Displays player stats, skills, and inventory
+:: postrender       - adds macros to tagged passages
+
+## Magic Passages ##
+* Some passages are automatically used to display information about your story
+* or items.
+:: NAME-start                  - the start page for your story
+:: NAME-startDescription       - an optional description for your story start
+  (~jumblesale todo)
+:: NAME-init                   - initialize any values for your story
+:: ITEM-itemDescription [item] - provide a description for your item
+
+## Magic Tags ##
+* Some tags have been set up to provide story writers with quick access to
+* certain features
+[inv]           - will show ":: Inventory" at the bottom of the passage
+[stats]         - will show ":: PlayerStats" at the bottom of the passage
+[skills]        - will show ":: PlayerSkills" at the bottom of the passage
+[playerProfile] - will show ":: PlayerProfile" at the bottom of the passage
+[item]          - will append a "[[Return|previous()]]" to the passage
+
+
+## The Player ##
+* Global objects are provided for $items, $events, $stats, and $skills that any
+  story can reference or modify
+
+## Player Inventory ##
+* The player has a global inventory of items that can be accessed in any story
+* One way to pick up an item is to use <<action "Get {item}">>
+* To check if a player has already retrieved an item, either check the
+* $items['ITEM'] value or check "visited("Get NAME")"
+* An item can be added to the global items hash with the following
+  $items['ITEM'] = VALUE
+* A unique item, like "gearbox" or "sword", will have VALUE of true
+* When a unique items is used up or destroyed, set its value to false
+* Generic items that the player can have many of, like "gold" or "smallKey",
+  will have a numerical value
+
+## Player Stats and Skills ##
+* Are persistant between stories
+* Are stored as
+  $stat['STAT'] = VALUE
+  $skill['SKILL'] = VALUE
+* Skills and stats can be modified by events.
+* eg "You eat the cake and feel much stronger! Strength increased to
+ <<$stat['strength'] += 2>>!"
+* Skills checks can be made by checking the value against your threshold
+* eg "<<if $skill['archery'] gt 3>>You hit the target!<<endif>>"
+
+## The Hub ##
+* Has links to all user stories
+* Should heal the player (~jumblesale todo)
+* Should be able to tell the player their stats/skills (~jumblesale todo)
+
+## General Guidelines ##
+* It is recomended (but not mandatory) to have separate .twee files
+USERNAME.twee - contains all your core story passages
+macros.twee   - contains any macros and *-init passages you write
+items.twee    - contains *-itemDescription passages
+              - optionally contains item getting passages
+
+## Story-telling Guidelines ##
+* All stories should have a path that leads back to the Hub
+** This path does not have to be made immediately upon entering, but should become available fairly soon
+* Stories can NOT kill the player
+** Alternately, we could allow player death to 'port them to the Hub
+* Stories should not cause the player to lose or use up global objects that
+* were not acquired in that story
+** An exception to this could be gold or money
+* Should not decrease a stat or skill

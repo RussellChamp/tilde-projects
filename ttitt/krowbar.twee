@@ -1,5 +1,75 @@
+:: krowbar-init [init]
+<<set $items['crowbar'] to true>>
+<<set $skills['adventuring'] to 1>>
+
+:: krowbar-startDescription
+Set in the wall, you see a large portal, twice your height, shining with a malevolent, pulsating, purple glow.
+Despite its omnious aura, you feel a strange impulse that compels you to [[enter the portal|krowbar-start]].
+
 :: krowbar-start [start inv]
-<<Init>>
+[[The Portal|krowbar-ExaminePortal]] you stepped through is in a forest of [[tropical trees|krowbar-ExamineTrees]].
+The heat and humidity hit you in contrast to the cool, dry environment of the Hub.
+As you listen, you hear the sounds of gunfire and muffled explosions in the distance.
+There is [[a dirt path leading downward|krowbar-FollowPath1]].
+<<if $events["krowbar-PortalRestored"]>>[[Enter the portal|Start]]<<endif>>
+[[Player Profile|PlayerProfile]]
+
+:: krowbar-ExaminePortal
+<<if $events["krowbar-PortalRestored"]>>The portal is now the same purple color as when you first entered
+<<else>>You examine the portal and note that it has lost the swirling purple luster that it had when you first came through.
+<<endif>>
+[[Return|previous()]]
+
+:: krowbar-ExamineTrees
+Upon closer examination, you find that these trees have strange orange bark and blue-tinted leaves.
+You also notice small burn pock-marks on several of the trees.
+How curious!
+[[Return|previous()]]
+
+:: krowbar-FollowPath1 [inv]
+You are on a dirt path on a hill.
+[[The path up|krowbar-start]] leads to the Portal.
+The path [[continues downward|krowbar-FollowPath2]].
+<<if not visited("krowbar-PressButton")>>You see a button on the ground
+[[Press Button|krowbar-PressButton]]<<endif>>
+
+:: krowbar-PressButton
+After you press the button, you hear a 'click' and feel a thrum in the air.
+[[Return|previous()]]
+<<set $events["krowbar-PortalRestored"] to true>>
+
+:: krowbar-FollowPath2 [inv]
+You find yourself in a small clearing. In the center, you see [[a small, thatched-roof cottage|krowbar-EnterCottage]].
+You see three dirt paths. One [[leads upwards|krowbar-FollowPath1]], one leads [[toward a lake|krowbar-FollowPath3]], and one leads [[toward rubble|krowbar-FollowPath4]]
+[[Examine cottage|krowbar-ExamineCottage]]
+
+:: krowbar-ExamineCottage
+This cottage appears to be made from the native trees.
+[[Enter cottage|krowbar-EnterCottage]]
+[[Return|previous()]]
+
+:: krowbar-EnterCottage [inv]
+There is a thick layer of dust on everything within the cottage. Very little light is able to make its way inward.
+<<if not visited("krowbar-CottageOpenWindows")>>The [[wooded window blinds|krowbar-CottageOpenWindows]] are closed.
+<<else>>The windows are now letting in enough light to let you see [[some cubbards|krowbar-CottageSearchCubbards]].
+<<endif>>
+[[Leave cottage|krowbar-FollowPath2]]
+
+:: krowbar-CottageOpenWindows
+After a few moments of effort, you manage to yank open the old blinds.
+[[Return|previous()]]
+
+:: krowbar-CottageSearchCubbards
+<<if visited("krowbar-CottageSearchCubbards") lte 1>>
+After rummaging around the cubbards, you find a rusty cleaver and <<$krowbar_temp1 to random(2,5)>> coins.
+[[Return|previous()]]
+<<set $items['cleaver'] to true>>
+<<set $items['gold'] += $krowbar_temp1>>
+<<else>>You don't find anything else of value in the cubbards.
+[[Return|previous()]]
+<<endif>>
+
+:: oldstart
 <<if visited("krowbar-start") is 1>>Welcome to the adventure!<<endif>>
 There is a sealed door on the wall.
 <<if not visited("Get McGuffin")>>You see a McGuffin<br><<endif>>\
