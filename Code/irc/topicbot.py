@@ -118,7 +118,7 @@ def topic_history(channel, user, count):
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
-  ircsock.send("USER "+ botnick +" "+ botnick +" "+ botnick +" :This bot is a result of a tutoral covered on http://shellium.org/wiki.\n") # user authentication
+  ircsock.send("USER "+ botnick +" "+ botnick +" "+ botnick +" :krowbar\n") # user authentication
   ircsock.send("NICK "+ botnick +"\n")
 
   joinchan(channel)

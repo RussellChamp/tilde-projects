@@ -1,5 +1,11 @@
 :: cleaver-itemDescription [item]
-This is a rusty old cleaver. It won't help you in a fight, but it could be useful
+''a cleaver''
+//This is a rusty old cleaver. It won't help you in a fight, but it could be useful//
 
 :: crowbar-itemDescription [item]
-It feels like this crowbar has a history behind it...
+''a crowbar''
+//It feels like this crowbar has a history behind it...//
+
+:: glowing rock-itemDescription [item]
+''a glowing, orange rock''
+//This rock glows with magical energies. You wonder what purpose it could serve//

@@ -200,6 +200,10 @@ try {
       }
       msg += "<<endif>><<endnobr>>";
     new Wikifier(place, msg);
+      console.log("$items contains " + Object.keys(state.history[0].variables.items).length + " object(s)");
+      console.log("$events contains " + Object.keys(state.history[0].variables.events).length + " object(s)");
+      console.log("$stats contains " + Object.keys(state.history[0].variables.stats).length + " object(s)");
+      console.log("$skills contains " + Object.keys(state.history[0].variables.skills).length + " object(s)");
   },
   init: function() { },
   };

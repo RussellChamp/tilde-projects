@@ -1,6 +1,10 @@
 Tilde.town shared Twine story guidelines
 Written by ~krowbar, managed by ~jumblesale
 
+## Building the story
+* Run the following script to collect and build the twine story
+* ~jumblesale/twine/build.py
+
 ## Reserved Passages ##
 * These passages are reserved for use by the core shared system
 :: Start            - Acts as the core hub
@@ -31,7 +35,6 @@ Written by ~krowbar, managed by ~jumblesale
 [skills]        - will show ":: PlayerSkills" at the bottom of the passage
 [playerProfile] - will show ":: PlayerProfile" at the bottom of the passage
 [item]          - will append a "[[Return|previous()]]" to the passage
-
 
 ## The Player ##
 * Global objects are provided for $items, $events, $stats, and $skills that any

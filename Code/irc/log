@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "./topicbot.py", line 187, in <module>
+    listen()
+  File "./topicbot.py", line 161, in listen
+    get_topic(channel, user, time)
+  File "./topicbot.py", line 61, in get_topic
+    with open("topics_" + channel + ".txt", "r") as topics:
+IOError: [Errno 2] No such file or directory: 'topics_topicbot.txt'
