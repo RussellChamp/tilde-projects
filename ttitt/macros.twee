@@ -97,13 +97,13 @@ try {
     handler: function(place, macroName, params, parser)
     {
       var msg = "";
-      var stats = state.history[0].variables.skills;
-      if (stats == undefined) {
+      var skills = state.history[0].variables.skills;
+      if (skills == undefined) {
         new Wikifier(place, "no skills");
         return;
       }
-      for(var stat in stats) {
-        msg += stat + ": " + stats[stat]+"<br>";
+      for(var skill in skills) {
+        msg += skill + ": " + skills[skill]+"<br>";
       }
     new Wikifier(place, msg);
   },
@@ -226,13 +226,14 @@ try {
         if(p.slice(-6) == "-start") {
           if(tale.passages[p+"Description"]) {
             console.log("Found " + p + "Description");
+            msg += "==== ~" + p.slice(0, -6) + " start~ ====\n";
             msg += "<<display \"" + p + "Description\">>";
           }
           else {
             console.log("Found " + p);
             msg += "[[" + p + "]]"
           }
-          msg += "\n\n";
+          msg += "\n----\n";
         }
       }
     new Wikifier(place, msg);

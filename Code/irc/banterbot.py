@@ -52,20 +52,25 @@ def score_banter(channel, user, messageText):
                 if re.sub('[^a-z0-9]+','',word.lower()) == bword[0]:
                     score += int(bword[1])
 
-    score += messageText.count('!') * 2
-    score += messageText.count('#') * 3
+    score += messageText.count('!') * 2   #hype is banter
+    score -= messageText.count('!!!') * 6 #too much hype is not banter
+    score += messageText.count('#') * 3   #hashs are mad bantz
+    score -= messageText.count('##') * 6  #but too many is garbage
 
+    names = ['mate', 'lad', 'my best boy']
+    compliment = ['top-drawer', 'top-shelf', 'bangin\'', 'legendary', 'smashing', 'incredible', 'impeccable', 'stunning']
 
-    score = score * 100 / len(messageText)
     msg = ""
     if score > 100:
-        msg = "Top drawer, mate! That was some #banter! You earned a " + str(score)
+        msg = "Truely " + random.choice(compliment).capitalize() + ", " + random.choice(names) \
+                + "! That was some #banter! You earned a " + str(score) + " for that!"
     elif score > 50:
-        msg = "Bangin' #banter! You got a " + str(score)
+        msg = random.choice(compliment).capitalize() + " #banter! You get a " + str(score) + " from me!"
     elif score > 10:
-        msg = "Acceptible #banter. You get a " + str(score)
+        msg = random.choice(["acceptible", "reasonable", "passable"]).capitalize() + " #banter. You get a " + str(score)
     else:
-        msg = "That was hardly #banter. You get a " + str(score) + ". Maybe try again?"
+        msg = "That " + random.choice(["was hardly", "was barely", "wasn't", "won't pass for", "was awful"]) \
+                + " #banter" + random.choice([", lad",", lah",", boy","",""]) + ". I'll give you a " + str(score) + ". Maybe try again?"
 
     ircsock.send("PRIVMSG " + channel + " :" + msg + "\n")
 

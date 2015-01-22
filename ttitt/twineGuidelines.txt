@@ -33,7 +33,6 @@ Written by ~krowbar, managed by ~jumblesale
 [inv]           - will show ":: Inventory" at the bottom of the passage
 [stats]         - will show ":: PlayerStats" at the bottom of the passage
 [skills]        - will show ":: PlayerSkills" at the bottom of the passage
-[playerProfile] - will show ":: PlayerProfile" at the bottom of the passage
 [item]          - will append a "[[Return|previous()]]" to the passage
 
 ## The Player ##

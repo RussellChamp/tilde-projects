@@ -1,8 +1,9 @@
+banterville|20
 lah|20
 boys|5
-boyz|-20
-b8|-10
-g8|-10
+boyz|-10
+b8|-5
+g8|-5
 bantamino|15
 banter|-5
 bantz|-5
@@ -40,3 +41,4 @@ great|5
 legendary|15
 minge|4
 listen|2
+the|1
