@@ -76,18 +76,31 @@ def score_banter(channel, user, messageText):
 
 def get_new_banter(channel, user):
     with open("/usr/share/dict/words", "r") as dict:
-        words = filter(lambda word:re.search(r"ant", word), dict.readlines())
-        words = filter(lambda word:re.search(r"^[^']*$", word), words)
-        random.shuffle(words)
-        word = words[0].strip("\n")
-        start = word.find('ant')
-        if(start == 0):
-            word = 'b' + word
-        else:
-            if('aeiou'.find(word[start]) > -1): #just append a 'b'
-                word = word[:start] + 'b' + word[start:]
-            else: #replace the letter with 'b'
-                word = word[:start-1] + 'b' + word[start:]
+        words = filter(lambda word:re.search(r"^[^']*$", word), dict.readlines())
+        if(random.randint(0,1)): #look for *ant words
+            words = filter(lambda word:re.search(r"ant", word), words)
+            random.shuffle(words)
+            word = words[0].strip("\n")
+            start = word.find('ant')
+            if(start == 0):
+                word = 'b' + word
+            else:
+                if('aeiou'.find(word[start]) > -1): #just append a 'b'
+                    word = word[:start] + 'b' + word[start:]
+                else: #replace the letter with 'b'
+                    word = word[:start-1] + 'b' + word[start:]
+        else: #look for ban* words
+            words = filter(lambda word:re.search(r"ban", word), words)
+            random.shuffle(words)
+            word = words[0].strip("\n")
+            end = word.find('ban') + 3
+            if(end == len(word)):
+                word = word + 't'
+            else:
+                if('aeiou'.find(word[end]) > -1): #just append 't'
+                    word = word[:end] + 't' + word[end:]
+                else: #replace the letter with 'b'
+                    word = word[:end] + 't' + word[end+1:]
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Here, why don't you try '" + word + "'?\n")
 
 def rollcall(channel):
