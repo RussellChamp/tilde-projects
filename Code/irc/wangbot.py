@@ -30,9 +30,9 @@ parser.add_option("-n", "--nick", dest="nick", default='numberwang_bot',
 (options, args) = parser.parse_args()
 
 p = inflect.engine()
-LIMIT_GUESSING = True
-MIN_ROUNDS = 2
-MAX_ROUNDS = 4
+LIMIT_GUESSING = False
+MIN_ROUNDS = 5
+MAX_ROUNDS = 12
 SCORE_FILE = "numberwangscores.txt"
 SHOW_TOP_NUM = 5
 
@@ -154,17 +154,18 @@ def save_scores():
         scores = scorefile.readlines()
         scorefile.seek(0)
         scorefile.truncate()
-        for name in currentScores:
-            found = False
-            for line in scores:
+        for line in scores:
+            for name in currentScores:
                 score = line.strip("\n").split("&^%")
                 if(score[0] == name):
-                    found = True
                     line = score[0] + "&^%" + str(int(score[1]) + currentScores[name]) + "\n"
-                scorefile.write(line)
-            if(not found):
-                line = name + "&^%" + str(currentScores[name]) + "\n"
-                scorefile.write(line)
+                    currentScores.remove(name)
+                    break
+            scorefile.write(line)
+
+        for name in currentScores: #new wangers
+            line = name + "&^%" + str(currentScores[name]) + "\n"
+            scorefile.write(line)
 
 def show_highscores(channel):
     with open(SCORE_FILE, "r") as scorefile:

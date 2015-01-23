@@ -74,8 +74,24 @@ def score_banter(channel, user, messageText):
 
     ircsock.send("PRIVMSG " + channel + " :" + msg + "\n")
 
+def get_new_banter(channel, user):
+    with open("/usr/share/dict/words", "r") as dict:
+        words = filter(lambda word:re.search(r"ant", word), dict.readlines())
+        words = filter(lambda word:re.search(r"^[^']*$", word), words)
+        random.shuffle(words)
+        word = words[0].strip("\n")
+        start = word.find('ant')
+        if(start == 0):
+            word = 'b' + word
+        else:
+            if('aeiou'.find(word[start]) > -1): #just append a 'b'
+                word = word[:start] + 'b' + word[start:]
+            else: #replace the letter with 'b'
+                word = word[:start-1] + 'b' + word[start:]
+        ircsock.send("PRIVMSG " + channel + " :" + user + ": Here, why don't you try '" + word + "'?\n")
+
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel!\n")
+  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter\n")
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
@@ -117,6 +133,9 @@ def listen():
 
     if ircmsg.find("#banter") != -1 or ircmsg.find("#bantz") != -1:
         score_banter(channel, user, messageText)
+
+    if ircmsg.find(":!newbanter") != -1:
+        get_new_banter(channel, user)
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)
