@@ -55,7 +55,7 @@ There is a thick layer of dust on everything within the cottage. Very little lig
 <<if not $events["krowbar-cottageOpenWindows"]>>The [[window frames|krowbar-CottageOpenWindows]] have been boarded up.
 <<if not $items["crowbar"]>> If you had the right tool, you could probably remove them.
 <<else>>[[Open windows with crowbar|krowbar-CottageOpenWindows]]<<endif>>
-<<else>>The windows are now letting in enough light to let you see [[some cubbards|krowbar-CottageSearchCubbards]].<<endif>>
+<<else>>The windows are now letting in enough light to let you see [[some cupboards|krowbar-CottageSearchcupboards]].<<endif>>
 [[Leave cottage|krowbar-FollowPath2]]
 
 :: krowbar-CottageOpenWindows
@@ -63,13 +63,13 @@ After a few minutes of effort, you manage to use the crowbar to remove the board
 [[Return|previous()]]
 <<set $events["krowbar-cottageOpenWindows"] to true>>
 
-:: krowbar-CottageSearchCubbards
-<<if visited("krowbar-CottageSearchCubbards") lte 1>>
-After rummaging around the cubbards, you find a rusty cleaver and <<$krowbar_temp1 to random(2,5)>> coins.
+:: krowbar-CottageSearchCupboards
+<<if visited("krowbar-CottageSearchCupboards") lte 1>>
+After rummaging around the cupboards, you find a rusty cleaver and <<$krowbar_temp1 to random(2,5)>> coins.
 [[Return|previous()]]
 <<set $items['cleaver'] to true>>
 <<set $items['gold'] += $krowbar_temp1>>
-<<else>>You don't find anything else of value in the cubbards.
+<<else>>You don't find anything else of value in the cupboards.
 [[Return|previous()]]
 <<endif>>
 

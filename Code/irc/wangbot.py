@@ -35,6 +35,7 @@ MIN_ROUNDS = 5
 MAX_ROUNDS = 12
 SCORE_FILE = "numberwangscores.txt"
 SHOW_TOP_NUM = 5
+GOOD_CHAN = "#bots"
 
 roundsLeft = 0
 bonusRound = 0
@@ -68,6 +69,10 @@ def hello():
   ircsock.send("PRIVMSG "+ channel +" :Hello!\n")
 
 def start_numberwang(channel, user):
+    if(channel != "#bots"):
+        ircsock.send("PRIVMSG " + channel + " :Numberwang has been disabled for " + channel + " due to spamminess. Please join " + GOOD_CHAN + " to start a game.\n")
+        return
+
     print user + " started a game"
     resetGlobals()
     ircsock.send("PRIVMSG " + channel + " :It's time for Numberwang!\n")
@@ -190,29 +195,6 @@ def show_user_score(channel, user):
         #if we don't find a score line
         ircsock.send("PRIVMSG " + channel + " :" + user + ": You haven't scored any points yet!\n")
 
-def give_tilde(channel, user, time):
-    found = False
-    with open("tildescores.txt", "r+") as scorefile:
-        scores = scorefile.readlines()
-        scorefile.seek(0)
-        scorefile.truncate()
-        for score in scores:
-            person = score.strip("\n").split("&^%")
-            if(person[0] == user):
-                found = True
-                if(too_recent(time, person[2])):
-                    ircsock.send("PRIVMSG " + channel + " :You have asked for a tilde too recently. Try again later.\n")
-                else:
-                    prize = get_prize(user)
-                    score = person[0] + "&^%" + str(int(person[1]) + prize[0]) + "&^%" + time + "\n"
-                    ircsock.send("PRIVMSG " + channel + " :" + prize[1] + "\n")
-            scorefile.write(score)
-        if(not found):
-            prize = get_prize(user)
-            ircsock.send("PRIVMSG " + channel + " :Welcome to the tilde game! Here's " + p.number_to_words(prize[0]+1) + " free tilde(s) to start you off.\n")
-            scorefile.write(user + "&^%" + str(prize[0]+1) + "&^%" + time + "\n")
-
-
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :Is it time for Numberwang? It might be! Start a new game with !numberwang or stop a current game with !wangernumb Get your score with !myscore and the list of top wangers with !topwangers\n")
 
@@ -222,6 +204,7 @@ def connect(server, channel, botnick):
   ircsock.send("NICK "+ botnick +"\n")
 
   joinchan(channel)
+  joinchan(GOOD_CHAN)
 
 def get_user_from_message(msg):
   try:
@@ -256,10 +239,13 @@ def listen():
 
     if ircmsg.find(":!numberwang") != -1 and roundsLeft == 0:
         start_numberwang(channel, user)
-    if ircmsg.find(":!wangernumb") != -1 and roundsLeft > 0:
-        stop_numberwang(channel, user)
-    if roundsLeft > 0:
-        guess_numberwang(channel, user, messageText)
+
+    if channel == GOOD_CHAN:
+        if ircmsg.find(":!wangernumb") != -1 and roundsLeft > 0:
+            stop_numberwang(channel, user)
+        if roundsLeft > 0:
+            guess_numberwang(channel, user, messageText)
+
     if ircmsg.find(":!topwangers") != -1:
         show_highscores(channel)
     if ircmsg.find(":!myscore") != -1:
