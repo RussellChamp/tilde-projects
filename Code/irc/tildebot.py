@@ -27,6 +27,10 @@ parser.add_option("-n", "--nick", dest="nick", default='tildebot',
 (options, args) = parser.parse_args()
 
 p = inflect.engine()
+SCORE_FILE = "tildescores.txt"
+JACKPOT_FILE = "tildejackpot.txt"
+JACKPOT_MIN = 3
+DEBUG = False
 
 def ping():
   ircsock.send("PONG :pingis\n")
@@ -47,16 +51,34 @@ def too_recent(time1, time2):
         return False
 
 def get_prize(user):
-    if(random.randint(1,10) > 2):
+    if(random.randint(1,10) > 2): #80% of the time it's a normal prize
         prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * 1
         prize = random.choice(prizes)
         return [prize, user + " is " + ("super " if prize > 4 else "really " if prize > 2 else "") + "cool and gets " + p.number_to_words(prize) + " tildes!"]
-    else:
-        return [0, user + " is a meanie and gets no tildes!"]
+    else: #20% of the time its a jackpot situation
+        with open(JACKPOT_FILE, "r+") as jackpotfile:
+            jackpot = int(jackpotfile.readline().strip("\n"))
+            jackpotfile.seek(0)
+            jackpotfile.truncate()
+            if(random.randint(1,10) > 1): #90% of the time it's a non-prize
+                new_jackpot = jackpot+1
+                jackpotfile.write(str(new_jackpot)) #increase the jackpot by 1
+                return [0, user + " is a meanie and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
+            else: #hit jackpot!
+                jackpotfile.write(str(JACKPOT_MIN))
+                return [jackpot, user + " hit the jackpot and got " + p.number_to_words(jackpot) + " tildes!"]
+
+def show_jackpot(channel):
+    with open(JACKPOT_FILE, "r") as jackpotfile:
+        jackpot = int(jackpotfile.readlines().strip("\n"))
+        ircsock.send("PRiVMSG " + channel + " :The jackpot is currently " + p.number_to_words(jackpot) + " tildes!\n")
 
 def give_tilde(channel, user, time):
+    if(channel != "#bots" and not DEBUG):
+        ircsock.send("PRIVMSG " + channel + " :" + user + " is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**\n")
+        return
     found = False
-    with open("tildescores.txt", "r+") as scorefile:
+    with open(SCORE_FILE, "r+") as scorefile:
         scores = scorefile.readlines()
         scorefile.seek(0)
         scorefile.truncate()
@@ -64,7 +86,7 @@ def give_tilde(channel, user, time):
             person = score.strip("\n").split("&^%")
             if(person[0] == user):
                 found = True
-                if(too_recent(time, person[2])):
+                if(too_recent(time, person[2]) and not DEBUG):
                     ircsock.send("PRIVMSG " + channel + " :You have asked for a tilde too recently. Try again later.\n")
                 else:
                     prize = get_prize(user)
@@ -77,7 +99,7 @@ def give_tilde(channel, user, time):
             scorefile.write(user + "&^%" + str(prize[0]+1) + "&^%" + time + "\n")
 
 def show_tildescore(channel, user):
-    with open("tildescores.txt", "r") as scorefile:
+    with open(SCORE_FILE, "r") as scorefile:
         for idx,score in enumerate(scorefile):
             person = score.strip("\n").split("&^%")
             if(person[0] == user):
@@ -95,6 +117,7 @@ def connect(server, channel, botnick):
   ircsock.send("NICK "+ botnick +"\n")
 
   joinchan(channel)
+  joinchan("#bots")
 
 def get_user_from_message(msg):
   try:
@@ -131,6 +154,9 @@ def listen():
         show_tildescore(channel, user)
     elif ircmsg.find(":!tilde") != -1:
         give_tilde(channel, user, time)
+
+    if ircmsg.find(":!jackpot") != -1:
+        show_jackpot(channel)
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)
