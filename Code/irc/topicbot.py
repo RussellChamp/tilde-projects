@@ -93,10 +93,10 @@ def random_topic(channel, user, time):
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :topicbot reporting! I respond to !topic !settopic !randomtopic !thistory\n")
 
-def topic_score():
+def topic_score(channel):
     ircsock.send("PRIVMSG "+ channel +" :Not implemented yet")
 
-def topic_scores():
+def topic_scores(channel):
     ircsock.send("PRIVMSG "+ channel +" :Not implemented yet")
 
 def topic_history(channel, user, count):
@@ -122,6 +122,7 @@ def connect(server, channel, botnick):
   ircsock.send("NICK "+ botnick +"\n")
 
   joinchan(channel)
+  joinchan("#bots")
 
 def get_user_from_message(msg):
   try:
@@ -164,9 +165,9 @@ def listen():
       set_topic(channel, user, time, messageText[10:])
 
     if ircmsg.find(":!tscores") != -1:
-      topic_scores()
+      topic_scores(channel)
     elif ircmsg.find(":!tscores") != -1:
-      topic_score()
+      topic_score(channel)
 
     if ircmsg.find(":!randomtopic") != -1:
       random_topic(channel, user, time)
