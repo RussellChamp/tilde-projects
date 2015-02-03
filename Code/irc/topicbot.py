@@ -102,7 +102,7 @@ def topic_scores(channel):
 def topic_history(channel, user, count):
   try:
     iCount = int(count.split()[1])
-  except ValueError:
+  except (ValueError, IndexError) as e:
     iCount = 3
   if(iCount > 10):
     iCount = 10
