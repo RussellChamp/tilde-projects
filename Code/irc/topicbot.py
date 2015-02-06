@@ -55,7 +55,7 @@ def get_topic(channel, user, time):
         scores[idx] = data[0] + "&^%" + str(userscore) + "&^%" + data[2] + "\n"
     scorefile.writelines(scores)
     if(not found):
-      scorefile.write(user + "&^%1&^%0")
+      scorefile.write(user + "&^%1&^%0\n")
 
 
   with open("topics_" + channel + ".txt", "r") as topics:

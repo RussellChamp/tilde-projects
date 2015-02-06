@@ -1,11 +1,24 @@
 :: cleaver-itemDescription [item]
 ''a cleaver''
-//This is a rusty old cleaver. It won't help you in a fight, but it could be useful//
+//This is a rusty old cleaver. It won't help in a fight, but it could be useful//
 
 :: crowbar-itemDescription [item]
 ''a crowbar''
 //It feels like this crowbar has a history behind it...//
 
 :: glowing rock-itemDescription [item]
-''a glowing, orange rock''
-//This rock glows with magical energies. You wonder what purpose it could serve//
+''a glowing, orange stone''
+//This stone glows with magical energies.//
+<<if $skills["runecraft"] gt 0>>//Runecraft: This is a rune of power<<else>>//What purpose could it serve?//<<endif>>
+
+:: tshirt-itemDescription [item]
+''a ratty t-shirt''
+//This shirt is worn and old. The image on it can no longer be made out.//
+
+:: leaves-itemDescription [item]
+''blue-tinted leaves''
+//These leaves have a blue tint and a slightly oily feel//
+
+:: device-itemDescription [item]
+''an old electronic device''
+//There are several switches and levers on this device and what looks like a speaker//

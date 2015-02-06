@@ -68,6 +68,9 @@ try {
         if(stat.slice(-4) == "_max") {
           continue;
         }
+        if(stats[stat+"_max"] != undefined && stats[stat+"_max"] == 0) {
+          continue;
+        }
         msg += stat + ": " + stats[stat];
         if(stats[stat+"_max"] != undefined) {
           msg += " / " + stats[stat+"_max"];
@@ -103,7 +106,9 @@ try {
         return;
       }
       for(var skill in skills) {
-        msg += skill + ": " + skills[skill]+"<br>";
+        if(skills[skill] > 0) {
+          msg += skill + ": " + skills[skill]+"<br>";
+        }
       }
     new Wikifier(place, msg);
   },
@@ -173,8 +178,8 @@ postrender.tagInventory = function(place) {
 <<set $stats = {} >>
 <<set $stats['health'] to 10 >>
 <<set $stats['health_max'] to 10 >>
-<<set $stats['mana'] to 5 >>
-<<set $stats['mana_max'] to 5 >>
+<<set $stats['mana'] to 0 >>
+<<set $stats['mana_max'] to 0 >>
 <<set $skills = {} >>
 <<set $items['gold'] to 0 >>
 <<endnobr>>

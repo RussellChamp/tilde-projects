@@ -66,11 +66,11 @@ def get_prize(user):
                 return [0, user + " is a meanie and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
             else: #hit jackpot!
                 jackpotfile.write(str(JACKPOT_MIN))
-                return [jackpot, user + " hit the jackpot and got " + p.number_to_words(jackpot) + " tildes!"]
+                return [jackpot, user + " hit the jackpot and won **" + p.number_to_words(jackpot) + " tildes!**"]
 
 def show_jackpot(channel):
     with open(JACKPOT_FILE, "r") as jackpotfile:
-        jackpot = int(jackpotfile.readlines().strip("\n"))
+        jackpot = int(jackpotfile.readline().strip("\n"))
         ircsock.send("PRiVMSG " + channel + " :The jackpot is currently " + p.number_to_words(jackpot) + " tildes!\n")
 
 def give_tilde(channel, user, time):

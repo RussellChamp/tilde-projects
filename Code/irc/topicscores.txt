@@ -1,5 +1,12 @@
-krowbar&^%21&^%24
+krowbar&^%21&^%25
 um&^%11&^%8
 kc&^%0&^%22
 marcus&^%4&^%1
-khoi&^%1&^%0karlen&^%0&^%1karlen&^%0&^%1jumblesale&^%1&^%0karlen&^%0&^%1karlen&^%0&^%1karlen&^%0&^%1dan&^%1&^%0datagrok&^%0&^%1vilmibm&^%0&^%1papa&^%1&^%0vilmibm&^%1&^%0vilmibm&^%0&^%1jumblesale&^%1&^%0selfsame&^%1&^%0karlen&^%0&^%1jumblesale&^%0&^%1karlen&^%0&^%1vilmibm&^%0&^%1vilmibm&^%0&^%1vilmibm&^%0&^%1jumblesale&^%1&^%0vilmibm&^%0&^%1
+khoi&^%1&^%0
+karlen&^%0&^%7
+jumblesale&^%3&^%2
+dan&^%1&^%0
+datagrok&^%0&^%1
+papa&^%1&^%0
+vilmibm&^%1&^%8
+selfsame&^%1&^%0

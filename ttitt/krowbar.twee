@@ -1,48 +1,76 @@
 :: krowbar-init [init]
-<<set $items['crowbar'] to true>>
+/%<<set $items['crowbar'] to true>>%/
+<<set $items['tshirt'] to true>>
 <<set $skills['adventuring'] to 1>>
+<<set $skills['runecraft'] to 0>>
 
 :: krowbar-startDescription
-Set in the stone floor, you see a large pool of water, twice your height wide, rippling with a malevolent, purple glow. Thin, flowing tendrils reach out of the portal, embrasing the narrow, steel frame around its edge. Small rocks, glowing orange, blue, and green circle the pool and gently bob up and down in the air. Despite its omnious aura, you feel a strange impulse that compels you to [[enter the pool|krowbar-start]].
+Rippling with a malevolent, purple glow, a ''large pool of water'', twice your height wide, sits in the stone floor.  Writhing, languid tendrils breach the surface and embrace its border yet do not go beyond the narrow, steel band set around its edge. Pulsing with energy and gently bobbing up and down in the air, ''several runes''- orange, blue, and green- engraved on smooth elipsoid stones circle the pool. Whispers, gently, tenderly tugging at the mind, collude with adventurous impulses; they encourage drawing near, despite the ominous aura. Several stone slabs [[descend into the pool|krowbar-start]]
 
 :: krowbar-start [start inv]
-[[The pool|krowbar-ExaminePortal]] you emerged from is in a forest of [[tropical trees|krowbar-ExamineTrees]].
-The heat and humidity hit you in contrast to the cool, dry environment of the Hub. As you listen, you hear the sounds of gunfire and muffled explosions in the distance.
-There is [[a beaten dirt path leading downward|krowbar-FollowPath1]].
+<<if previous() == "Start">>A blaze of flashing lights blur past, engulfing reality; all senses simultaneously stretched and melded in painful euphoria. A year or a second pass by while blinking becomes impossible.<<endif>>
+[[The pool|krowbar-ExaminePortal]] emerges into a ''forest'' of [[tropical trees|krowbar-ExamineTrees]].
+The heat and humidity of the forest is exaggerated in contrast to the cool, dry environment of the Hub. The sounds of ''gunfire'' and muffled explosions can be heard in the distance.
+A wide, ''dirt road'' leads [[downward|krowbar-FollowPath1]].
 <<if $events["krowbar-PortalRestored"]>>[[Step into the pool|Start]]<<endif>>
 <<if $items["glowing rock"]>>[[Place glowing rock in pool crevice|krowbar-PlaceRock]]<<endif>>
 [[Player Profile|PlayerProfile]]
 
 :: krowbar-ExaminePortal
-<<if $events["krowbar-PortalRestored"]>>The pool has now the same purple sheen as when you first entered.
-<<else>>You examine the pool and note that there are several locations around its edge that appear to be missing glowing rocks.
+This ''pool'' looks similar to the one found in the Hub.
+<<if $events["krowbar-PortalRestored"]>>With ''restored energy'', it now has the same purple sheen.
+<<else>>However, there are several locations around the edge of the pool that appear to be ''missing runes''. The rest glow dully; the water looks mundane and slightly dirty.
 <<endif>>
 [[Return|previous()]]
 
 :: krowbar-ExamineTrees
-Upon closer examination, you find that these trees have strange orange bark and blue-tinted leaves. You also notice small burn pock-marks on several of the trees.
+These trees have strange orange bark and blue-tinted leaves. There are also small burned pock-marks on several of the trees.
 How curious!
+<<if not visited("krowbar-getLeaves")>>[[Collect some leaves|krowbar-GetLeaves]]<<endif>>
 [[Return|previous()]]
 
+:: krowbar-GetLeaves [inv]
+The leaves break crisply at their stems.
+<<set $items['leaves'] to 3>>
+[[Return|krowbar-start]]
+
 :: krowbar-PlaceRock
-You place the glowing rock where you believe it belongs around the pool. The pool lights up and starts humming like the one in The Cave did.
+When placed in its crevice around the pool, the glowing rock floats; held by an invisible energy. The pool lights up and starts humming.
 [[Return|previous()]]
 <<set $events["krowbar-PortalRestored"] to true>>
 <<set $items["glowing rock"] to false>>
 
 :: krowbar-FollowPath1 [inv]
-You are on a dirt path on a hill that [[leads to the pool|krowbar-start]].
+This dirt road rests on a hill that [[leads to the pool|krowbar-start]]. Several small footpaths lead off into the dense underbrush. It would be foolish to follow any of them.
 The path [[continues downward|krowbar-FollowPath2]].
-<<if not visited("krowbar-PressButton")>>You see [[a glowing rock|krowbar-GetGlowingRock]] on the ground<<endif>>
+A squat, [[dirty man|krowbar-ExamineMan]] stands beside the road, mubmling to himself.
+[[Talk to the man|krowbar-TalkToMan]]
+<<if $items["translator"]>>[[Use translator with man|krowbar-TalkToManTranslated]]<<endif>>
+<<if not visited("krowbar-PressButton")>>There is a [[softly glowing stone|krowbar-GetGlowingRock]] on the ground<<endif>>
+
+:: krowbar-ExamineMan
+The man has dirt-stained skin and a broad hat that partially covers his eyes. He mumble viscious nothings to himself.
+[[Return|previous()]]
+
+:: krowbar-TalkToMan
+''YAR thar!'' The man bellows, ''diyee comferm dontha hill? Noon comfra tha place ina time. Fley troh dee gaet doin?''
+''AECH, pthoo!'' The man spits.
+The man's local dialect seems indesipherable.
+[[Return|previous()]]
+
+:: krowbar-TalkToManTranslated
+''Ahoy! Did you come down that hill? Nobody has come from there in some time. Did you come from the gate?''
+The man spits.
+[[Return|previous()]]
 
 :: krowbar-GetGlowingRock
-You pick up the glowing, orange rock.
+The stone glows orange and has a strange rune on the bottom.
 [[Return|previous()]]
 <<set $items["glowing rock"] to true>>
 
 :: krowbar-FollowPath2 [inv]
-You find yourself in a small clearing. In the center, you see [[a small, thatched-roof cottage|krowbar-EnterCottage]].
-Three dirt paths lead from here; one [[leads upwards|krowbar-FollowPath1]], one leads [[toward a lake|krowbar-FollowPath3]], and one leads [[toward rubble|krowbar-FollowPath4]]
+In the center of a small clearing, there is [[a small, thatched-roof cottage|krowbar-EnterCottage]].
+Three dirt roads intersect here; one [[leads upwards|krowbar-FollowPath1]], one leads [[toward a lake|krowbar-FollowPath3]], and one leads [[toward rubble|krowbar-FollowPath4]]
 [[Examine cottage|krowbar-ExamineCottage]]
 
 :: krowbar-ExamineCottage
@@ -53,65 +81,22 @@ This cottage appears to be made from the native trees.
 :: krowbar-EnterCottage [inv]
 There is a thick layer of dust on everything within the cottage. Very little light is able to make its way inward.
 <<if not $events["krowbar-cottageOpenWindows"]>>The [[window frames|krowbar-CottageOpenWindows]] have been boarded up.
-<<if not $items["crowbar"]>> If you had the right tool, you could probably remove them.
+<<if not $items["crowbar"]>> The boards could probably be removed witht the right tool.
 <<else>>[[Open windows with crowbar|krowbar-CottageOpenWindows]]<<endif>>
-<<else>>The windows are now letting in enough light to let you see [[some cupboards|krowbar-CottageSearchcupboards]].<<endif>>
+<<else>>The windows are now letting in enough light to see [[some cupboards|krowbar-CottageSearchcupboards]].<<endif>>
 [[Leave cottage|krowbar-FollowPath2]]
 
 :: krowbar-CottageOpenWindows
-After a few minutes of effort, you manage to use the crowbar to remove the boards from the windows.
+After a few minutes of effort with the crowbar, the boards are removed from the windows.
 [[Return|previous()]]
 <<set $events["krowbar-cottageOpenWindows"] to true>>
 
 :: krowbar-CottageSearchCupboards
 <<if visited("krowbar-CottageSearchCupboards") lte 1>>
-After rummaging around the cupboards, you find a rusty cleaver and <<$krowbar_temp1 to random(2,5)>> coins.
+Rummaging around the cupboards reveals an old electronic device and <<$krowbar_temp1 to random(2,5)>> coins.
 [[Return|previous()]]
-<<set $items['cleaver'] to true>>
+<<set $items['device'] to true>>
 <<set $items['gold'] += $krowbar_temp1>>
-<<else>>You don't find anything else of value in the cupboards.
+<<else>>There is nothing else of value in the cupboards.
 [[Return|previous()]]
 <<endif>>
-
-:: oldstart
-<<if visited("krowbar-start") is 1>>Welcome to the adventure!<<endif>>
-There is a sealed door on the wall.
-<<if not visited("Get McGuffin")>>You see a McGuffin<br><<endif>>\
-<<if not visited("Get Coins")>>You see a few coins on the floor<br><<endif>>\
-<<actions "Get McGuffin" "Get Coins">>\
-<<if $items['McGuffin'] is true>><<actions "Use McGuffin on door">><<endif>>\
-<<if visited("Use McGuffin on door")>>[[Go through door|Room2]]<<endif>>
-[[PlayerProfile]]
-[[Return to Hub|Start]]
-
-:: Get McGuffin
-You pick up the McGuffin.
-<<set $items['McGuffin'] to true>>
-[[Return|previous()]]
-
-:: Get Coins
-You find <<$items['gold'] += random(2,5)>> coins
-[[Return|previous()]]
-
-:: Use McGuffin on door
-You use the McGuffin on the door.
-The McGuffin crumbles and the door opens.
-<<set $items['McGuffin'] to false>>
-[[Return|previous()]]
-
-:: Room2 [inv]
-This is room2. There is a cake on the ground.
-The door ahead is blocked.
-<<actions "Eat cake">>
-<<if $stats['strength'] gte 3>>[[Break through the door|Room3]]
-<<else>>You are not strong enough to break this door.<<endif>>
-
-::Eat cake
-You feel incredibly stronger!
-Strength increased to <<$stats['strength'] += 3>>
-[[Return|previous()]]
-
-:: Room3 [inv]
-Seriously, nothing here.
-Return to [[the start|Start]]
-
