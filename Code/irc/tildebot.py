@@ -14,6 +14,7 @@ import get_users
 import mentions
 import pretty_date
 import inflect
+import puzzle
 
 parser = OptionParser()
 
@@ -27,6 +28,7 @@ parser.add_option("-n", "--nick", dest="nick", default='tildebot',
 (options, args) = parser.parse_args()
 
 p = inflect.engine()
+challenges = {}
 SCORE_FILE = "tildescores.txt"
 JACKPOT_FILE = "tildejackpot.txt"
 JACKPOT_MIN = 3
@@ -50,17 +52,18 @@ def too_recent(time1, time2):
     else:
         return False
 
-def get_prize(user):
-    if(random.randint(1,10) > 2): #80% of the time it's a normal prize
-        prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * 1
+def get_prize(user, isHuman):
+    if(random.randint(1,10) > 6 - 4 * isHuman): #80% of the time it's a normal prize (40% for not humans)
+        prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans
         prize = random.choice(prizes)
-        return [prize, user + " is " + ("super " if prize > 4 else "really " if prize > 2 else "") + "cool and gets " + p.number_to_words(prize) + " tildes!"]
+        return [prize, user + ": " + (random.choice(['Yes','Yep','Correct','You got it']) if isHuman else random.choice(['No', 'Nope', 'Sorry', 'Wrong']))\
+                + "! You are " + ("super " if prize > 4 else "really " if prize > 2 else "") + "cool and get " + p.number_to_words(prize) + " tildes!"]
     else: #20% of the time its a jackpot situation
         with open(JACKPOT_FILE, "r+") as jackpotfile:
             jackpot = int(jackpotfile.readline().strip("\n"))
             jackpotfile.seek(0)
             jackpotfile.truncate()
-            if(random.randint(1,10) > 1): #90% of the time it's a non-prize
+            if(random.randint(1,10) > 1 or not isHuman): #90% of the time it's a non-prize. non-humans never win jackpot
                 new_jackpot = jackpot+1
                 jackpotfile.write(str(new_jackpot)) #increase the jackpot by 1
                 return [0, user + " is a meanie and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
@@ -73,10 +76,7 @@ def show_jackpot(channel):
         jackpot = int(jackpotfile.readline().strip("\n"))
         ircsock.send("PRiVMSG " + channel + " :The jackpot is currently " + p.number_to_words(jackpot) + " tildes!\n")
 
-def give_tilde(channel, user, time):
-    if(channel != "#bots" and not DEBUG):
-        ircsock.send("PRIVMSG " + channel + " :" + user + " is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**\n")
-        return
+def give_tilde(channel, user, time, human):
     found = False
     with open(SCORE_FILE, "r+") as scorefile:
         scores = scorefile.readlines()
@@ -89,12 +89,12 @@ def give_tilde(channel, user, time):
                 if(too_recent(time, person[2]) and not DEBUG):
                     ircsock.send("PRIVMSG " + channel + " :You have asked for a tilde too recently. Try again later.\n")
                 else:
-                    prize = get_prize(user)
+                    prize = get_prize(user, human)
                     score = person[0] + "&^%" + str(int(person[1]) + prize[0]) + "&^%" + time + "\n"
                     ircsock.send("PRIVMSG " + channel + " :" + prize[1] + "\n")
             scorefile.write(score)
         if(not found):
-            prize = get_prize(user)
+            prize = get_prize(user, True)
             ircsock.send("PRIVMSG " + channel + " :Welcome to the tilde game! Here's " + p.number_to_words(prize[0]+1) + " free tilde(s) to start you off.\n")
             scorefile.write(user + "&^%" + str(prize[0]+1) + "&^%" + time + "\n")
 
@@ -108,6 +108,27 @@ def show_tildescore(channel, user):
         #person has not played yet
         ircsock.send("PRIVMSG " + channel + " :" + user + " has no tildes yet!\n")
 
+def challenge(channel, user, time):
+    if(channel != "#bots" and not DEBUG):
+        ircsock.send("PRIVMSG " + channel + " :" + user + " is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**\n")
+        return
+    global challenges;
+    challenge = puzzle.make_puzzle();
+    challenges[user] = challenge[0]; #challenges[USER] = ANSWER
+    ircsock.send("PRIVMSG " + channel + " :" + user + ": " + challenge[1] + "\n");
+
+def challenge_response(channel, user, time, msg):
+    global challenges
+    print(msg);
+    if(challenges.has_key(user)):
+        if(msg == str(challenges[user]) or msg == p.number_to_words(challenges[user])):
+            give_tilde(channel, user, time, True);
+        else:
+            give_tilde(channel, user, time, False);
+        del challenges[user]; #delete the user from challenges either way
+
+
+
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :tildebot reporting! I respond to !tilde !tildescore\n")
 
@@ -117,7 +138,8 @@ def connect(server, channel, botnick):
   ircsock.send("NICK "+ botnick +"\n")
 
   joinchan(channel)
-  joinchan("#bots")
+  if(not DEBUG):
+      joinchan("#bots")
 
 def get_user_from_message(msg):
   try:
@@ -152,8 +174,11 @@ def listen():
 
     if ircmsg.find(":!tildescore") != -1:
         show_tildescore(channel, user)
-    elif ircmsg.find(":!tilde") != -1:
-        give_tilde(channel, user, time)
+    elif ircmsg.find(":!tilde") != -1 and not challenges.has_key(user):
+        challenge(channel, user, time)
+    elif challenges.has_key(user):
+        challenge_response(channel, user, time, messageText)
+        #give_tilde(channel, user, time)
 
     if ircmsg.find(":!jackpot") != -1:
         show_jackpot(channel)

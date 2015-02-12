@@ -85,10 +85,13 @@ def set_topic(channel, user, time, msg):
   ircsock.send("TOPIC "+ channel +" :" + msg + "\n")
   count_topic(channel, user, time, msg)
 
-def random_topic(channel, user, time):
+def random_topic(channel, user, time, setTopic=false):
     with open("randomtopics.txt") as rtopics:
       msg = random.choice(rtopics.readlines()).strip("\n")
-      set_topic(channel, user, time, msg)
+      if(setTopic):
+          set_topic(channel, user, time, msg)
+      else:
+          ircsock.send("TOPIC "+ channel +" :Suggested Topic: " + msg + "\n")
 
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :topicbot reporting! I respond to !topic !settopic !randomtopic !thistory\n")
@@ -170,7 +173,9 @@ def listen():
       topic_score(channel)
 
     if ircmsg.find(":!randomtopic") != -1:
-      random_topic(channel, user, time)
+      random_topic(channel, user, time, True)
+    if ircmsg.find(":!suggesttopic") != -1:
+      random_topic(channel,user,time, False)
 
     if ircmsg.find(":!thistory") != -1:
       topic_history(channel, user, messageText)

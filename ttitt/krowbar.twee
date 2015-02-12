@@ -46,7 +46,7 @@ The path [[continues downward|krowbar-FollowPath2]].
 A squat, [[dirty man|krowbar-ExamineMan]] stands beside the road, mubmling to himself.
 [[Talk to the man|krowbar-TalkToMan]]
 <<if $items["translator"]>>[[Use translator with man|krowbar-TalkToManTranslated]]<<endif>>
-<<if not visited("krowbar-PressButton")>>There is a [[softly glowing stone|krowbar-GetGlowingRock]] on the ground<<endif>>
+<<if not visited("krowbar-GetGlowingRock")>>There is a [[softly glowing stone|krowbar-GetGlowingRock]] on the ground<<endif>>
 
 :: krowbar-ExamineMan
 The man has dirt-stained skin and a broad hat that partially covers his eyes. He mumble viscious nothings to himself.
@@ -80,10 +80,10 @@ This cottage appears to be made from the native trees.
 
 :: krowbar-EnterCottage [inv]
 There is a thick layer of dust on everything within the cottage. Very little light is able to make its way inward.
-<<if not $events["krowbar-cottageOpenWindows"]>>The [[window frames|krowbar-CottageOpenWindows]] have been boarded up.
+<<if not $events["krowbar-cottageOpenWindows"]>>The window frames have been boarded up.
 <<if not $items["crowbar"]>> The boards could probably be removed witht the right tool.
 <<else>>[[Open windows with crowbar|krowbar-CottageOpenWindows]]<<endif>>
-<<else>>The windows are now letting in enough light to see [[some cupboards|krowbar-CottageSearchcupboards]].<<endif>>
+<<else>>The windows are now letting in enough light to see [[some cupboards|krowbar-CottageSearchCupboards]].<<endif>>
 [[Leave cottage|krowbar-FollowPath2]]
 
 :: krowbar-CottageOpenWindows
