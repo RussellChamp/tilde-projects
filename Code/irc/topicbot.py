@@ -85,13 +85,13 @@ def set_topic(channel, user, time, msg):
   ircsock.send("TOPIC "+ channel +" :" + msg + "\n")
   count_topic(channel, user, time, msg)
 
-def random_topic(channel, user, time, setTopic=false):
+def random_topic(channel, user, time, setTopic=False):
     with open("randomtopics.txt") as rtopics:
       msg = random.choice(rtopics.readlines()).strip("\n")
       if(setTopic):
           set_topic(channel, user, time, msg)
       else:
-          ircsock.send("TOPIC "+ channel +" :Suggested Topic: " + msg + "\n")
+          ircsock.send("PRIVMSG "+channel +" :Suggested Topic: " + msg + "\n")
 
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :topicbot reporting! I respond to !topic !settopic !randomtopic !thistory\n")

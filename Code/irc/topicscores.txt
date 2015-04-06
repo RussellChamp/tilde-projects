@@ -1,12 +1,13 @@
-krowbar&^%21&^%27
+krowbar&^%22&^%29
 um&^%11&^%8
 kc&^%0&^%22
 marcus&^%4&^%1
 khoi&^%1&^%0
-karlen&^%0&^%7
-jumblesale&^%3&^%2
+karlen&^%0&^%9
+jumblesale&^%4&^%3
 dan&^%1&^%0
 datagrok&^%0&^%1
 papa&^%1&^%0
-vilmibm&^%1&^%8
+vilmibm&^%1&^%12
 selfsame&^%1&^%0
+endorphant&^%0&^%6

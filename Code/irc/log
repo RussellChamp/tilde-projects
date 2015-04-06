@@ -6,3 +6,7 @@ Traceback (most recent call last):
   File "./topicbot.py", line 104, in topic_history
     iCount = int(count.split()[1])
 IndexError: list index out of range
+Traceback (most recent call last):
+  File "./topicbot.py", line 88, in <module>
+    def random_topic(channel, user, time, setTopic=false):
+NameError: name 'false' is not defined

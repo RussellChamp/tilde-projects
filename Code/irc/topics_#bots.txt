@@ -2,3 +2,12 @@
 1423077842&^%krowbar&^%tildebot now has a jackpot that increases for each non-payout. every request has a chance to hit jackpot!
 1423607774&^%krowbar&^%WARNING! Anti-botting measures enacted... soon. Un-clever work-arounds will not be tolerated
 1423771803&^%krowbar&^%Anti-botting measure have been enacted. Un-clever work-arounds will not be tolerated.
+1424362211&^%krowbar&^%Anti-botting measures have been worked around. Those responsible have been sacked.
+1424648855&^%endorphant&^%Anti-botting measures have been worked around. Those responsible have been sacked. | Try out txtminebot!
+1424700303&^%karlen&^%quote_bots is down for feature, tildes will not be logged in the interim
+1424701008&^%karlen&^%SO MUCH MINING IN THIS CHANNEL NOW!!
+1424993782&^%endorphant&^%/!grovel
+1425709612&^%endorphant&^%txtmines: !strike rates now calculated from strength stat
+1426016256&^%endorphant&^%http://tilde.town/~wiki/ircbots.html
+1426298989&^%endorphant&^%http://tilde.town/~wiki/ircbots.html | txtminebot had a data wipe for a feature push | !golem
+1426455418&^%endorphant&^%http://tilde.town/~wiki/ircbots.html | !golem
