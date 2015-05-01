@@ -11,3 +11,5 @@
 1426016256&^%endorphant&^%http://tilde.town/~wiki/ircbots.html
 1426298989&^%endorphant&^%http://tilde.town/~wiki/ircbots.html | txtminebot had a data wipe for a feature push | !golem
 1426455418&^%endorphant&^%http://tilde.town/~wiki/ircbots.html | !golem
+1429088209&^%jumblesale&^%
+1429628571&^%endorphant&^%http://tilde.town/~wiki/ircbots.html
