@@ -10,3 +10,21 @@ Traceback (most recent call last):
   File "./topicbot.py", line 88, in <module>
     def random_topic(channel, user, time, setTopic=false):
 NameError: name 'false' is not defined
+Traceback (most recent call last):
+  File "./topicbot.py", line 193, in <module>
+    listen()
+  File "./topicbot.py", line 162, in listen
+    count_topic(channel,user, time, messageText)
+  File "./topicbot.py", line 77, in count_topic
+    userscore = int(data[2])+1
+ValueError: invalid literal for int() with base 10: '1insom'
+Traceback (most recent call last):
+  File "./topicbot.py", line 193, in <module>
+    listen()
+  File "./topicbot.py", line 168, in listen
+    set_topic(channel, user, time, messageText[10:])
+  File "./topicbot.py", line 86, in set_topic
+    count_topic(channel, user, time, msg)
+  File "./topicbot.py", line 77, in count_topic
+    userscore = int(data[2])+1
+ValueError: invalid literal for int() with base 10: '1vilmibm'

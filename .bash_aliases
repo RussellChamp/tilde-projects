@@ -6,7 +6,7 @@ alias la='ls -A'
 alias l='ls -CF'
 alias psg='ps -ef| grep'
 alias alpine='alpine -sort arrival/reverse'
-alias biggest='du -a ~ | sort -n -r | head -n 10'
+alias biggest='find ~ -type f -exec du -a {} + | sort -n -r | head -n 10'
 alias mudgame='telnet localhost 5071'
 function cdl(){ cd $@; ls -l; }
 alias mtrek='telnet mtrek.com 1701'

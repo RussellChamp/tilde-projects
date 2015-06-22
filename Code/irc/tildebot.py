@@ -5,6 +5,7 @@
 import socket
 import os
 import sys
+import time
 from optparse import OptionParser
 import fileinput
 import random
@@ -166,7 +167,7 @@ def listen():
     # print formatted
 
     split = formatted.split("\t")
-    time = split[0]
+    iTime = split[0]
     user = split[1]
     command = split[2]
     channel = split[3]
@@ -175,10 +176,10 @@ def listen():
     if ircmsg.find(":!tildescore") != -1:
         show_tildescore(channel, user)
     elif ircmsg.find(":!tilde") != -1 and not challenges.has_key(user):
-        challenge(channel, user, time)
+        challenge(channel, user, iTime)
     elif challenges.has_key(user):
-        challenge_response(channel, user, time, messageText)
-        #give_tilde(channel, user, time)
+        challenge_response(channel, user, iTime, messageText)
+        #give_tilde(channel, user, iTime)
 
     if ircmsg.find(":!jackpot") != -1:
         show_jackpot(channel)
@@ -190,6 +191,7 @@ def listen():
       ping()
 
     sys.stdout.flush()
+    time.sleep(1)
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connect(options.server, options.channel, options.nick)
