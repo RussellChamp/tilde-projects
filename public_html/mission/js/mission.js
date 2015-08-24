@@ -18,8 +18,9 @@ var mission_grammars = Array(
     {chance:10, grammar: 'actor +"\'s " + noun1'},
     {chance:10, grammar: 'noun1 + " of the " + noun2'},
     {chance:10, grammar: 'noun1 + " of " + noun2'},
+    {chance:10, grammar: 'noun1 + " of " + color + " " + noun2'},
     {chance:10, grammar: 'adj1 + " " + noun1 + " and " + adj2 + " " + noun2'},
-    {chance:3,  grammar: '"Attack of the " + actors + "s"'}
+    {chance:3,  grammar: '"Attack of the " + actor + "s"'}
     );
 this.getNoun = function(badNouns) {
   return _.chain(nouns)

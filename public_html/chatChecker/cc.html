@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Who chats and when?</title>
+</head>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script type="text/javascript">
+userData = {};
+jQuery.getJSON("/~krowbar/data/userData.json", function(json) {
+    userData = json;
+    });
+</script>
+
+<body>
+Here's some stuff! Check the console for userData
+<br/>
+Maybe I should use Google charts again instead of D3. Remember to use .setUTCSeconds()
+</body>
+</html>

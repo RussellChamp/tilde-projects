@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.js"></script>
+<script type="text/javascript" src="d3.layout.cloud.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script>(function() {
+
+var fill = d3.scale.category20();
+
+layout = d3.layout.cloud();
+jQuery.getJSON("/~krowbar/data/chatcloud.json", function(json) {
+  jsonWords = [];
+  _.forEach(json, function(count, word) {
+    console.log("Added", word, count);
+    jsonWords.push({text: word, size: count});
+    });
+
+  layout
+    .size([1200, 800])
+    .words(jsonWords)
+    .padding(5)
+    .rotate(function() { return ~~(Math.random() * 2) * 90; })
+    .font("Impact")
+    .fontSize(function(d) { return d.size * 2 / 3; })
+    .on("end", draw);
+
+layout.start();
+});
+
+draw = function(words) {
+  console.log("Started draw with", words);
+  d3.select("body").append("svg")
+      .attr("width", layout.size()[0])
+      .attr("height", layout.size()[1])
+    .append("g")
+      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+    .selectAll("text")
+      .data(words)
+    .enter().append("text")
+      .style("font-size", function(d) { return d.size + "px"; })
+      .style("font-family", "Impact")
+      .style("fill", function(d, i) { return fill(i); })
+      .attr("text-anchor", "middle")
+      .attr("transform", function(d) {
+        return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+      })
+      .text(function(d) { return d.text; });
+}
+
+})();</script>
