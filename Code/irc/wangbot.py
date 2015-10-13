@@ -164,7 +164,7 @@ def save_scores():
                 score = line.strip("\n").split("&^%")
                 if(score[0] == name):
                     line = score[0] + "&^%" + str(int(score[1]) + currentScores[name]) + "\n"
-                    currentScores.remove(name)
+                    del currentScores[name]
                     break
             scorefile.write(line)
 

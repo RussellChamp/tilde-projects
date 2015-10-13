@@ -1,6 +1,35 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
+<div>
+<select id="series">
+  <option value="">Today</option>
+  <option value="_2015_09">Sep 2015</option>
+  <option value="_2015_08">Aug 2015</option>
+  <option value="_2015_07">July 2015</option>
+  <option value="_2015_06">June 2015</option>
+  <option value="_2015_05">May 2015</option>
+  <option value="_2015_04">Apr 2015</option>
+  <option value="_2015_03">Mar 2015</option>
+  <option value="_2015_02">Feb 2015</option>
+  <option value="_2015_01">Jan 2015</option>
+  <option value="_2014_12">Dec 2014</option>
+  <option value="_2014_11">Nov 2014</option>
+  <option value="_2014_10">Oct 2014</option>
+  <option value="_all_time">All Time</option>
+</select>
+<select id="howMuch">
+  <option value=0>All words</option>
+  <option value=1>Less words</option>
+  <option value=2>Lesser words</option>
+  <option value=3>Lessest words</option>
+<select>
+<button type="button" 
+  onclick="getWords('/~krowbar/data/chatcloud' + document.getElementById('series').value + '.json',
+    document.getElementById('howMuch').value)"
+  >Generate Cloud</button>
+</div>
+<div id="cloud"></div>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.js"></script>
 <script type="text/javascript" src="d3.layout.cloud.js"></script>
@@ -8,30 +37,54 @@
 <script>(function() {
 
 var fill = d3.scale.category20();
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 layout = d3.layout.cloud();
-jQuery.getJSON("/~krowbar/data/chatcloud.json", function(json) {
+maxSize = 10; //default
+
+getWords = function(source, fraction) {
+jQuery.getJSON(source, function(json) {
+  delete json.length; //if one of our words is the word "length", it messes up the count
   jsonWords = [];
+
+  maxCount = _.max(json);
+  minCount = _.min(json);
+  if(source.indexOf('_') == -1) {
+  var d = new Date();
+  jsonWords.push({text: months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(), size: maxCount+1});
+  }
+  //eliminate the bottom 10% * fraction items
+  threshold = minCount + Math.floor(( maxCount - minCount) * fraction / 10);
+  console.log("Out of",_.size(json), "words from", source, "with count", minCount, "to", maxCount,": adding words at least",threshold);
+  //console.log(json);
+  data = json;
+
   _.forEach(json, function(count, word) {
-    console.log("Added", word, count);
-    jsonWords.push({text: word, size: count});
+    if(isNaN(count)) { console.log("DANGER!:", word, "is", count); };
+    if(count >= threshold) {
+      //console.log("Added", word, count);
+      jsonWords.push({text: word, size: count});
+    }
     });
+  maxSize = Math.sqrt(maxCount);
 
   layout
     .size([1200, 800])
     .words(jsonWords)
-    .padding(5)
+    .padding(3)
     .rotate(function() { return ~~(Math.random() * 2) * 90; })
     .font("Impact")
-    .fontSize(function(d) { return d.size * 2 / 3; })
+    .fontSize(function(d) { return Math.sqrt(d.size) * 50 / maxSize + 6; })
     .on("end", draw);
 
 layout.start();
-});
+})};
 
+getWords("/~krowbar/data/chatcloud.json", 1);
 draw = function(words) {
-  console.log("Started draw with", words);
-  d3.select("body").append("svg")
+  console.log("Started draw with", words.length, "words");
+  d3.select("svg").remove();
+  d3.select("#cloud").append("svg")
       .attr("width", layout.size()[0])
       .attr("height", layout.size()[1])
     .append("g")
@@ -50,3 +103,4 @@ draw = function(words) {
 }
 
 })();</script>
+</body>
