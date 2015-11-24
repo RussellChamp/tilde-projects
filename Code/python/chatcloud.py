@@ -31,7 +31,8 @@ with open(logfile, "r") as log:
             continue #We don't care what they say
         if time >= timeCutoff and time <= timeTo:
             #print "Processing line from " + user + " at " + str(time)
-            for word in re.sub('[\'\"\`\/\\;:,.?!*&^\-()<>|_\[\]0-9]', '', message).lower().split():
+            for word in re.sub('[\'\"\`\/\\;:,.?!*&^\-()<>\{\}|_\[\]0-9]', ' ', message).lower().split():
+                #changing symbols into spaces instead of stripping them avoids compounded words
                 if len(word) < minLength or word in bannedWords:
                     #print "Rejecting " + word
                     continue

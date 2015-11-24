@@ -15,6 +15,8 @@ import get_users
 import mentions
 import pretty_date
 import inflect
+from rhymesWith import getRhymes
+from defineWord import define
 
 parser = OptionParser()
 
@@ -103,8 +105,32 @@ def get_new_banter(channel, user):
                     word = word[:end] + 't' + word[end+1:]
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Here, why don't you try '" + word + "'?\n")
 
+def get_rhymes(channel, user, text):
+    word = ""
+    if(len(text.split(' ')) > 1):
+        word = text.split(' ')[1]
+    else:
+        with open("/home/nossidge/poems/words_poetic.txt", "r") as words:
+            word = random.choice(words.readlines()).strip("\n")
+    rhymes = getRhymes(word)
+    if(len(rhymes) == 0):
+        ircsock.send("PRIVMSG " + channel + " :" + user + ": Couldn't find anything that rhymes with '" + word + "' :(\n")
+    else:
+        ircsock.send("PRIVMSG " + channel + " :" + user + ": Here, these words rhyme with '" + word + "': " + ', '.join(rhymes) + "\n")
+
+def define_word(channel, user, text):
+    word = ""
+    if(len(text.split(' ')) > 1):
+        word = text.split(' ')[1]
+        defs = define(word)
+    if(len(defs) == 0):
+        ircsock.send("PRIVMSG " + channel + " :" + user + ": Couldn't find the definition of '" + word + "' :(\n")
+    else:
+        ircsock.send("PRIVMSG " + channel + " :" + user + ": Define '" + word + "'" + ''.join(defs)[0:200] + "\n")
+
+
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter\n")
+  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhyme, and !define\n")
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
@@ -112,6 +138,7 @@ def connect(server, channel, botnick):
   ircsock.send("NICK "+ botnick +"\n")
 
   joinchan(channel)
+  joinchan("#bots")
 
 def get_user_from_message(msg):
   try:
@@ -149,6 +176,12 @@ def listen():
 
     if ircmsg.find(":!newbanter") != -1:
         get_new_banter(channel, user)
+
+    if ircmsg.find(":!rhymes") != -1:
+        get_rhymes(channel, user, messageText)
+
+    if ircmsg.find(":!define") != -1:
+        define_word(channel, user, messageText)
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)
