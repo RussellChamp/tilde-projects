@@ -16,7 +16,9 @@ import mentions
 import pretty_date
 import inflect
 from rhymesWith import getRhymes
-from defineWord import define
+from rhymesWith import rhymeZone
+from defineWord import defWord
+from rainbow import makeRainbow
 
 parser = OptionParser()
 
@@ -112,7 +114,7 @@ def get_rhymes(channel, user, text):
     else:
         with open("/home/nossidge/poems/words_poetic.txt", "r") as words:
             word = random.choice(words.readlines()).strip("\n")
-    rhymes = getRhymes(word)
+    rhymes = rhymeZone(word)
     if(len(rhymes) == 0):
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Couldn't find anything that rhymes with '" + word + "' :(\n")
     else:
@@ -122,15 +124,18 @@ def define_word(channel, user, text):
     word = ""
     if(len(text.split(' ')) > 1):
         word = text.split(' ')[1]
-        defs = define(word)
+        defs = defWord(word)
     if(len(defs) == 0):
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Couldn't find the definition of '" + word + "' :(\n")
     else:
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Define '" + word + "'" + ''.join(defs)[0:200] + "\n")
 
+def make_rainbow(channel, user, text):
+    rbword = makeRainbow(text[9:])
+    ircsock.send("PRIVMSG " + channel + " :" + rbword + "\n")
 
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhyme, and !define\n")
+  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhymes, and !define. Make your chatter #legend with !rainbow\n")
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
@@ -182,6 +187,9 @@ def listen():
 
     if ircmsg.find(":!define") != -1:
         define_word(channel, user, messageText)
+
+    if ircmsg.find(":!rainbow") != -1:
+        make_rainbow(channel, user, messageText)
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Who chats and when?</title>
+</head>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"
+charset="utf-8"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+      google.load("visualization", "1", {packages:["timeline"]});
+
+      data = [];
+      jQuery.getJSON("/~krowbar/data/userData.json", function(json) {
+          _.forEach(json, function(times, user) {
+            console.log("~" + user + ":", times.length, "item(s)");
+            _.forEach(times, function(time) {
+              d = new Date(0);
+              d.setUTCSeconds(Number(time));
+              <!--data.push([user, d.toISOString().slice(11,16), d, d]);-->
+              data.push([user, d, d]);
+              })
+            });
+          google.setOnLoadCallback(drawChart);
+      });
+
+      function drawChart() {
+        var container = document.getElementById('timeline');
+        var chart = new google.visualization.Timeline(container);
+        var dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn({ type: 'string', id: 'User' });
+        <!--dataTable.addColumn({ type: 'string', id: 'tooltip' });-->
+        dataTable.addColumn({ type: 'date', id: 'Start' });
+        dataTable.addColumn({ type: 'date', id: 'End' });
+        dataTable.addRows(data);
+
+        chart.draw(dataTable);
+      }
+    </script>
+<body>
+<div id="timeline" style="height: 800px;"></div>
+</body>
+</html>

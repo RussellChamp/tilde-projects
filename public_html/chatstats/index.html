@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>IRC chat stats</title>
+</head>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"
+charset="utf-8"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+      google.load("visualization", "1.1", {packages:["table"]});
+
+      data = [];
+      jQuery.getJSON("/~krowbar/data/chatStats.json", function(json) {
+          _.forEach(json, function(userData, user) {
+            data.push([user, new Date(userData.startTime*1000), new Date(userData.endTime*1000), 
+              Number(((userData.endTime - userData.startTime) / 86400).toFixed(2)), userData.lineCount, 
+              userData.wordCount, Number((userData.wordCount / userData.lineCount).toFixed(2)), 
+              userData.charCount, Number((userData.charCount / userData.lineCount).toFixed(2))]);
+            });
+          google.setOnLoadCallback(drawTable);
+      });
+
+      function drawTable() {
+
+        var dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn('string', 'User');
+        dataTable.addColumn('datetime', 'Start');
+        dataTable.addColumn('datetime', 'End');
+        dataTable.addColumn('number', 'Days Active');
+        dataTable.addColumn('number', 'Lines');
+        dataTable.addColumn('number', 'Words');
+        dataTable.addColumn('number', 'per Line');
+        dataTable.addColumn('number', 'Characters');
+        dataTable.addColumn('number', 'per Line');
+
+        dataTable.addRows(data);
+
+        var table = new google.visualization.Table(document.getElementById('statTable'));
+
+        table.draw(dataTable, {showRowNumber: false, width:'80%', height: '60%', sortColumn:2, sortAscending:false});
+      }
+    </script>
+<body>
+<div id="statTable"></div>
+</body>
+</html>

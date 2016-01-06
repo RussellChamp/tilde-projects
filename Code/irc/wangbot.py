@@ -30,7 +30,7 @@ parser.add_option("-n", "--nick", dest="nick", default='numberwang_bot',
 (options, args) = parser.parse_args()
 
 p = inflect.engine()
-LIMIT_GUESSING = False
+LIMIT_GUESSING = True
 MIN_ROUNDS = 5
 MAX_ROUNDS = 12
 SCORE_FILE = "numberwangscores.txt"

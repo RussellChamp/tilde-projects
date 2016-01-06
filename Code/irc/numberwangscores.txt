@@ -1,2 +1,4 @@
 endorphant&^%68
-krowbar&^%60
+krowbar&^%119
+karlen&^%2
+jumblesal&^%37

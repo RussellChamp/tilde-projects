@@ -7,24 +7,24 @@
 
     var self = this;
 
-var adjectives = Array('Bold','Breaking','Brilliant','Crescent','Dark|Darkness','Desert|Desert','Eternal','Evening|Darkness','Final','First','Forever','Glorious','Joyful','July','Last','Libery|Liberty','Magic|Magic','Morning|Morning','Power|Power','Phantom','Present','Roaring|Roar|Scream','Rolling','Sand','Screaming|Roar|Scream','Soaring','Standing|Stand','Star|Star','Twisted','Urgent','Utopian','Valiant');
+var adjectives = Array('Bold','Breaking','Brilliant','Crescent','Dark|Darkness','Desert|Desert','Eternal','Evening|Darkness','Final','First','Forever','Glorious','Joyful','July','Last','Liberty|Liberty','Magic|Magic','Morning|Morning','Power|Power','Phantom','Present','Roaring|Roar|Scream','Rolling','Sand','Screaming|Roar|Scream','Soaring','Standing|Stand','Star|Star','Twisted','Urgent','Utopian','Valiant');
 var nouns = Array('Action','Alert','Beauty','Claw','Darkness','Dawn','Day','Desert','Envy','Fall','Fist','Flight','Fury','Guard','Hammer','Hand','Honor','Hope','Hurricane','Liberty','Light','Lightning','Magic','Morning','October','Power','Rain','Repose','Roar','Scream','Skull','Sky','Skies','Shield','Stand','Star','Storm','Streak','Strike','Sun','Thunder','Victory','Whisper','Wind','Wrath');
 var colors = Array('Black','Blue','Brown','Gray','Green','Indego','Orange','Purple','Rainbow','Red','Scarlet','Silver','Violet','White','Yellow');
 var actors = Array('Cobra','Condor','Dragon','Eagle','Guardian','Hawk','Hydra','Jackal','King','Knight','Lady','Lion','Scorpion','Spartan','Titan','Victor','Viking','Warrior');
 var mission_grammars = Array(
-    {chance:30, grammar: 'adj1 + " " + noun1'},
-    {chance:20, grammar: 'adj1 + " " + actor'},
-    {chance:10, grammar: 'color + " " + noun1'},
-    {chance:10, grammar: 'color + " " + actor'},
-    {chance:10, grammar: 'actor +"\'s " + noun1'},
-    {chance:10, grammar: 'noun1 + " of the " + noun2'},
-    {chance:10, grammar: 'noun1 + " of the " + actor'},
-    {chance:10, grammar: 'actor + " of the " + noun1'},
-    {chance:10, grammar: 'noun1 + " of " + noun2'},
-    {chance:10, grammar: 'noun1 + " of " + color + " " + noun2'},
-    {chance:10, grammar: 'adj1 + " " + noun1 + " and " + adj2 + " " + noun2'},
-    {chance:3,  grammar: '"Attack of the " + actor + "s"'},
-    {chance:3,  grammar: '"Return of the " + actor + "s"'}
+    {chance:30, grammar: "{adj1} {noun1}"},
+    {chance:20, grammar: "{adj1} {actor}"},
+    {chance:10, grammar: "{color} {noun1}"},
+    {chance:10, grammar: "{color} {actor}"},
+    {chance:10, grammar: "{actor}'s {noun1}"},
+    {chance:10, grammar: "{noun1} of the {noun2}"},
+    {chance:10, grammar: "{noun1} of the {actor}"},
+    {chance:10, grammar: "{actor} of the {noun1}"},
+    {chance:10, grammar: "{noun1} of {noun2}"},
+    {chance:10, grammar: "{noun1} of {color} {noun2}"},
+    {chance:10, grammar: "{adj1} {noun1} and {adj2} {noun2}"},
+    {chance:3,  grammar: "Attack of the {actor}s"},
+    {chance:3,  grammar: "Return of the {actor}s"}
     );
 this.getNoun = function(badNouns) {
   return _.chain(nouns)
@@ -65,7 +65,13 @@ this.getMissionName = function() {
       rand -= g.chance;
       }
     else {
-      mission += eval(g.grammar);
+      mission += g.grammar
+                 .replace(/{adj1}/, adj1)
+                 .replace(/{adj2}/, adj2)
+                 .replace(/{noun1}/, noun1)
+                 .replace(/{noun2}/, noun2)
+                 .replace(/{color}/, color)
+                 .replace(/{actor}/, actor);
       return mission;
     }
   }
