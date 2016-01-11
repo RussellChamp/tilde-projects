@@ -3,13 +3,14 @@ import random
 import inflect
 
 p = inflect.engine()
+primes = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71]
 
 def make_puzzle():
   answer = 0
   puzzle = random.choice(["Prove you're not a robot: ", "Are you a robot?: ", "Anti-bot check: ", "Counter-cndorphant measures: "])
   puzzle += random.choice(["What is", "How many is", "What do you get from", "What do you get with", "What is the value of", "Can you answer", "Can you tell me"])
   puzzle += " "
-  roll = random.randrange(0,4)
+  roll = random.randrange(0,6)
   var1 = random.randrange(1,10)
   var2 = random.randrange(1,10)
 
@@ -31,8 +32,14 @@ def make_puzzle():
       answer = var1 * 2 / var2
       puzzle += p.number_to_words(var1*2) + " " + random.choice(["divided by", "over"]) + " " + p.number_to_words(var2) + " (no remainder)"
   elif roll == 4:
-      answer == var1 ** var2
+      answer = var1 ** var2
       puzzle += p.number_to_words(var1) + " to the " + p.ordinal(p.number_to_words(var2)) + " power"
+  elif roll == 5:
+      p1 = primes[random.randrange(0,len(primes))]
+      p2 = primes[random.randrange(0,len(primes))]
+      answer = str(p1) + ',' + str(p2)
+      puzzle += p.number_to_words(p1 * p2) + " when factored into its two primes (answer in the form of the two primes with a comman between)"
+
 
   puzzle += "? (Answer with numbers)"
   return [answer, puzzle]

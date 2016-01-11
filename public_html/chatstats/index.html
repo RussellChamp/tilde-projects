@@ -13,11 +13,19 @@ charset="utf-8"></script>-->
 
       data = [];
       jQuery.getJSON("/~krowbar/data/chatStats.json", function(json) {
+          now = new Date();
+          nowSec = Math.round(now.getTime()/1000)
           _.forEach(json, function(userData, user) {
             data.push([user, new Date(userData.startTime*1000), new Date(userData.endTime*1000), 
-              Number(((userData.endTime - userData.startTime) / 86400).toFixed(2)), userData.lineCount, 
+              Number(((userData.endTime - userData.startTime) / 86400).toFixed(2)),
+              userData.daysActive,
+              Math.min(Number(((86400 * userData.daysActive) / (nowSec - userData.startTime)).toFixed(2)), 1),
+              userData.lineCount,
               userData.wordCount, Number((userData.wordCount / userData.lineCount).toFixed(2)), 
-              userData.charCount, Number((userData.charCount / userData.lineCount).toFixed(2))]);
+              userData.charCount, Number((userData.charCount / userData.lineCount).toFixed(2)),
+              userData.streak, userData.mentions, userData.botUse,
+              Number((userData.responseTime / (userData.mentions ? userData.mentions : 1) / 60).toFixed(2)),
+              ]);
             });
           google.setOnLoadCallback(drawTable);
       });
@@ -25,22 +33,41 @@ charset="utf-8"></script>-->
       function drawTable() {
 
         var dataTable = new google.visualization.DataTable();
+        var minFormatter = new google.visualization.NumberFormat({pattern: '##.## minutes'});
+        var dayFormatter = new google.visualization.NumberFormat({pattern: '## days'});
+        var wordFormatter = new google.visualization.NumberFormat({pattern: '##.## words'});
+        var charFormatter = new google.visualization.NumberFormat({pattern: '##.## chars'});
+        var streakFormatter = new google.visualization.NumberFormat({pattern: '## lines'});
+        var mentionsFormatter = new google.visualization.NumberFormat({pattern: '## mentions'});
 
-        dataTable.addColumn('string', 'User');
-        dataTable.addColumn('datetime', 'Start');
-        dataTable.addColumn('datetime', 'End');
-        dataTable.addColumn('number', 'Days Active');
-        dataTable.addColumn('number', 'Lines');
-        dataTable.addColumn('number', 'Words');
-        dataTable.addColumn('number', 'per Line');
-        dataTable.addColumn('number', 'Characters');
-        dataTable.addColumn('number', 'per Line');
+        dataTable.addColumn('string', 'User');        //col0
+        dataTable.addColumn('datetime', 'First Spoke');     //col1
+        dataTable.addColumn('datetime', 'Last Spoke');       //col2
+        dataTable.addColumn('number', 'Total Time'); //col3
+        dataTable.addColumn('number', 'Active on');      //col4
+        dataTable.addColumn('number', 'Active Ratio');//col5
+        dataTable.addColumn('number', 'Lines');       //col6
+        dataTable.addColumn('number', 'Words');       //col7
+        dataTable.addColumn('number', 'per Line');    //col8
+        dataTable.addColumn('number', 'Characters');  //col9
+        dataTable.addColumn('number', 'per Line');    //col10
+        dataTable.addColumn('number', 'Chat Streak');      //col11
+        dataTable.addColumn('number', 'Popularity');  //col12
+        dataTable.addColumn('number', 'Bot Use');     //col13
+        dataTable.addColumn('number', 'Avg response time'); //col14
 
         dataTable.addRows(data);
+        dayFormatter.format(dataTable, 3);
+        dayFormatter.format(dataTable, 4);
+        wordFormatter.format(dataTable, 8);
+        charFormatter.format(dataTable, 10);
+        streakFormatter.format(dataTable, 11);
+        mentionsFormatter.format(dataTable, 12);
+        minFormatter.format(dataTable, 14);
 
         var table = new google.visualization.Table(document.getElementById('statTable'));
 
-        table.draw(dataTable, {showRowNumber: false, width:'80%', height: '60%', sortColumn:2, sortAscending:false});
+        table.draw(dataTable, {showRowNumber: false, width:'95%', height: '60%', sortColumn:2, sortAscending:false});
       }
     </script>
 <body>
