@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html content="text/html; charset=UTF-8;charset=utf-8">
 <head>
 <title>IRC chat stats</title>
 </head>
@@ -12,6 +12,7 @@ charset="utf-8"></script>-->
       google.load("visualization", "1.1", {packages:["table"]});
 
       data = [];
+
       jQuery.getJSON("/~krowbar/data/chatStats.json", function(json) {
           now = new Date();
           nowSec = Math.round(now.getTime()/1000)
@@ -27,12 +28,15 @@ charset="utf-8"></script>-->
               Number((userData.responseTime / (userData.mentions ? userData.mentions : 1) / 60).toFixed(2)),
               ]);
             });
-          google.setOnLoadCallback(drawTable);
+          console.log("* Loaded the data!");
+          //google.setOnLoadCallback(drawTable);
+          $(drawTable)
       });
 
       function drawTable() {
 
         var dataTable = new google.visualization.DataTable();
+        var userFormatter = new google.visualization.PatternFormat('<a href="/~{0}">{0}</a>');
         var minFormatter = new google.visualization.NumberFormat({pattern: '##.## minutes'});
         var dayFormatter = new google.visualization.NumberFormat({pattern: '## days'});
         var wordFormatter = new google.visualization.NumberFormat({pattern: '##.## words'});
@@ -40,23 +44,24 @@ charset="utf-8"></script>-->
         var streakFormatter = new google.visualization.NumberFormat({pattern: '## lines'});
         var mentionsFormatter = new google.visualization.NumberFormat({pattern: '## mentions'});
 
-        dataTable.addColumn('string', 'User');        //col0
-        dataTable.addColumn('datetime', 'First Spoke');     //col1
-        dataTable.addColumn('datetime', 'Last Spoke');       //col2
-        dataTable.addColumn('number', 'Total Time'); //col3
-        dataTable.addColumn('number', 'Active on');      //col4
-        dataTable.addColumn('number', 'Active Ratio');//col5
-        dataTable.addColumn('number', 'Lines');       //col6
-        dataTable.addColumn('number', 'Words');       //col7
-        dataTable.addColumn('number', 'per Line');    //col8
-        dataTable.addColumn('number', 'Characters');  //col9
-        dataTable.addColumn('number', 'per Line');    //col10
-        dataTable.addColumn('number', 'Chat Streak');      //col11
-        dataTable.addColumn('number', 'Popularity');  //col12
-        dataTable.addColumn('number', 'Bot Use');     //col13
-        dataTable.addColumn('number', 'Avg response time'); //col14
+        dataTable.addColumn('string', 'User');          //col0
+        dataTable.addColumn('datetime', 'First Spoke'); //col1
+        dataTable.addColumn('datetime', 'Last Spoke');  //col2
+        dataTable.addColumn('number', 'Total');    //col3
+        dataTable.addColumn('number', 'Active on');     //col4
+        dataTable.addColumn('number', 'Ratio');         //col5
+        dataTable.addColumn('number', 'Lines');         //col6
+        dataTable.addColumn('number', 'Words');         //col7
+        dataTable.addColumn('number', 'per Line');      //col8
+        dataTable.addColumn('number', 'Characters');    //col9
+        dataTable.addColumn('number', 'per Line');      //col10
+        dataTable.addColumn('number', 'Chat Streak');   //col11
+        dataTable.addColumn('number', 'Popularity');    //col12
+        dataTable.addColumn('number', 'Bot Use');       //col13
+        dataTable.addColumn('number', 'Response time'); //col14
 
         dataTable.addRows(data);
+        userFormatter.format(dataTable, [0]);
         dayFormatter.format(dataTable, 3);
         dayFormatter.format(dataTable, 4);
         wordFormatter.format(dataTable, 8);
@@ -64,10 +69,12 @@ charset="utf-8"></script>-->
         streakFormatter.format(dataTable, 11);
         mentionsFormatter.format(dataTable, 12);
         minFormatter.format(dataTable, 14);
+        console.log("* Set up the columns!");
 
         var table = new google.visualization.Table(document.getElementById('statTable'));
 
-        table.draw(dataTable, {showRowNumber: false, width:'95%', height: '60%', sortColumn:2, sortAscending:false});
+        table.draw(dataTable, {showRowNumber: false, width:'95%', height: '60%', sortColumn:2, sortAscending:false, allowHtml: true});
+        console.log("* Drew the tables! (I hope.)");
       }
     </script>
 <body>

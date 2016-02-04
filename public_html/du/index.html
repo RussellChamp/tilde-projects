@@ -49,6 +49,9 @@
         linedata.addColumn('date', 'Date');
         var userData = {};
         _.forEach(json, function(set, idx) {
+          //only display 1/8 the points. (every 2 days instead of every 6 hours) page is loading too slow
+          //maybe i could add something to show more points but we're not losing too much granularity for the speed we gain
+          if(idx % 8 != 0) return; 
           _.forEach(set.data, function(point) {
             if(point.du > 2000) { //the 'interesting' threshold is set at 20000kb
               if(!userData[point.user]) {
@@ -63,6 +66,7 @@
           })
         })
         _.forEach(json, function(set,idx) {
+          if(idx % 8 != 0) return;
             var d = new Date(0);
             d.setUTCSeconds(set.date);
             linedata.addRow([d].concat(_.map(userData, function(user) { return user[idx];})));

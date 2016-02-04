@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+        <script type="text/javascript" src="js/jsondiffpatch.min.js"></script>
+        <script type="text/javascript" src="js/jsondiffpatch-formatters.min.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <link rel="stylesheet" href="css/html.css" type="text/css" />
+        <link rel="stylesheet" href="css/annotated.css" type="text/css" />
+    </head>
+    <body ng-app="DiffApp">
+    <div ng-controller="DiffCtrl as d">
+    <button type="button" ng-click="d.get_data()">Get Data</button>
+    <button type="button" ng-click="d.compare()">Compare</button>
+    <br/>
+        <textarea id="text1" columns="40" rows="10" ng-model="d.left"></textarea>
+        <div id="visual"></div>
+        <textarea id="text2" columns="40" rows="10" ng-model="d.right"></textarea>
+        <hr/>
+        <div id="annotated"></div>
+    </div>
+    <script>
+(function(angular) {
+  'use strict';
+
+  angular.module('DiffApp',[]);
+
+  function DiffCtrl($scope) {
+    var self = this;
+    this.left = "";
+    this.right = "";
+    console.log("HEELLLLO!!!");
+    this.get_data = function() {
+      console.log("Starting to load data...");
+      jQuery.getJSON("data.json", function(data) {
+        console.log("Loaded data.json");
+        self.left = JSON.stringify(data, null, 2);
+        $scope.$apply();
+
+        })
+      .fail(function(fail) {
+        console.log("FAIL", fail);
+        });
+      jQuery.getJSON("data2.json", function(json) {
+        console.log("Loaded data2.json");
+        self.right = JSON.stringify(json, null, 2);
+        $scope.$apply();
+        });
+    };
+    this.compare = function() {
+      console.log("Running compare");
+      // beautiful html diff
+      var jsonLeft = JSON.parse(self.left);
+      var jsonRight = JSON.parse(self.right);
+      var delta = jsondiffpatch.diff(jsonLeft, jsonRight);
+      document.getElementById('visual').innerHTML = jsondiffpatch.formatters.html.format(delta, jsonLeft);
+
+      // self-explained json
+      document.getElementById('annotated').innerHTML = jsondiffpatch.formatters.annotated.format(delta, jsonLeft);
+    };
+  };
+
+        angular.module('DiffApp').controller('DiffCtrl', ['$scope', DiffCtrl]);
+  }(window.angular));
+    </script>
+    </body>
+</html>

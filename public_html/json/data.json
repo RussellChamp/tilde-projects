@@ -2,4 +2,4 @@
   "data1": "foo",
   "data2": "bar",
   "data3": ["foo","bar","baz"]
-};
+}

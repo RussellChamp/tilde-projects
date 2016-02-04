@@ -19,6 +19,10 @@ from rhymesWith import getRhymes
 from rhymesWith import rhymeZone
 from defineWord import defWord
 from rainbow import makeRainbow
+import welch
+import evil
+import tumblr
+import xkcdApropos
 
 parser = OptionParser()
 
@@ -129,14 +133,35 @@ def define_word(channel, user, text):
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Couldn't find the definition of '" + word + "' :(\n")
     else:
         for entry in defs:
-          ircsock.send("PRIVMSG " + channel + " :" + user + ": Define '" + word + "'" + entry[0:200] + "\n")
+          ircsock.send("PRIVMSG " + channel + " :" + user + ": Define '" + word + "'" + entry[0:400] + "\n")
 
 def make_rainbow(channel, user, text):
     rbword = makeRainbow(text[9:])
     ircsock.send("PRIVMSG " + channel + " :" + rbword + "\n")
 
+def get_welch(channel):
+    ircsock.send("PRIVMSG " + channel + " :" + welch.get_thing()[0:400] + "\n")
+
+def get_evil(channel):
+    evilThing = evil.get_thing();
+    for line in [evilThing[i:i+400] for i in range(0, len(evilThing), 400)]:
+         ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+
+def get_tumble(url, channel):
+    tumble = tumblr.tumble(url)
+    for line in [tumble[i:i+400] for i in range(0, len(tumble), 400)]:
+        ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+
+def get_xkcd(channel, text):
+    links = xkcdApropos.xkcd_links(text[6:])
+    joined_links = ', '.join(links)
+    for line in [joined_links[i:i+400] for i in range(0, len(joined_links), 400)]:
+        ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+    #res = xkcdApropos.xkcd(text[6:])
+    #ircsock.send("PRIVMSG " + channel + " :" + res + "\n")
+
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhymes, and !define. Make your chatter #legend with !rainbow\n")
+  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhymes, and !define. Make your chatter #legend with !rainbow and get jokes with !welch and !evil\n")
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
@@ -191,6 +216,21 @@ def listen():
 
     if ircmsg.find(":!rainbow") != -1:
         make_rainbow(channel, user, messageText)
+
+    if ircmsg.find("!welch") != -1:
+        get_welch(channel)
+
+    if ircmsg.find("!evil") != -1:
+        get_evil(channel)
+
+    if ircmsg.find("!kjp") != -1:
+        get_tumble('http://kingjamesprogramming.tumblr.com', channel)
+
+    if ircmsg.find("!help") != -1:
+        get_tumble('http://thedoomthatcametopuppet.tumblr.com', channel)
+
+    if ircmsg.find("!xkcd") != -1:
+        get_xkcd(channel, messageText)
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)

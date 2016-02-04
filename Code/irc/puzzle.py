@@ -37,8 +37,8 @@ def make_puzzle():
   elif roll == 5:
       p1 = primes[random.randrange(0,len(primes))]
       p2 = primes[random.randrange(0,len(primes))]
-      answer = str(p1) + ',' + str(p2)
-      puzzle += p.number_to_words(p1 * p2) + " when factored into its two primes (answer in the form of the two primes with a comman between)"
+      answer = str(min(p1,p2)) + ',' + str(max(p1,p2))
+      puzzle += p.number_to_words(p1 * p2) + " when factored into its two primes (answer in the form of the two primes with a comma between)"
 
 
   puzzle += "? (Answer with numbers)"
