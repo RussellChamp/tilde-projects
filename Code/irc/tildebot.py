@@ -154,44 +154,45 @@ def listen():
   while 1:
 
     ircmsg = ircsock.recv(2048)
-    ircmsg = ircmsg.strip('\n\r')
+    for msg in ircmsg.split('\n'):
+      msg = msg.strip('\n\r')
 
-    if ircmsg.find("PING :") != -1:
-      ping()
+      if msg.find("PING :") != -1:
+        ping()
 
-    formatted = formatter.format_message(ircmsg)
+      formatted = formatter.format_message(msg)
 
-    if "" == formatted:
-      continue
+      if "" == formatted:
+        continue
 
     # print formatted
 
-    split = formatted.split("\t")
-    iTime = split[0]
-    user = split[1]
-    command = split[2]
-    channel = split[3]
-    messageText = split[4]
+      split = formatted.split("\t")
+      iTime = split[0]
+      user = split[1]
+      command = split[2]
+      channel = split[3]
+      messageText = split[4]
 
-    if ircmsg.find(":!tildescore") != -1:
+      if msg.find(":!tildescore") != -1:
         show_tildescore(channel, user)
-    elif ircmsg.find(":!tilde") != -1 and not challenges.has_key(user):
+      elif msg.find(":!tilde") != -1 and not challenges.has_key(user):
         challenge(channel, user, iTime)
-    elif challenges.has_key(user):
+      elif challenges.has_key(user):
         challenge_response(channel, user, iTime, messageText)
         #give_tilde(channel, user, iTime)
 
-    if ircmsg.find(":!jackpot") != -1:
+      if msg.find(":!jackpot") != -1:
         show_jackpot(channel)
 
-    if ircmsg.find(":!rollcall") != -1:
-      rollcall(channel)
+      if msg.find(":!rollcall") != -1:
+        rollcall(channel)
 
-    if ircmsg.find("PING :") != -1:
-      ping()
+      if msg.find("PING :") != -1:
+        ping()
 
-    sys.stdout.flush()
-    time.sleep(1)
+  sys.stdout.flush()
+  time.sleep(1)
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connect(options.server, options.channel, options.nick)
