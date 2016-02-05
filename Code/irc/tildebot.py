@@ -160,7 +160,7 @@ def listen():
       if msg.find("PING :") != -1:
         ping()
 
-      formatted = formatter.format_message(imsg)
+      formatted = formatter.format_message(msg)
 
       if "" == formatted:
         continue
