@@ -9,6 +9,7 @@ from optparse import OptionParser
 import fileinput
 import random
 import re
+import subprocess
 
 import formatter
 import get_users
@@ -23,6 +24,8 @@ import welch
 import evil
 import tumblr
 import xkcdApropos
+import wikiphilosophy
+import acronymFinder
 
 parser = OptionParser()
 
@@ -126,6 +129,7 @@ def get_rhymes(channel, user, text):
 
 def define_word(channel, user, text):
     word = ""
+    defs = []
     if(len(text.split(' ')) > 1):
         word = text.split(' ')[1]
         defs = defWord(word)
@@ -143,7 +147,7 @@ def get_welch(channel):
     ircsock.send("PRIVMSG " + channel + " :" + welch.get_thing()[0:400] + "\n")
 
 def get_evil(channel):
-    evilThing = evil.get_thing();
+    evilThing = evil.get_thing()
     for line in [evilThing[i:i+400] for i in range(0, len(evilThing), 400)]:
          ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
 
@@ -159,6 +163,33 @@ def get_xkcd(channel, text):
         ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
     #res = xkcdApropos.xkcd(text[6:])
     #ircsock.send("PRIVMSG " + channel + " :" + res + "\n")
+
+def get_wphilosophy(channel, text):
+  steps = wikiphilosophy.get_philosophy_lower(text[17:])
+  if not steps:
+    ircsock.send("PRIVMSG " + channel + " :Couldn't find a wikipedia entry for " + text + "\n")
+  else:
+    joined_steps = ' > '.join(steps)
+    if steps[-1] == 'Philosophy':
+      joined_steps += "!!!"
+    for line in [joined_steps[i:i+400] for i in range(0, len(joined_steps), 400)]:
+      ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+
+def figlet(channel, text):
+    if not text:
+        ircsock.send("PRIVMSG " + channel + " :No text given. :(\n")
+    else:
+        lines = subprocess.Popen(["figlet", "-w80"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
+        for line in lines.split('\n'):
+            ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+
+def get_acronym(channel, text):
+  if not text:
+    ircsock.send("PRIVMSG " + channel + " :No text given :(\n")
+  else:
+    defs = acronymFinder.get_acros(text)
+    for d in defs[0:5]: #only the first five. they are already sorted by 'score'
+      ircsock.send("PRIVMSG " + channel + " :" + d + "\n")
 
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhymes, and !define. Make your chatter #legend with !rainbow and get jokes with !welch and !evil\n")
@@ -231,6 +262,14 @@ def listen():
 
     if ircmsg.find("!xkcd") != -1:
         get_xkcd(channel, messageText)
+    if ircmsg.find("!wiki-philosophy") != -1:
+        get_wphilosophy(channel, messageText);
+
+    if ircmsg.find("!figlet") != -1:
+        figlet(channel, messageText[8:])
+
+    if ircmsg.find("!acronym") != -1:
+        get_acronym(channel, messageText[9:])
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)

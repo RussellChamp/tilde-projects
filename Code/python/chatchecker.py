@@ -11,7 +11,7 @@ userData = {} #hash keyed by "user" that contains an array of timestamps
 #we only care about recent chats, let's say for the past couple weeks
 oneWeek = 7 * 24 * 60 * 60
 fiveMinutes = 5 * 60
-timeCutoff = calendar.timegm(time.gmtime()) - (2 * oneWeek)
+timeCutoff = calendar.timegm(time.gmtime()) - (5 * oneWeek)
 
 with open(logfile, "r") as log:
     for line in log:

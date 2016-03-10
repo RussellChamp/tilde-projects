@@ -12,16 +12,42 @@ charset="utf-8"></script>-->
       google.load("visualization", "1", {packages:["timeline"]});
 
       data = [];
+      threshold = 5;
+      threeDays = 3 * 86400;
+      oneWeek = 7 * 86400; <!-- seconds in a week -->
       jQuery.getJSON("/~krowbar/data/userData.json", function(json) {
           _.forEach(json, function(times, user) {
-            console.log("~" + user + ":", times.length, "item(s)");
-            _.forEach(times, function(time) {
-              d = new Date(0);
-              d.setUTCSeconds(Number(time));
-              <!--data.push([user, d.toISOString().slice(11,16), d, d]);-->
-              data.push([user, d, d]);
-              })
+            if(times.length > threshold) {
+              console.log("~" + user + ":", times.length, "item(s)");
+              _.forEach(times, function(time) {
+                d = new Date(0);
+                d.setUTCSeconds((Number(time) + threeDays) % oneWeek - threeDays);
+                <!--data.push([user, d.toISOString().slice(11,16), d, d]);-->
+                data.push([user, d, d]);
+                });
+              }
             });
+          <!-- compress the data -->
+          data.sort(); <!-- to get the multi-week dates adjusted-->
+          timeThreshold = 30 * 60 * 1000; <!-- five minutes in milliseconds -->
+          removeCount = 0;
+          for(var i = 0; i < data.length-1;) {
+            removed = false;
+            if(data[i][0] == data[i+1][0]) { <!--name check-->
+              if(data[i][2].getTime() + timeThreshold > data[i+1][1].getTime() &&
+                data[i][2].getTime() < data[i+1][2].getTime() ) { <!--time check-->
+                <!-- console.log('Combining items', data[i][2].getTime(), data[i+1][1].getTime()); -->
+                data[i][2] = data[i+1][2];
+                data.splice(i+1,1); <!--remove item i+1-->
+                removed = true;
+                removeCount++;
+              }
+            }
+            if(!removed) {
+              i++;
+            }
+          }
+          console.log('Removed', removeCount, 'items');
           //google.setOnLoadCallback(drawChart);
           $(drawChart);
       });

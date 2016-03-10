@@ -53,10 +53,10 @@ def too_recent(time1, time2):
     else:
         return False
 
-def get_prize(user, isHuman):
+def get_prize(user, isHuman, bonus=0):
     if(random.randint(1,10) > 6 - 4 * isHuman): #80% of the time it's a normal prize (40% for not humans)
         prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans
-        prize = random.choice(prizes)
+        prize = random.choice(prizes) + bonus
         return [prize, user + ": " + (random.choice(['Yes','Yep','Correct','You got it']) if isHuman else random.choice(['No', 'Nope', 'Sorry', 'Wrong']))\
                 + "! You are " + ("super " if prize > 4 else "really " if prize > 2 else "") + "cool and get " + p.number_to_words(prize) + " tildes!"]
     else: #20% of the time its a jackpot situation
@@ -77,7 +77,7 @@ def show_jackpot(channel):
         jackpot = int(jackpotfile.readline().strip("\n"))
         ircsock.send("PRiVMSG " + channel + " :The jackpot is currently " + p.number_to_words(jackpot) + " tildes!\n")
 
-def give_tilde(channel, user, time, human):
+def give_tilde(channel, user, time, human, bonus=0):
     found = False
     with open(SCORE_FILE, "r+") as scorefile:
         scores = scorefile.readlines()
@@ -90,12 +90,12 @@ def give_tilde(channel, user, time, human):
                 if(too_recent(time, person[2]) and not DEBUG):
                     ircsock.send("PRIVMSG " + channel + " :You have asked for a tilde too recently. Try again later.\n")
                 else:
-                    prize = get_prize(user, human)
+                    prize = get_prize(user, human, bonus)
                     score = person[0] + "&^%" + str(int(person[1]) + prize[0]) + "&^%" + time + "\n"
                     ircsock.send("PRIVMSG " + channel + " :" + prize[1] + "\n")
             scorefile.write(score)
         if(not found):
-            prize = get_prize(user, True)
+            prize = get_prize(user, True, bonus)
             ircsock.send("PRIVMSG " + channel + " :Welcome to the tilde game! Here's " + p.number_to_words(prize[0]+1) + " free tilde(s) to start you off.\n")
             scorefile.write(user + "&^%" + str(prize[0]+1) + "&^%" + time + "\n")
 
@@ -122,10 +122,11 @@ def challenge_response(channel, user, time, msg):
     global challenges
     print(msg);
     if(challenges.has_key(user)):
+        bonus = 1 if str(challenges[user]).find(',') != -1 else 0 #give a bonus for prime factoring
         if(msg == str(challenges[user]) or msg == p.number_to_words(challenges[user])):
-            give_tilde(channel, user, time, True);
+            give_tilde(channel, user, time, True, bonus);
         else:
-            give_tilde(channel, user, time, False);
+            give_tilde(channel, user, time, False, 0);
         del challenges[user]; #delete the user from challenges either way
 
 

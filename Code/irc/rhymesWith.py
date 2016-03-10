@@ -20,6 +20,6 @@ def rhymeZone(word):
     for t in soup.find_all('a', 'd'):
         w = t.text.rstrip()
         if w not in [u'', u'\xa0'] and '?' not in t:
-            words.append(w)
+            words.append(w.encode('ascii', 'ignore'))
     random.shuffle(words)
     return words[0:5]

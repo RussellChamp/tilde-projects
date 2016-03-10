@@ -7,7 +7,7 @@
 
     var self = this;
 
-var adjectives = Array('Ancient','Bold','Breaking','Brightest','Brilliant','Crescent','Dark|Darkness','Darkest|Darkness','Desert|Desert','Eternal','Evening|Darkness','Final','First','Forever','Giant|Giant','Glorious|Glory','Joyful|Joy','July','Last','Liberty|Liberty','Magic|Magic','Morning|Morning','Power|Power','Phantom','Present','Righteous','Roaring|Roar|Scream','Rolling','Sand','Screaming|Roar|Scream','Silent','Soaring','Standing|Stand','Star|Star','Stunning','Super','Thunderous|Thunder','Twisted','Urgent','Utopian','Valiant');
+var adjectives = Array('Ancient','Bold','Breaking','Brightest','Brilliant','Crescent','Dark|Darkness','Darkest|Darkness','Desert|Desert','Eternal','Evening|Darkness','Final','First','Forever','Giant|Giant','Glorious|Glory','Joyful|Joy','July','Last','Liberty|Liberty','Magic|Magic','Morning|Morning','Power|Power','Phantom','Present','Righteous','Roaring|Roar|Scream','Rolling','Sand','Screaming|Roar|Scream','Silent','Sleeping','Soaring','Standing|Stand','Star|Star','Stunning','Super','Thunderous|Thunder','Twisted','Urgent','Utopian','Valiant');
 var nouns = Array('Action','Alert','Bane','Beauty','Claw','Darkness','Dawn','Day','Defense','Desert','Envy','Fall','Fist','Flight','Fury','Guard','Glory','Hammer','Hand','Honor','Hope','Hunt','Hurricane','Joy','Liberty','Light','Lightning','Magic','Morning','October','Power','Rain','Response','Repose','Roar','Scream','Skull','Sky','Skies','Shield','Shout','Stand','Star','Storm','Streak','Strike','Sun','Thunder','Victory','Whisper','Wind','Wrath');
 var colors = Array('Black','Blue','Brown','Golden','Gray','Green','Indego','Orange','Purple','Rainbow','Red','Scarlet','Silver','Violet','White','Yellow');
 var actors = Array('Cobra','Condor','Dragon','Eagle','Giant','Guardian','Hawk','Hydra','Jackal','King','Knight','Lady','Lion','Scorpion','Spartan','Stranger','Titan','Victor','Viking','Warrior');
@@ -24,7 +24,8 @@ var mission_grammars = Array(
     {chance:5,  grammar: "{noun1} of {color} {noun2}"},
     {chance:10, grammar: "{adj1} {noun1} and {adj2} {noun2}"},
     {chance:3,  grammar: "Attack of the {actor}s"},
-    {chance:3,  grammar: "Return of the {actor}s"}
+    {chance:3,  grammar: "Return of the {actor}s"},
+    {chance:1,  grammar: "The {actor} Awakens"}
     );
 this.getNoun = function(badNouns) {
   return _.chain(nouns)
