@@ -24,7 +24,11 @@ charset="utf-8"></script>-->
               userData.lineCount,
               userData.wordCount, Number((userData.wordCount / userData.lineCount).toFixed(2)), 
               userData.charCount, Number((userData.charCount / userData.lineCount).toFixed(2)),
-              userData.streak, userData.mentions, userData.botUse,
+              userData.streak,
+              userData.mentions,
+              (userData.mentions / userData.daysActive),
+              (userData.mentions / userData.lineCount),
+              userData.botUse,
               Number((userData.responseTime / (userData.mentions ? userData.mentions : 1) / 60).toFixed(2)),
               ]);
             });
@@ -40,7 +44,7 @@ charset="utf-8"></script>-->
         var minFormatter = new google.visualization.NumberFormat({pattern: '##.## minutes'});
         var dayFormatter = new google.visualization.NumberFormat({pattern: '## days'});
         var wordFormatter = new google.visualization.NumberFormat({pattern: '##.## words'});
-        var charFormatter = new google.visualization.NumberFormat({pattern: '##.## chars'});
+        var charFormatter = new google.visualization.NumberFormat({pattern: '##.## char'});
         var streakFormatter = new google.visualization.NumberFormat({pattern: '## lines'});
         var mentionsFormatter = new google.visualization.NumberFormat({pattern: '## mentions'});
 
@@ -48,17 +52,19 @@ charset="utf-8"></script>-->
         dataTable.addColumn('datetime', 'First Spoke'); //col1
         dataTable.addColumn('datetime', 'Last Spoke');  //col2
         dataTable.addColumn('number', 'Total');    //col3
-        dataTable.addColumn('number', 'Active on');     //col4
+        dataTable.addColumn('number', 'Active');        //col4
         dataTable.addColumn('number', 'Ratio');         //col5
         dataTable.addColumn('number', 'Lines');         //col6
         dataTable.addColumn('number', 'Words');         //col7
         dataTable.addColumn('number', 'per Line');      //col8
         dataTable.addColumn('number', 'Characters');    //col9
         dataTable.addColumn('number', 'per Line');      //col10
-        dataTable.addColumn('number', 'Chat Streak');   //col11
+        dataTable.addColumn('number', 'Streak');        //col11
         dataTable.addColumn('number', 'Popularity');    //col12
-        dataTable.addColumn('number', 'Bot Use');       //col13
-        dataTable.addColumn('number', 'Response time'); //col14
+        dataTable.addColumn('number', 'by Day');        //col13
+        dataTable.addColumn('number', 'by Line');       //col14
+        dataTable.addColumn('number', 'Bot Use');       //col15
+        dataTable.addColumn('number', 'Response time'); //col16
 
         dataTable.addRows(data);
         userFormatter.format(dataTable, [0]);
@@ -68,7 +74,7 @@ charset="utf-8"></script>-->
         charFormatter.format(dataTable, 10);
         streakFormatter.format(dataTable, 11);
         mentionsFormatter.format(dataTable, 12);
-        minFormatter.format(dataTable, 14);
+        minFormatter.format(dataTable, 16);
         console.log("* Set up the columns!");
 
         var table = new google.visualization.Table(document.getElementById('statTable'));

@@ -8,11 +8,13 @@ import re
 import math
 import operator
 
-MAX_NODES = 3
+MAX_NODES = 5
 
 logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatBesties.json"
 outCircle = "/home/krowbar/logs/chatcircle.json"
+timePeriod = calendar.timegm(time.gmtime()) - (3 * 7 * 24 * 60 * 60) #3 weeks
+
 userData = {} #hash keyed by "user" that contains a hash of mentioned other users with count
 nameFix = {
         'jumblesal': 'jumblesale',
@@ -47,6 +49,8 @@ with open(logfile, "r") as log:
     for line in log:
         try:
             time, user, message = line.split("\t", 3)
+            if int(time) < timePeriod:
+                continue #only consider the past three weeks of chats
             if nameFix.has_key(user):
                 user = nameFix[user]
             else:
@@ -61,31 +65,38 @@ with open(logfile, "r") as log:
                         userData[user]['data'][word] += 1
                     else: #This user never mentioned this person before
                         userData[user]['data'][word] = 1
+                    #give both the target and mentioner a point
                 else: #This user was never set up
                     userData[user] = {} #make it a dictionary!
                     userData[user]['data'] = {}
                     userData[user]['data'][word] = 1
+                    userData[user]['score'] = 0
                     userData[user]['id'] = len(d3data['nodes']) #so we know how to match people during the links phase
                     d3data['nodes'].append({"name": user, "group": 1})
                 if not userData.has_key(word): #check if the target has not been set up
                     userData[word] = {}
                     userData[word]['data'] = {}
+                    userData[word]['score'] = 0
                     userData[word]['id'] = len(d3data['nodes'])
                     d3data['nodes'].append({"name": word, "group": 1})
+                userData[user]['score'] += 1
+                userData[word]['score'] += 1
 
 d3data['links'] = []
 #Now connect all the pople to their stuff
 for user, values in userData.iteritems():
-    besties = sorted(values['data'].items(), key=operator.itemgetter(1), reverse=True)[0:MAX_NODES] #ONLY the top 5 besties
+    #give the user a 'group' based on their total score
+    d3data['nodes'][values['id']]['group'] = int(math.ceil(math.sqrt(math.sqrt(values['score']))))
+    besties = sorted(values['data'].items(), key=operator.itemgetter(1), reverse=True)[0:MAX_NODES] #ONLY the top besties
     for target, score in besties:
         try:
-            print "Adding link for " + user + " (" + str(values['id']) + ") to " + target + " (" + str(userData[target]['id']) + ") for " + str(score)
+            print "Adding link from " + user + " (" + str(values['id']) + ") to " + target + " (" + str(userData[target]['id']) + ") with strength " + str(score)
             d3data['links'].append({"source": values['id'], "target": userData[target]['id'], "value": math.ceil(math.sqrt(score))})
         except KeyError:
-            print "Error when trying to link " + user + " to " + target
+            print "! Error when trying to link " + user + " to " + target
             continue
     if len(values['data']) > MAX_NODES:
-        print "...ignoring " + str(len(values['data']) - MAX_NODES) + " more connections"
+        print "  ...ignoring " + str(len(values['data']) - MAX_NODES) + " more connections from " + user
 
 d3Circle = {}
 d3Circle['names'] = [''] * len(userData)

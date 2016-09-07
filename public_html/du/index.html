@@ -53,15 +53,22 @@
           //maybe i could add something to show more points but we're not losing too much granularity for the speed we gain
           if(idx % 8 != 0) return; 
           _.forEach(set.data, function(point) {
-            if(point.du > 2000) { //the 'interesting' threshold is set at 20000kb
-              if(!userData[point.user]) {
-                userData[point.user] = [];
+            if(point.du > 5000) { //the 'interesting' threshold is set at 5000kb
+              if(!userData[point.user]) { //if the current user has not been initialized yet
+                userData[point.user] = []; //create an empty array
                 var size = json.length;
-                while(size--) userData[point.user][size] = 0;
-                linedata.addColumn('number', point.user);
+                while(size--) userData[point.user][size] = 0; //and populate it with zeros for the lenght of our entire set
+                linedata.addColumn('number', point.user); //then add a column of type 'number' for this user
 
               }
-              userData[point.user][idx] = point.du;
+              userData[point.user][idx] = point.du; //add a point for this user
+              //if the last three data points are the same value
+              //if(idx > 16 && userData[point.user][idx] == userData[point.user][idx-8] && userData[point.user][idx-16]) {
+              //  userData[point.user].splice(idx,1); //then get rid of the middle one
+              //  if(point.user == '~vilmibm') {
+              //    console.log('points', userData[point.user]);
+              //    }
+              //}
             }
           })
         })

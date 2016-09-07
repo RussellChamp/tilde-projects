@@ -54,9 +54,9 @@ def too_recent(time1, time2):
         return False
 
 def get_prize(user, isHuman, bonus=0):
+    prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans
+    prize = random.choice(prizes) + bonus
     if(random.randint(1,10) > 6 - 4 * isHuman): #80% of the time it's a normal prize (40% for not humans)
-        prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans
-        prize = random.choice(prizes) + bonus
         return [prize, user + ": " + (random.choice(['Yes','Yep','Correct','You got it']) if isHuman else random.choice(['No', 'Nope', 'Sorry', 'Wrong']))\
                 + "! You are " + ("super " if prize > 4 else "really " if prize > 2 else "") + "cool and get " + p.number_to_words(prize) + " tildes!"]
     else: #20% of the time its a jackpot situation
@@ -65,8 +65,8 @@ def get_prize(user, isHuman, bonus=0):
             jackpotfile.seek(0)
             jackpotfile.truncate()
             if(random.randint(1,10) > 1 or not isHuman): #90% of the time it's a non-prize. non-humans never win jackpot
-                new_jackpot = jackpot+1
-                jackpotfile.write(str(new_jackpot)) #increase the jackpot by 1
+                new_jackpot = jackpot+max(1,prize)
+                jackpotfile.write(str(new_jackpot)) #increase the jackpot by the prize size
                 return [0, user + " is a meanie and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
             else: #hit jackpot!
                 jackpotfile.write(str(JACKPOT_MIN))

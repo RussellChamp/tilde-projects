@@ -1,11 +1,12 @@
 import urllib
 from bs4 import BeautifulSoup
 import random
+import string
 
-
+dict = '/usr/share/dict/american-english-huge'
 (userId,token) = open("/home/krowbar/.secret/s4token").readline().rstrip().split(',')
 
-def get_acros(word):
+def get_acros(word, silly):
   acros = []
   url = "http://www.stands4.com/services/v2/abbr.php?uid=%s&tokenid=%s&term=%s" % (userId, token, word)
   soup = BeautifulSoup(urllib.urlopen(url).read(), 'html5lib')
@@ -14,7 +15,7 @@ def get_acros(word):
   defs = []
   for r in results:
       rdef = r.find('definition').text
-      match = next((x for x in defs if x['definition'] == rdef), None)
+      match = next((x for x in defs if x['definition'].lower() == rdef.lower()), None)
       if match is not None:
           #if we find a match, add the category to the existing categories and increase the score
           match['categories'].append(((r.find('parentcategoryname').text + '\\') if r.find('parentcategoryname') else '') + r.find('categoryname').text)
@@ -32,4 +33,21 @@ def get_acros(word):
       acros.append(("%s: \"%s\" (%s, score: %s)" % \
               (d['term'], d['definition'], ', '.join(d['categories']), d['score'])\
               ).encode('ascii', 'ignore'))
+  if silly is True:
+      newDef = []
+      words = open(dict, 'r').readlines()
+      try:
+          for idx,letter in enumerate(word):
+              newWord = random.choice(\
+                      filter(lambda w: (idx is 0 or not w.strip().lower().endswith('\'s'))\
+                      and w.lower().startswith(letter.lower()), words)\
+                      ).strip()
+              print str(idx) + ' -> ' + newWord
+              newDef.append(newWord)
+          acros.append(("%s: \"%s\" (%s, score: %s)" % \
+                  (word.upper(), string.capwords(' '.join(newDef)), 'Tilde.town Original', '0')\
+                  ).encode('ascii', 'ignore'))
+      except IndexError:
+          acros.append("Future hazy, try again later: Tilde.town Error");
+
   return acros

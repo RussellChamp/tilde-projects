@@ -133,3 +133,29 @@
 1453427743&^%vilmibm&^%WHAT MOVIE SHOULD WE WATCH IN ASCII ON MOVIE NIGHT? | add yrself to the map http://tilde.town/~bear/where.html
 1455911894&^%vilmibm&^%RESTART IMMINENT | OUT YOUR CRUSHES | WATCH THE WORLD BURN
 1456278388&^%vilmibm&^%how about the feels tho?
+1459142397&^%vilmibm&^%what is your favorite html tag and why
+1459201315&^%vilmibm&^%who would like to be able to use cgi bin scripts?
+1459831112&^%vilmibm&^%when was the last time you thought about a tree?
+1460409890&^%vilmibm&^%why, though?
+1460603383&^%vilmibm&^%when was the last time you puked?
+1460603418&^%vilmibm&^%have you ever intentionally destroyed some tangible thing?
+1461126470&^%vilmibm&^%fire?
+1461445727&^%vilmibm&^%does the internet feel more or less lonely now than in the past?
+1461584303&^%premysl&^%If you could have a child with any famous person alive, who would it be? What would you name him/her?
+1461709537&^%vilmibm&^%did you know there's a tilde.town zine in the works? submit! https://github.com/tildetown/zine
+1462235950&^%vilmibm&^%omg ~endorphant/bin/ttbp | contrib 2 zine <3 https://github.com/tildetown/zine
+1462435258&^%vilmibm&^%harsh
+1462435306&^%vilmibm&^%Everything is Up | contrib 2 zine <3 https://github.com/tildetown/zine
+1462913538&^%vilmibm&^%lol washpo http://wapo.st/1WVQGuS | contrib 2 zine <3 https://github.com/tildetown/zine
+1467089202&^%vilmibm&^%when was the last time you cried for joy, not sadness
+1468306858&^%vilmibm&^%have you ever taken apart a computer to hang its innards on your wall
+1469144561&^%vilmibm&^%who is your favorite lizard?
+1470363543&^%vilmibm&^%TILDE.TOWN ZINE ISSUE 1 IS OUT! https://t.co/EqOBdefVkQ | CONTRIBUTE TO ISSUE 2 https://github.com/tildetown/zine/blob/master/contributing.md
+1470840724&^%vilmibm&^%someone did some seemingly malicious things and amazon cut us off of everything but ssh
+1470842778&^%vilmibm&^%scanning was not malicious; waiting on amazon to restore our non-ssh access
+1470936112&^%vilmibm&^%please don't ever perform pentesting from this host
+1471278375&^%cmr&^%oom-killer killed the ircd because the box ran out of memory. does anyone know what ate all the memory?
+1471364675&^%cmr&^%Would you rather lead or follow? Why?
+1471364822&^%krowbar&^%If you could be permanently one color for the rest of your life, what color would it be & why?
+1472981491&^%vilmibm&^%any feedback on the new homepage template? http://tilde.town/~vilmibm/new_tilde_index.html
+1473143684&^%vilmibm&^%how was your day?

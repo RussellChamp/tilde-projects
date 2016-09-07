@@ -10,6 +10,8 @@ import fileinput
 import random
 import re
 import subprocess
+import time
+import datetime
 
 import formatter
 import get_users
@@ -26,6 +28,7 @@ import tumblr
 import xkcdApropos
 import wikiphilosophy
 import acronymFinder
+from whosaid import whoSaid
 
 parser = OptionParser()
 
@@ -157,7 +160,7 @@ def get_tumble(url, channel):
         ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
 
 def get_xkcd(channel, text):
-    links = xkcdApropos.xkcd_links(text[6:])
+    links = xkcdApropos.xkcd(text[6:])
     joined_links = ', '.join(links)
     for line in [joined_links[i:i+400] for i in range(0, len(joined_links), 400)]:
         ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
@@ -183,13 +186,39 @@ def figlet(channel, text):
         for line in lines.split('\n'):
             ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
 
+def toilet(channel, text):
+    if not text:
+        ircsock.send("PRIVMSG " + channel + " :No text given. :(\n")
+    else:
+        lines = subprocess.Popen(["toilet", "--irc"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
+        for line in lines.split('\n'):
+            ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+            time.sleep(0.3) #to avoid channel throttle due to spamming
+
 def get_acronym(channel, text):
   if not text:
     ircsock.send("PRIVMSG " + channel + " :No text given :(\n")
   else:
-    defs = acronymFinder.get_acros(text)
+    defs = acronymFinder.get_acros(text, True)
     for d in defs[0:5]: #only the first five. they are already sorted by 'score'
       ircsock.send("PRIVMSG " + channel + " :" + d + "\n")
+    if len(defs) > 5:
+      ircsock.send("PRIVMSG " + channel + " :" + defs[-1] + "\n")
+
+def get_whosaid(channel, text):
+  if not text:
+    ircsock.send("PRIVMSG " + channel + " :No text given :(\n")
+  else:
+    result = whoSaid(text)
+    date = datetime.date.fromtimestamp(result['timecutoff'])
+    dateStr = date.strftime('%B %d')
+    if not result['data']:
+      msg = 'Nobody said \'%s\' since %s' % (text, dateStr)
+    else:
+      msg = 'Since %s, %s said \'%s\' %d times' % (dateStr, result['data'][0][0], text, result['data'][0][1])
+      if len(result['data']) > 1:
+        msg += ' and %s said it %d times' % (result['data'][1][0], result['data'][1][1])
+    ircsock.send("PRIVMSG " + channel + " :" + msg + ".\n")
 
 def rollcall(channel):
   ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhymes, and !define. Make your chatter #legend with !rainbow and get jokes with !welch and !evil\n")
@@ -268,8 +297,14 @@ def listen():
     if ircmsg.find("!figlet") != -1:
         figlet(channel, messageText[8:])
 
+    if ircmsg.find("!toilet") != -1:
+        toilet(channel, messageText[8:])
+
     if ircmsg.find("!acronym") != -1:
         get_acronym(channel, messageText[9:])
+
+    if ircmsg.find(":!whosaid") != -1:
+        get_whosaid(channel, messageText[9:])
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)

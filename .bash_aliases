@@ -15,3 +15,6 @@ alias units='~/Code/units/units-2.11/units -f ~/Code/units/units-2.11/definition
 alias beats_raw='echo "x = (`date +%s` + 3600) % 86400; scale=3; x / 86.4" | bc'
 alias beats='printf "@\e[0;36m`beats_raw`\e[m\n"'
 alias pp='python -mjson.tool'
+alias ttbp='~endorphant/bin/ttbp'
+alias vuln='find /home/ \! -type l -perm -o=w 2> /dev/null'
+alias vulnc='vuln | sed "s/\/home\/\([^/]*\)\/.*/\1/g" | sort | uniq -c | sort -nr'
