@@ -3,10 +3,10 @@ from bs4 import BeautifulSoup
 import random
 import string
 
-dict = '/usr/share/dict/american-english-huge'
+dict = '/usr/share/dict/american-english'
 (userId,token) = open("/home/krowbar/.secret/s4token").readline().rstrip().split(',')
 
-def get_acros(word, silly):
+def get_acros(word, silly, short):
   acros = []
   url = "http://www.stands4.com/services/v2/abbr.php?uid=%s&tokenid=%s&term=%s" % (userId, token, word)
   soup = BeautifulSoup(urllib.urlopen(url).read(), 'html5lib')
@@ -30,7 +30,10 @@ def get_acros(word, silly):
 
   for d in sorted(defs, key=lambda x:float(x['score']), reverse=True):
       #print d;
-      acros.append(("%s: \"%s\" (%s, score: %s)" % \
+      if short is True:
+        acros.append("\"%s\"" % d['definition'])
+      else:
+        acros.append(("%s: \"%s\" (%s, score: %s)" % \
               (d['term'], d['definition'], ', '.join(d['categories']), d['score'])\
               ).encode('ascii', 'ignore'))
   if silly is True:
@@ -44,10 +47,19 @@ def get_acros(word, silly):
                       ).strip()
               print str(idx) + ' -> ' + newWord
               newDef.append(newWord)
-          acros.append(("%s: \"%s\" (%s, score: %s)" % \
-                  (word.upper(), string.capwords(' '.join(newDef)), 'Tilde.town Original', '0')\
+          newWord = string.capwords(' '.join(newDef))
+          if short is True:
+            acros.append("\"%s\"" % newWord)
+          else:
+            acros.append(("%s: \"%s\" (%s, score: %s)" % \
+                  (word.upper(), newWord, 'Tilde.town Original', '0')\
                   ).encode('ascii', 'ignore'))
       except IndexError:
           acros.append("Future hazy, try again later: Tilde.town Error");
-
-  return acros
+  if short is True:
+    shortList = acros[0:5]
+    if len(acros) > 5:
+      shortList.append(acros[-1])
+    return [word.upper() + ': ' + ', '.join(shortList)]
+  else:
+    return acros

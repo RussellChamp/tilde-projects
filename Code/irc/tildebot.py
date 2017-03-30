@@ -53,12 +53,32 @@ def too_recent(time1, time2):
     else:
         return False
 
+def get_positive():
+    return random.choice(['Yes','Yep','Correct','You got it', 'Yeah', 'Right on', 'Uh-huh', 'Positive'])
+
+def get_negative():
+    return random.choice(['No', 'Nope', 'Sorry', 'Wrong', 'Nuh-uh', 'Negatory', 'Incorrect', 'Not today', 'Try again', 'Maybe later'])
+
+def get_superlative(score):
+    if score > 4:
+        return random.choice(["super cool", "totally rad", "extraordinary", "dynomite", "#topdrawer", "a #TopLad", "the cat's meow", "a tilde town hero", "my favorite person", "incredibly lucky",\
+                "unbelievable", "a tilde town hunk", "could bring all the boys to the yard", "worth twice their weight in gold"]);
+    elif score > 2:
+        return random.choice(["really cool", "pretty neat", "rather nice", "a dynamic doggo", "radical", "intense", "pretty lucky", "knows the territory", "has what it takes", "has mad skillz",\
+                "going the distance"]);
+    else:
+        return random.choice(["cool", "nice", "acceptible", "good enough", "a promising pupper", "better than a horse", "swell", "a little lucky", "just credible", "my friend"]);
+
+def get_bad_thing():
+    return random.choice(["is a meanie", "mugs me right off", "is worse than a horse", "smells like a ghost", "probably didn't bathe today", "didn't guess hard enough", "isn't lucky",\
+            "smells of elderberries", "should reconsider their life choices", "did't believe in the heart of the tilde", "came to the wrong chat channel", "should have stopped while they were ahead",\
+            "requires annotations from an authoratative source", "could have been a contender"]);
+
 def get_prize(user, isHuman, bonus=0):
     prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans
     prize = random.choice(prizes) + bonus
     if(random.randint(1,10) > 6 - 4 * isHuman): #80% of the time it's a normal prize (40% for not humans)
-        return [prize, user + ": " + (random.choice(['Yes','Yep','Correct','You got it']) if isHuman else random.choice(['No', 'Nope', 'Sorry', 'Wrong']))\
-                + "! You are " + ("super " if prize > 4 else "really " if prize > 2 else "") + "cool and get " + p.number_to_words(prize) + " tildes!"]
+        return [prize, user + ": " + (get_positive() if isHuman else get_negative()) + "! You are " + get_superlative(prize) + " and get " + p.number_to_words(prize) + " tildes!"]
     else: #20% of the time its a jackpot situation
         with open(JACKPOT_FILE, "r+") as jackpotfile:
             jackpot = int(jackpotfile.readline().strip("\n"))
@@ -67,7 +87,7 @@ def get_prize(user, isHuman, bonus=0):
             if(random.randint(1,10) > 1 or not isHuman): #90% of the time it's a non-prize. non-humans never win jackpot
                 new_jackpot = jackpot+max(1,prize)
                 jackpotfile.write(str(new_jackpot)) #increase the jackpot by the prize size
-                return [0, user + " is a meanie and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
+                return [0, user + " " + get_bad_thing() + " and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
             else: #hit jackpot!
                 jackpotfile.write(str(JACKPOT_MIN))
                 return [jackpot, user + " hit the jackpot and won **" + p.number_to_words(jackpot) + " tildes!**"]
@@ -88,7 +108,7 @@ def give_tilde(channel, user, time, human, bonus=0):
             if(person[0] == user):
                 found = True
                 if(too_recent(time, person[2]) and not DEBUG):
-                    ircsock.send("PRIVMSG " + channel + " :You have asked for a tilde too recently. Try again later.\n")
+                    ircsock.send("PRIVMSG " + channel + " :" + user + " have asked for a tilde too recently and " + get_bad_thing() + ". Try again later.\n")
                 else:
                     prize = get_prize(user, human, bonus)
                     score = person[0] + "&^%" + str(int(person[1]) + prize[0]) + "&^%" + time + "\n"
@@ -123,7 +143,7 @@ def challenge_response(channel, user, time, msg):
     print(msg);
     if(challenges.has_key(user)):
         bonus = 1 if str(challenges[user]).find(',') != -1 else 0 #give a bonus for prime factoring
-        if(msg == str(challenges[user]) or msg == p.number_to_words(challenges[user])):
+        if(msg.lower() == str(challenges[user]).lower() or msg == p.number_to_words(challenges[user])):
             give_tilde(channel, user, time, True, bonus);
         else:
             give_tilde(channel, user, time, False, 0);

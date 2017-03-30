@@ -199,7 +199,7 @@ def get_acronym(channel, text):
   if not text:
     ircsock.send("PRIVMSG " + channel + " :No text given :(\n")
   else:
-    defs = acronymFinder.get_acros(text, True)
+    defs = acronymFinder.get_acros(text, True, True)
     for d in defs[0:5]: #only the first five. they are already sorted by 'score'
       ircsock.send("PRIVMSG " + channel + " :" + d + "\n")
     if len(defs) > 5:
@@ -256,7 +256,7 @@ def listen():
     # print formatted
 
     split = formatted.split("\t")
-    time = split[0]
+    #time = split[0]
     user = split[1]
     command = split[2]
     channel = split[3]
@@ -313,6 +313,7 @@ def listen():
       ping()
 
     sys.stdout.flush()
+    time.sleep(1)
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connect(options.server, options.channel, options.nick)

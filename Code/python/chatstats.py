@@ -4,10 +4,15 @@ import json
 import time
 import calendar
 import shutil
+import re
 
 logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatStats.json"
 userData = {} #hash keyed by "user" that contains a start timestamp, last timestamp, last said string, chat count, letter count, and word count
+                #also now happy emotes and sad emotes
+rejectRegexp = "http[s]?://|[0-9]{2}[;:][0-9]{2}"
+happyRegexp = ":[-]?[])}]"
+sadRegexp = ":[-]?[[({]"
 nameFix = {
         'jumblesal': 'jumblesale',
         'hardmath1': 'kc',
@@ -68,10 +73,17 @@ with open(logfile, "r") as log:
             userData[user]['lastMention'] = 0
             userData[user]['responseTime'] = 0
             userData[user]['botUse'] = 0
+            userData[user]['happyEmotes'] = 0
+            userData[user]['sadEmotes'] = 0
 
         lastUser = user;
         if message.rstrip() and message[0] == '!':
             userData[user]['botUse'] += 1
+        if not re.search(rejectRegexp, message):
+            if re.search(happyRegexp, message):
+                userData[user]['happyEmotes'] += 1
+            if re.search(sadRegexp, message):
+                userData[user]['sadEmotes'] += 1
 
         try:
             if message.rstrip() and message.split()[0][-1] == ':': #last character of first word

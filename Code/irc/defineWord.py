@@ -14,7 +14,7 @@ def define(word):
 
 key = open("/home/krowbar/.secret/key").readline().rstrip()
 
-def defWord(word):
+def defWord(word, short = True):
     defs = []
     url = 'http://www.dictionaryapi.com/api/v1/references/collegiate/xml/%s?key=%s' % (word, key)
     soup = BeautifulSoup(urllib.urlopen(url).read(), 'html5lib')
@@ -22,4 +22,7 @@ def defWord(word):
     if entry:
         for d in entry.find_all('dt'):
             defs.append(d.text.encode('ascii', 'ignore'))
-    return defs
+    if short:
+        return ' '.join(defs)
+    else:
+        return defs

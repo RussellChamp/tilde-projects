@@ -8,15 +8,17 @@ import shutil
 
 logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatcloud.json"
-#outfile = "/home/krowbar/logs/chatcloud_2016_01.json"
+#outfile = "/home/krowbar/logs/chatcloud_2016_10.json"
+
 bannedUsersFile = "/home/krowbar/Code/python/bannedUsers"
 bannedWordsFile = "/home/krowbar/Code/python/bannedWords"
 wordData = {} # keyed by "word" that contains a count
 #we only care about recent chats, let's say for the past sixteen hours
 timeTo = calendar.timegm(time.gmtime())
-#timeTo = calendar.timegm(time.strptime("1 Feb 16", "%d %b %y"))
+#timeTo = calendar.timegm(time.strptime("1 Nov 16", "%d %b %y"))
+
 timeCutoff = timeTo - (16 * 60 * 60)
-#timeCutoff = calendar.timegm(time.strptime("1 Jan 16", "%d %b %y"))
+#timeCutoff = calendar.timegm(time.strptime("1 Oct 16", "%d %b %y"))
 print "Generating word cloud based off words from " + str(timeCutoff) + " to " + str(timeTo)
 minOccurance = 3 #we'll have to reduce the minOccurances if we reduce the timeCutoff
 minLength = 3 #number of letters long

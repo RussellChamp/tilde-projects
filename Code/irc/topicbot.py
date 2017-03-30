@@ -8,6 +8,7 @@ import sys
 from optparse import OptionParser
 import fileinput
 import random
+import time
 
 import formatter
 import get_users
@@ -152,20 +153,20 @@ def listen():
     # print formatted
 
     split = formatted.split("\t")
-    time = split[0]
+    msgtime = split[0]
     user = split[1]
     command = split[2]
     channel = split[3]
     messageText = split[4]
 
     if(command == "TOPIC" and user != options.nick):
-      count_topic(channel,user, time, messageText)
+      count_topic(channel,user, msgtime, messageText)
 
     if ircmsg.find(":!topic") != -1:
-      get_topic(channel, user, time)
+      get_topic(channel, user, msgtime)
 
     if ircmsg.find(":!settopic") != -1:
-      set_topic(channel, user, time, messageText[10:])
+      set_topic(channel, user, msgtime, messageText[10:])
 
     if ircmsg.find(":!tscores") != -1:
       topic_scores(channel)
@@ -173,9 +174,9 @@ def listen():
       topic_score(channel)
 
     if ircmsg.find(":!randomtopic") != -1:
-      random_topic(channel, user, time, True)
+      random_topic(channel, user, msgtime, True)
     if ircmsg.find(":!suggesttopic") != -1:
-      random_topic(channel,user,time, False)
+      random_topic(channel,user,msgtime, False)
 
     if ircmsg.find(":!thistory") != -1:
       topic_history(channel, user, messageText)
@@ -187,6 +188,7 @@ def listen():
       ping()
 
     sys.stdout.flush()
+    time.sleep(1)
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connect(options.server, options.channel, options.nick)

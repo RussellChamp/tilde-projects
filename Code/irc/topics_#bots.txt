@@ -27,3 +27,7 @@
 1470840451&^%marcus&^%Bots are cool, yo!
 1471364647&^%krowbar&^%Test bots and play games
 1471365078&^%krowbar&^%Test bots and play games. Use !rollcall to list bot's abilities
+1475761505&^%krowbar&^%Test bots and play with them
+1475761589&^%krowbar&^%Test bots and play games. Use !rollcall to list bot's abilities
+1475761599&^%krowbar&^%Test bots and play games. Use !rollcall to list bot's abilities
+1475765914&^%cmr&^%Test bots and play games. Use !rollcall to list bots' abilities

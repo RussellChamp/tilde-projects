@@ -112,6 +112,7 @@ def listen():
       ping()
 
     sys.stdout.flush()
+    time.sleep(1)
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connect(options.server, options.channel, options.nick)

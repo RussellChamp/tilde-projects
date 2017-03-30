@@ -159,3 +159,29 @@
 1471364822&^%krowbar&^%If you could be permanently one color for the rest of your life, what color would it be & why?
 1472981491&^%vilmibm&^%any feedback on the new homepage template? http://tilde.town/~vilmibm/new_tilde_index.html
 1473143684&^%vilmibm&^%how was your day?
+1473493478&^%vilmibm&^%when was the last time you smiled
+1474433676&^%vilmibm&^%you stub your toe. what's the first thing you think about?
+1474741818&^%vilmibm&^%emacs updated to 25.2 | tweepy installed for python 2 & 3 | how are the feels today?
+1474741976&^%vilmibm&^%REBOOT SCHEDULED for night of Sunday 9/25 | prep for apocalypse | emacs fixed
+1474867066&^%vilmibm&^%THE END IS NIGH | PLEASE RECONNECT
+1474907143&^%vilmibm&^%thank you for your reconnection
+1475735477&^%vilmibm&^%was today better than yesterday? or the same? or?
+1476135782&^%vilmibm&^%contribute to the zine <3 https://github.com/tildetown/zine
+1476138398&^%vilmibm&^%tilde.town turns two tomorrow! | alliteration appreciated
+1476209319&^%vilmibm&^%HAPPY BIRTHDAY!!!!!
+1476382999&^%vilmibm&^%we're two years old! contribute to zine issue 2! https://github.com/tildetown/zine/tree/master/issue%202
+1478737007&^%vilmibm&^%contribute to the second issue of the zine! https://github.com/tildetown/zine/blob/master/contributing.md
+1479517668&^%vilmibm&^%wHaT...tha WoOf! | contribute 2 zine: https://github.com/tildetown/zine/blob/master/contributing.md
+1479931451&^%vilmibm&^%/join #music | zine vol 2! https://github.com/tildetown/zine/blob/master/contributing.md
+1480058791&^%vilmibm&^%畂桳栠摩琠敨映捡獴 | /join #music | contrib 2 zine http://bit.ly/2gslcg3
+1480139365&^%vilmibm&^%RIP castro | 畂桳栠摩琠敨映捡獴 | /join #music | contrib 2 zine http://bit.ly/2gslcg3
+1480140856&^%vilmibm&^%RIP castro | /join #music | contrib 2 zine http://bit.ly/2gslcg3
+1480489447&^%vilmibm&^%they call me DJ colspan | /join #music | contrib 2 zine http://bit.ly/2gslcg3
+1482644786&^%vilmibm&^%happy xmas if yr into it | contrib 2 zine https://github.com/tildetown/zine
+1483206856&^%vilmibm&^%happy new 365th kilobeat! | contrib 2 zine https://github.com/tildetown/zine
+1484692523&^%vilmibm&^%hooray for chelsea manning <3 | contrib2zine https://github.com/tildetown/zine
+1484724998&^%vilmibm&^%hooray for chelsea manning! <3 | join our starbound server! starbound.tilde.town | contrib2zine https://github.com/tildetown/zine
+1486083879&^%vilmibm&^%the town is lovely / its people are nice | checkout #starbound | contrib 2 zine https://github.com/tildetown/zine/tree/master/issue_2
+1487317602&^%vilmibm&^%what would you change about the town? | checkout #starbound | contrib 2 zine https://github.com/tildetown/zine/tree/master/issue_2
+1488837030&^%vilmibm&^%what made you feel good today? | checkout #starbound | contrib 2 zine https://github.com/tildetown/zine/tree/master/issue_2
+1490764617&^%vilmibm&^%let's make some stuff | check out #starbound, #dev | zine! https://github.com/tildetown/zine/tree/master/issue_2

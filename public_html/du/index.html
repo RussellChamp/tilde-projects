@@ -26,7 +26,7 @@
        title: 'Tilder Disk Usage',
        subtitle: 'in kb',
        pieHole: 0.4,
-       sliceVisibilityThreshold: 0.01
+       sliceVisibilityThreshold: 0.005
     };
     var lineoptions = {
       title: 'Tilder Disk Usage',
@@ -48,10 +48,13 @@
         //Draw LineChart
         linedata.addColumn('date', 'Date');
         var userData = {};
+
+        var cutoffDate = new Date(); cutoffDate.setMonth(cutoffDate.getMonth() - 6); cutoffDate = cutoffDate.getTime() / 1000; //the last 3 months
+
         _.forEach(json, function(set, idx) {
           //only display 1/8 the points. (every 2 days instead of every 6 hours) page is loading too slow
           //maybe i could add something to show more points but we're not losing too much granularity for the speed we gain
-          if(idx % 8 != 0) return; 
+          if(idx % 4 != 0 || set.date < cutoffDate) return; 
           _.forEach(set.data, function(point) {
             if(point.du > 5000) { //the 'interesting' threshold is set at 5000kb
               if(!userData[point.user]) { //if the current user has not been initialized yet
@@ -73,10 +76,10 @@
           })
         })
         _.forEach(json, function(set,idx) {
-          if(idx % 8 != 0) return;
-            var d = new Date(0);
-            d.setUTCSeconds(set.date);
-            linedata.addRow([d].concat(_.map(userData, function(user) { return user[idx];})));
+          if(idx % 4 != 0) return;
+          var d = new Date(0);
+          d.setUTCSeconds(set.date);
+          linedata.addRow([d].concat(_.map(userData, function(user) { return user[idx];})));
         });
         console.log(linedata);
         linechart.draw(linedata, lineoptions);
@@ -86,5 +89,5 @@
 </script>
 <body>
   <div id="donutchart" style="width: 700px; height: 400px;"></div>
-  <div id="linechart" style="width: 1200px; height: 1200px;"></div>
+  <div id="linechart" style="width: 120%; height: 130%; margin-left: -10%"></div>
 </body>

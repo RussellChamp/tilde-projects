@@ -1,8 +1,12 @@
 endorphant&^%68
-krowbar&^%175
+krowbar&^%221
 karlen&^%2
 jumblesal&^%37
 marcus&^%28
 premysl&^%29
 demophoon&^%50
 minerobbe&^%76
+bear&^%34
+cosnok&^%38
+caff&^%31
+amicabot&^%9

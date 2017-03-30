@@ -11,12 +11,21 @@ charset="utf-8"></script>-->
 <script type="text/javascript">
       google.load("visualization", "1.1", {packages:["table"]});
 
-      data = [];
+
+      $(loadData);
+
+      function loadData() {
+
+        data = [];
+        brutalMode = $("#onlyReal").is(":checked");
 
       jQuery.getJSON("/~krowbar/data/chatStats.json", function(json) {
           now = new Date();
           nowSec = Math.round(now.getTime()/1000)
           _.forEach(json, function(userData, user) {
+            if(brutalMode && (userData.mentions < 3 || userData.lineCount < 20)) {
+              return;
+            }
             data.push([user, new Date(userData.startTime*1000), new Date(userData.endTime*1000), 
               Number(((userData.endTime - userData.startTime) / 86400).toFixed(2)),
               userData.daysActive,
@@ -30,12 +39,16 @@ charset="utf-8"></script>-->
               (userData.mentions / userData.lineCount),
               userData.botUse,
               Number((userData.responseTime / (userData.mentions ? userData.mentions : 1) / 60).toFixed(2)),
+              userData.happyEmotes,
+              userData.sadEmotes,
+              (userData.happyEmotes + userData.sadEmotes) == 0 ? 0 : userData.happyEmotes / (userData.happyEmotes + userData.sadEmotes)
               ]);
             });
           console.log("* Loaded the data!");
           //google.setOnLoadCallback(drawTable);
           $(drawTable)
       });
+      }
 
       function drawTable() {
 
@@ -65,6 +78,9 @@ charset="utf-8"></script>-->
         dataTable.addColumn('number', 'by Line');       //col14
         dataTable.addColumn('number', 'Bot Use');       //col15
         dataTable.addColumn('number', 'Response time'); //col16
+        dataTable.addColumn('number', 'Happy');         //col17
+        dataTable.addColumn('number', 'Sad');           //col18
+        dataTable.addColumn('number', 'Ratio');         //col19
 
         dataTable.addRows(data);
         userFormatter.format(dataTable, [0]);
@@ -84,6 +100,7 @@ charset="utf-8"></script>-->
       }
     </script>
 <body>
+  <input id="onlyReal" type="checkbox" onClick="loadData()">Only real people</input>
 <div id="statTable"></div>
 </body>
 </html>
