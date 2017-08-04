@@ -54,25 +54,27 @@ def too_recent(time1, time2):
         return False
 
 def get_positive():
-    return random.choice(['Yes','Yep','Correct','You got it', 'Yeah', 'Right on', 'Uh-huh', 'Positive'])
+    return random.choice(['Yes', 'Yep', 'Yeppers', 'Correct','You got it', 'Yeah', 'Right on', 'Uh-huh', 'Positive', 'Totally right', 'Close enough', 'That\'s it'])
 
 def get_negative():
-    return random.choice(['No', 'Nope', 'Sorry', 'Wrong', 'Nuh-uh', 'Negatory', 'Incorrect', 'Not today', 'Try again', 'Maybe later'])
+    return random.choice(['No', 'Nope', 'Sorry', 'Wrong', 'Nuh-uh', 'Negatory', 'Incorrect', 'Not today', 'Try again', 'Maybe later', 'Probably not', 'Answer hazy', 'Not quite',\
+                'Not even close'])
 
 def get_superlative(score):
     if score > 4:
         return random.choice(["super cool", "totally rad", "extraordinary", "dynomite", "#topdrawer", "a #TopLad", "the cat's meow", "a tilde town hero", "my favorite person", "incredibly lucky",\
-                "unbelievable", "a tilde town hunk", "could bring all the boys to the yard", "worth twice their weight in gold"]);
+                "unbelievable", "a tilde town hunk", "could bring all the boys to the yard", "worth twice their weight in gold", "the hero we need", "no ordinary townie"]);
     elif score > 2:
         return random.choice(["really cool", "pretty neat", "rather nice", "a dynamic doggo", "radical", "intense", "pretty lucky", "knows the territory", "has what it takes", "has mad skillz",\
-                "going the distance"]);
+                "going the distance", "a hard worker", "my sunshine", "ready to rumble"]);
     else:
-        return random.choice(["cool", "nice", "acceptible", "good enough", "a promising pupper", "better than a horse", "swell", "a little lucky", "just credible", "my friend"]);
+        return random.choice(["cool", "nice", "acceptible", "good enough", "a promising pupper", "better than a horse", "swell", "a little lucky", "just credible", "my friend", "probably not a robot",\
+                "valuable to the team"]);
 
 def get_bad_thing():
     return random.choice(["is a meanie", "mugs me right off", "is worse than a horse", "smells like a ghost", "probably didn't bathe today", "didn't guess hard enough", "isn't lucky",\
             "smells of elderberries", "should reconsider their life choices", "did't believe in the heart of the tilde", "came to the wrong chat channel", "should have stopped while they were ahead",\
-            "requires annotations from an authoratative source", "could have been a contender"]);
+            "requires annotations from an authoratative source", "could have been a contender", "spreads vicious rumors", "drank my milkshake", "is probably cheating", "is trying too hard"]);
 
 def get_prize(user, isHuman, bonus=0):
     prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans

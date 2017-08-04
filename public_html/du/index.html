@@ -21,7 +21,6 @@
     data.addColumn('number', 'Disk Usage');
     data.addColumn('number', 'File Count');
 
-
     var pieoptions = {
        title: 'Tilder Disk Usage',
        subtitle: 'in kb',
@@ -48,15 +47,39 @@
         //Draw LineChart
         linedata.addColumn('date', 'Date');
         var userData = {};
+        var userInterest = {};
 
-        var cutoffDate = new Date(); cutoffDate.setMonth(cutoffDate.getMonth() - 6); cutoffDate = cutoffDate.getTime() / 1000; //the last 3 months
+        var cutoffDate = new Date(); cutoffDate.setMonth(cutoffDate.getMonth() - 6); cutoffDate = cutoffDate.getTime() / 1000; //the last 3 monthsa
+        var interestQuotent = 0.005;
+
+        _.forEach(json, function(set, idx) { //generate the 'interest quotent' for each user as a value of change
+          if(set.date < cutoffDate) return;
+          _.forEach(set.data, function(point) {
+            if(!userInterest[point.user]) {
+              userInterest[point.user] = { absChange: 0, lastValue: point.du, count: 1 };
+            } else {
+              userInterest[point.user].absChange = userInterest[point.user].absChange 
+                  + Math.abs(point.du - userInterest[point.user].lastValue) / userInterest[point.user].lastValue;
+              userInterest[point.user].lastValue = point.du;
+              userInterest[point.user].count = userInterest[point.user].count + 1;
+            }
+          })
+        })
+
+        function isInteresting(point) {
+          if($("#onlyInteresting").is(":checked")) {
+            return userInterest[point.user].absChange / userInterest[point.user].count > interestQuotent;
+          } else {
+            return point.du > 5000; //the 'interesting' threshold is set at 5000kb
+          }
+        }
 
         _.forEach(json, function(set, idx) {
           //only display 1/8 the points. (every 2 days instead of every 6 hours) page is loading too slow
           //maybe i could add something to show more points but we're not losing too much granularity for the speed we gain
           if(idx % 4 != 0 || set.date < cutoffDate) return; 
           _.forEach(set.data, function(point) {
-            if(point.du > 5000) { //the 'interesting' threshold is set at 5000kb
+            if(isInteresting(point)) {
               if(!userData[point.user]) { //if the current user has not been initialized yet
                 userData[point.user] = []; //create an empty array
                 var size = json.length;
@@ -89,5 +112,6 @@
 </script>
 <body>
   <div id="donutchart" style="width: 700px; height: 400px;"></div>
+  <input id="onlyInteresting" type="checkbox" onClick="drawCharts()">Only Interesting Data</input>
   <div id="linechart" style="width: 120%; height: 130%; margin-left: -10%"></div>
 </body>

@@ -31,3 +31,4 @@
 1475761589&^%krowbar&^%Test bots and play games. Use !rollcall to list bot's abilities
 1475761599&^%krowbar&^%Test bots and play games. Use !rollcall to list bot's abilities
 1475765914&^%cmr&^%Test bots and play games. Use !rollcall to list bots' abilities
+1493646477&^%krowbar&^%Name your favorite song.

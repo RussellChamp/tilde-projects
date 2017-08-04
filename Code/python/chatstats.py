@@ -14,6 +14,7 @@ rejectRegexp = "http[s]?://|[0-9]{2}[;:][0-9]{2}"
 happyRegexp = ":[-]?[])}]"
 sadRegexp = ":[-]?[[({]"
 nameFix = {
+        'archangel': 'archangelic',
         'jumblesal': 'jumblesale',
         'hardmath1': 'kc',
         'hardmath123': 'kc',
