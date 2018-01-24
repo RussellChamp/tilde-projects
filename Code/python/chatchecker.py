@@ -5,7 +5,8 @@ import time
 import calendar
 import shutil
 
-logfile = "/home/jumblesale/Code/irc/log"
+logfile = "/home/archangelic/irc/log"
+#logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/userData.json"
 userData = {} #hash keyed by "user" that contains an array of timestamps
 #we only care about recent chats, let's say for the past couple weeks

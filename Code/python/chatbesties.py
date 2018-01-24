@@ -8,12 +8,13 @@ import re
 import math
 import operator
 
-MAX_NODES = 5
+MAX_NODES = 4
 
-logfile = "/home/jumblesale/Code/irc/log"
+logfile = "/home/archangelic/irc/log"
+#logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatBesties.json"
 outCircle = "/home/krowbar/logs/chatcircle.json"
-timePeriod = calendar.timegm(time.gmtime()) - (3 * 7 * 24 * 60 * 60) #3 weeks
+timePeriod = calendar.timegm(time.gmtime()) - (2 * 7 * 24 * 60 * 60) #2 weeks
 
 userData = {} #hash keyed by "user" that contains a hash of mentioned other users with count
 nameFix = {
@@ -31,6 +32,8 @@ with open(logfile, "r") as log:
     for line in log:
         try:
             time, user, message = line.split("\t", 3)
+            if int(time) < timePeriod:
+                continue #only add users who have spoken in the last period
             if nameFix.has_key(user):
                 user = nameFix[user]
             else:
@@ -86,12 +89,12 @@ d3data['links'] = []
 #Now connect all the pople to their stuff
 for user, values in userData.iteritems():
     #give the user a 'group' based on their total score
-    d3data['nodes'][values['id']]['group'] = int(math.ceil(math.sqrt(math.sqrt(values['score']))))
+    d3data['nodes'][values['id']]['group'] = int(math.ceil(math.log(values['score'])))
     besties = sorted(values['data'].items(), key=operator.itemgetter(1), reverse=True)[0:MAX_NODES] #ONLY the top besties
     for target, score in besties:
         try:
             print "Adding link from " + user + " (" + str(values['id']) + ") to " + target + " (" + str(userData[target]['id']) + ") with strength " + str(score)
-            d3data['links'].append({"source": values['id'], "target": userData[target]['id'], "value": math.ceil(math.sqrt(score))})
+            d3data['links'].append({"source": values['id'], "target": userData[target]['id'], "value": math.ceil(math.sqrt(score))*2 })
         except KeyError:
             print "! Error when trying to link " + user + " to " + target
             continue

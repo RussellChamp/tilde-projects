@@ -138,9 +138,11 @@ def define_word(channel, user, text):
         defs = defWord(word)
     if(len(defs) == 0):
         ircsock.send("PRIVMSG " + channel + " :" + user + ": Couldn't find the definition of '" + word + "' :(\n")
-    else:
+    elif(isinstance(defs, list)):
         for entry in defs:
           ircsock.send("PRIVMSG " + channel + " :" + user + ": Define '" + word + "'" + entry[0:400] + "\n")
+    else:
+        ircsock.send("PRIVMSG " + channel + " :" + user + ": Define '" + word + "'" + defs[0:400] + "\n")
 
 def make_rainbow(channel, user, text):
     rbword = makeRainbow(text[9:])

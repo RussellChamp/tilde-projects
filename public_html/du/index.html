@@ -7,9 +7,10 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.8.0/lodash.min.js"></script>
 <script type="text/javascript">
-  google.load("visualization", "1.1", {packages:["corechart", "line"]});
-  google.setOnLoadCallback(drawCharts);
+  google.load("visualization", "1.1", {packages:["corechart", "line"], callback: drawCharts});
+  //google.setOnLoadCallback(drawCharts);
   function drawCharts() {
+    console.log('called drawCharts!');
     var data = new google.visualization.DataTable();
     var piechart = new google.visualization.PieChart(document.getElementById('donutchart'));
 
@@ -37,6 +38,7 @@
     };
 
     jQuery.getJSON("/~krowbar/data/du_log.json", function(json) {
+      console.log('loaded disk usage json data!');
         date.setUTCSeconds(json[json.length-1].date);
         //Draw PieChart
         data.addRows(

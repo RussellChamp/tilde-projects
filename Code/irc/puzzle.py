@@ -5,15 +5,18 @@ import quote_puzzle
 
 p = inflect.engine()
 primes = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71]
+fuzz_amount = 3
 
 def make_puzzle(obfuscate=True):
   answer = 0
   puzzle = random.choice(["Prove you're not a robot: ", "Are you a robot?: ", "Anti-bot check: ", "Counter-cndorphant measures: ", "Cosnok countermeasures: "])
   puzzle += random.choice(["What is", "How many is", "What do you get from", "What do you get with", "What is the value of", "Can you answer", "Can you tell me"])
   puzzle += " "
-  roll = random.randrange(0,10)
+  roll = random.randrange(0,12)
   var1 = random.randrange(1,10)
   var2 = random.randrange(1,10)
+  var3 = random.randrange(1,20)
+  var4 = random.randrange(1,20)
   let1_ord = random.randrange(ord('a'), ord('z')+1)
 
   if roll == 0:
@@ -60,10 +63,16 @@ def make_puzzle(obfuscate=True):
   elif roll == 9:
       answer, puzzle = quote_puzzle.get_quote()
       obfuscate = False
+  elif roll == 10:
+      answer = str(min(var1, var2, var3, var4))
+      puzzle = "What is the " + random.choice(["smallest", "lowest"]) + " of " + p.number_to_words(var1) + ", " + p.number_to_words(var2) + ", " + p.number_to_words(var3) + ", and " + p.number_to_words(var4)
+  elif roll == 11:
+      answer = str(max(var1, var2, var3, var4))
+      puzzle = "What is the " + random.choice(["biggest", "largest"]) + " of " + p.number_to_words(var1) + ", " + p.number_to_words(var2) + ", " + p.number_to_words(var3) + ", and " + p.number_to_words(var4)
 
   puzzle += "?"
   if obfuscate == True:
-      for _ in range(3):
+      for _ in range(fuzz_amount):
           idx = random.randrange(len(puzzle)-1) #get between 0 and string length
           puzzle = ''.join([puzzle[0:idx], chr(random.randint(33,126)), puzzle[idx+1:]])
   return [answer, puzzle]

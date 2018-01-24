@@ -6,7 +6,8 @@ import calendar
 import shutil
 import re
 
-logfile = "/home/jumblesale/Code/irc/log"
+logfile = "/home/archangelic/irc/log"
+#logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatStats.json"
 userData = {} #hash keyed by "user" that contains a start timestamp, last timestamp, last said string, chat count, letter count, and word count
                 #also now happy emotes and sad emotes

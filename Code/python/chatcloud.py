@@ -6,7 +6,8 @@ import calendar
 import re
 import shutil
 
-logfile = "/home/jumblesale/Code/irc/log"
+logfile = "/home/archangelic/irc/log"
+#logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatcloud.json"
 #outfile = "/home/krowbar/logs/chatcloud_2016_10.json"
 
