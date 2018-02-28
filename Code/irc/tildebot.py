@@ -12,6 +12,7 @@ import random
 
 import formatter
 import get_users
+import names
 import mentions
 import pretty_date
 import inflect
@@ -76,11 +77,11 @@ def get_bad_thing():
             "smells of elderberries", "should reconsider their life choices", "did't believe in the heart of the tilde", "came to the wrong chat channel", "should have stopped while they were ahead",\
             "requires annotations from an authoratative source", "could have been a contender", "spreads vicious rumors", "drank my milkshake", "is probably cheating", "is trying too hard"]);
 
-def get_prize(user, isHuman, bonus=0):
+def get_prize(name, isHuman, bonus=0):
     prizes = [1] * 8 + [2] * 4 + [3] * 2 + [5] * isHuman #no 5pt prize for non-humans
     prize = random.choice(prizes) + bonus
     if(random.randint(1,10) > 6 - 4 * isHuman): #80% of the time it's a normal prize (40% for not humans)
-        return [prize, user + ": " + (get_positive() if isHuman else get_negative()) + "! You are " + get_superlative(prize) + " and get " + p.number_to_words(prize) + " tildes!"]
+        return [prize, name + ": " + (get_positive() if isHuman else get_negative()) + "! You are " + get_superlative(prize) + " and get " + p.number_to_words(prize) + " tildes!"]
     else: #20% of the time its a jackpot situation
         with open(JACKPOT_FILE, "r+") as jackpotfile:
             jackpot = int(jackpotfile.readline().strip("\n"))
@@ -89,17 +90,17 @@ def get_prize(user, isHuman, bonus=0):
             if(random.randint(1,10) > 1 or not isHuman): #90% of the time it's a non-prize. non-humans never win jackpot
                 new_jackpot = jackpot+max(1,prize)
                 jackpotfile.write(str(new_jackpot)) #increase the jackpot by the prize size
-                return [0, user + " " + get_bad_thing() + " and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
+                return [0, name + " " + get_bad_thing() + " and gets no tildes! (Jackpot is now " + str(new_jackpot) + " tildes)"]
             else: #hit jackpot!
                 jackpotfile.write(str(JACKPOT_MIN))
-                return [jackpot, user + " hit the jackpot and won **" + p.number_to_words(jackpot) + " tildes!**"]
+                return [jackpot, name + " hit the jackpot and won **" + p.number_to_words(jackpot) + " tildes!**"]
 
 def show_jackpot(channel):
     with open(JACKPOT_FILE, "r") as jackpotfile:
         jackpot = int(jackpotfile.readline().strip("\n"))
         ircsock.send("PRiVMSG " + channel + " :The jackpot is currently " + p.number_to_words(jackpot) + " tildes!\n")
 
-def give_tilde(channel, user, time, human, bonus=0):
+def give_tilde(channel, user, name, time, human, bonus=0):
     found = False
     with open(SCORE_FILE, "r+") as scorefile:
         scores = scorefile.readlines()
@@ -110,45 +111,45 @@ def give_tilde(channel, user, time, human, bonus=0):
             if(person[0] == user):
                 found = True
                 if(too_recent(time, person[2]) and not DEBUG):
-                    ircsock.send("PRIVMSG " + channel + " :" + user + " have asked for a tilde too recently and " + get_bad_thing() + ". Try again later.\n")
+                    ircsock.send("PRIVMSG " + channel + " :" + name + " asked for a tilde too recently and " + get_bad_thing() + ". Try again later.\n")
                 else:
-                    prize = get_prize(user, human, bonus)
+                    prize = get_prize(name, human, bonus)
                     score = person[0] + "&^%" + str(int(person[1]) + prize[0]) + "&^%" + time + "\n"
                     ircsock.send("PRIVMSG " + channel + " :" + prize[1] + "\n")
             scorefile.write(score)
         if(not found):
-            prize = get_prize(user, True, bonus)
+            prize = get_prize(name, True, bonus)
             ircsock.send("PRIVMSG " + channel + " :Welcome to the tilde game! Here's " + p.number_to_words(prize[0]+1) + " free tilde(s) to start you off.\n")
             scorefile.write(user + "&^%" + str(prize[0]+1) + "&^%" + time + "\n")
 
-def show_tildescore(channel, user):
+def show_tildescore(channel, user, name):
     with open(SCORE_FILE, "r") as scorefile:
         for idx,score in enumerate(scorefile):
             person = score.strip("\n").split("&^%")
             if(person[0] == user):
-                ircsock.send("PRIVMSG " + channel + " :" + user + " has " + p.number_to_words(person[1]) + " tildes!\n")
+                ircsock.send("PRIVMSG " + channel + " :" + name + " has " + p.number_to_words(person[1]) + " tildes!\n")
                 return
         #person has not played yet
-        ircsock.send("PRIVMSG " + channel + " :" + user + " has no tildes yet!\n")
+        ircsock.send("PRIVMSG " + channel + " :" + name + " has no tildes yet!\n")
 
-def challenge(channel, user, time):
+def challenge(channel, user, name, time):
     if(channel != "#bots" and not DEBUG):
-        ircsock.send("PRIVMSG " + channel + " :" + user + " is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**\n")
+        ircsock.send("PRIVMSG " + channel + " :" + name + " is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**\n")
         return
     global challenges;
     challenge = puzzle.make_puzzle();
     challenges[user] = challenge[0]; #challenges[USER] = ANSWER
-    ircsock.send("PRIVMSG " + channel + " :" + user + ": " + challenge[1] + "\n");
+    ircsock.send("PRIVMSG " + channel + " :" + name + ": " + challenge[1] + "\n");
 
-def challenge_response(channel, user, time, msg):
+def challenge_response(channel, user, name, time, msg):
     global challenges
     print(msg);
     if(challenges.has_key(user)):
         bonus = 1 if str(challenges[user]).find(',') != -1 else 0 #give a bonus for prime factoring
         if(msg.lower() == str(challenges[user]).lower() or msg == p.number_to_words(challenges[user])):
-            give_tilde(channel, user, time, True, bonus);
+            give_tilde(channel, user, name, time, True, bonus);
         else:
-            give_tilde(channel, user, time, False, 0);
+            give_tilde(channel, user, name, time, False, 0);
         del challenges[user]; #delete the user from challenges either way
 
 
@@ -193,17 +194,18 @@ def listen():
       split = formatted.split("\t")
       iTime = split[0]
       user = split[1]
+      name = names.get_name(user)
       command = split[2]
       channel = split[3]
       messageText = split[4]
 
       if msg.find(":!tildescore") != -1:
-        show_tildescore(channel, user)
+        show_tildescore(channel, user, name)
       elif msg.find(":!tilde") != -1 and not challenges.has_key(user):
-        challenge(channel, user, iTime)
+        challenge(channel, user, name, iTime)
       elif challenges.has_key(user):
-        challenge_response(channel, user, iTime, messageText)
-        #give_tilde(channel, user, iTime)
+        challenge_response(channel, user, name, iTime, messageText)
+        #give_tilde(channel, user, name, iTime)
 
       if msg.find(":!jackpot") != -1:
         show_jackpot(channel)

@@ -184,15 +184,16 @@ def figlet(channel, text):
     if not text:
         ircsock.send("PRIVMSG " + channel + " :No text given. :(\n")
     else:
-        lines = subprocess.Popen(["figlet", "-w80"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
+        lines = subprocess.Popen(["figlet", "-w140"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
         for line in lines.split('\n'):
             ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+            time.sleep(0.3) #to avoid channel throttle due to spamming
 
 def toilet(channel, text):
     if not text:
         ircsock.send("PRIVMSG " + channel + " :No text given. :(\n")
     else:
-        lines = subprocess.Popen(["toilet", "--irc"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
+        lines = subprocess.Popen(["toilet", "-w140", "--irc"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
         for line in lines.split('\n'):
             ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
             time.sleep(0.3) #to avoid channel throttle due to spamming
@@ -222,8 +223,16 @@ def get_whosaid(channel, text):
         msg += ' and %s said it %d times' % (result['data'][1][0], result['data'][1][1])
     ircsock.send("PRIVMSG " + channel + " :" + msg + ".\n")
 
+def mug_off(channel):
+    ircsock.send("PRIVMSG " + channel + " :u want some of this, m8?\n")
+
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! Find new top-shelf banter with !newbanter, !rhymes, and !define. Make your chatter #legend with !rainbow and get jokes with !welch and !evil\n")
+  ircsock.send("PRIVMSG "+ channel +" :U wot m8? I score all the top drawer #banter and #bantz on this channel! \
+          Find new top-shelf banter with !newbanter, !rhymes, and !define. \
+          Look up things with !acronym and !whosaid. \
+          Make your chatter #legend with !rainbow, !toilet, and !figlet. \
+          Find interesting things with !xkcd and !wiki-philosophy. \
+          Get jokes with !welch and !evil\n")
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
@@ -279,30 +288,30 @@ def listen():
     if ircmsg.find(":!rainbow") != -1:
         make_rainbow(channel, user, messageText)
 
-    if ircmsg.find("!welch") != -1:
+    if ircmsg.find(":!welch") != -1:
         get_welch(channel)
 
-    if ircmsg.find("!evil") != -1:
+    if ircmsg.find(":!evil") != -1:
         get_evil(channel)
 
-    if ircmsg.find("!kjp") != -1:
+    if ircmsg.find(":!kjp") != -1:
         get_tumble('http://kingjamesprogramming.tumblr.com', channel)
 
-    if ircmsg.find("!help") != -1:
+    if ircmsg.find(":!help") != -1:
         get_tumble('http://thedoomthatcametopuppet.tumblr.com', channel)
 
-    if ircmsg.find("!xkcd") != -1:
+    if ircmsg.find(":!xkcd") != -1:
         get_xkcd(channel, messageText)
-    if ircmsg.find("!wiki-philosophy") != -1:
+    if ircmsg.find(":!wiki-philosophy") != -1:
         get_wphilosophy(channel, messageText);
 
-    if ircmsg.find("!figlet") != -1:
+    if ircmsg.find(":!figlet") != -1:
         figlet(channel, messageText[8:])
 
-    if ircmsg.find("!toilet") != -1:
+    if ircmsg.find(":!toilet") != -1:
         toilet(channel, messageText[8:])
 
-    if ircmsg.find("!acronym") != -1:
+    if ircmsg.find(":!acronym") != -1:
         get_acronym(channel, messageText[9:])
 
     if ircmsg.find(":!whosaid") != -1:
@@ -310,6 +319,9 @@ def listen():
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)
+
+    if ircmsg.find(":" + botname + ":") != -1:
+        mug_off(channel)
 
     if ircmsg.find("PING :") != -1:
       ping()
