@@ -15,6 +15,7 @@ import get_users
 import mentions
 import pretty_date
 import inflect
+import names
 
 parser = OptionParser()
 
@@ -61,7 +62,8 @@ def get_topic(channel, user, time):
 
   with open("topics_" + channel + ".txt", "r") as topics:
     topic = topics.readlines()[-1].strip("\n").split("&^%", 3)
-    ircsock.send("PRIVMSG "+ channel +" :I've told you " + p.number_to_words(userscore) + " times! It's \"" + topic[2] + "\" (Set by " + topic[1] + " " + pretty_date.pretty_date(int(topic[0])) + ")\n")
+    byuser = names.get_name(topic[1])
+    ircsock.send("PRIVMSG "+ channel +" :I've told you " + p.number_to_words(userscore) + " times! It's \"" + topic[2] + "\" (Set by " + byuser + " " + pretty_date.pretty_date(int(topic[0])) + ")\n")
 
 def count_topic(channel, user, time, msg):
   with open("topics_" + channel + ".txt", "a") as topics:
@@ -95,7 +97,7 @@ def random_topic(channel, user, time, setTopic=False):
           ircsock.send("PRIVMSG "+channel +" :Suggested Topic: " + msg + "\n")
 
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :topicbot reporting! I respond to !topic !settopic !randomtopic !thistory\n")
+  ircsock.send("PRIVMSG "+ channel +" :topicbot reporting! I respond to !topic !settopic !suggesttopic !thistory\n")
 
 def topic_score(channel):
     ircsock.send("PRIVMSG "+ channel +" :Not implemented yet")
@@ -117,7 +119,8 @@ def topic_history(channel, user, count):
     ircsock.send("PRIVMSG "+ channel +" :Ok, here were the last " + p.number_to_words(iCount) + " topics\n")
     for idx,topic in enumerate(reversed(topicsfile.readlines()[-iCount:])):
       topic = topic.strip("\n").split("&^%", 3)
-      ircsock.send("PRIVMSG "+ channel +" :" + str(idx+1) + ": \"" + topic[2] + "\" (Set by " + topic[1] + " " + pretty_date.pretty_date(int(topic[0])) + ")\n")
+      byuser = names.get_name(topic[1])
+      ircsock.send("PRIVMSG "+ channel +" :" + str(idx+1) + ": \"" + topic[2] + "\" (Set by " + byuser + " " + pretty_date.pretty_date(int(topic[0])) + ")\n")
 
 
 def connect(server, channel, botnick):

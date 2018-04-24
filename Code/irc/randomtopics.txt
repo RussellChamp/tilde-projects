@@ -24,10 +24,10 @@ Do you feel that children should be sheltered from unhappiness?
 If you could have personally witnessed anything, what would you want to have seen?
 If you could wake up tomorrow in the body of someone else, who would you pick and what would you do?
 If you could be any age for a week, what age would that be?
- What question do you hate to answer?
+What question do you hate to answer?
 If you could only have one meal for the rest of your life, what would it be?
 Where do you go to get on a computer?
- How do you start a conversation?
+How do you start a conversation?
 What keys on a keyboard do you not use?
 If you had a brainwashing machine, who would you use it on?
 You are walking home in the dark, you see something move. What/Who is it(guess)?      What do you do?
@@ -1000,3 +1000,104 @@ If you were going to become a close friend with your partner, please share what 
 When did you last cry in front of another person? By yourself?
 What, if anything, is too serious to be joked about?
 Your house, containing everything you own, catches fire. After saving your loved ones and pets, you have time to safely make a final dash to save any one item. What would it be? Why?
+Tell me the 3 best things about you.
+On a scale of 1-10, how strict are/were your parents?
+Who was your worst teacher? Why?
+Who was your favorite teacher? Why?
+Which would you pick: being world-class attractive, a genius or famous for doing something great?
+Who are the 3 greatest living musicians?
+If you could change one thing about yourself, what would it be?
+What was your favorite toy growing up?
+Name 3 celebrities you most admire.
+Name a celebrity you think is lame.
+What accomplishment are you most proud of?
+Which of your friends are you proudest of? Why?
+What’s the most beautiful place you’ve ever been?
+What are your 3 favorite movies?
+How would you describe me to your friends?
+Which historical figure would you like to be?
+What’s the right age to get married?
+Tell me 3 things you remember about kindergarten.
+What paper that you’ve written are you most proud of?
+What would you do if you were invisible for a day?
+Who would you like to live like for a day?
+If you could time travel, where would you go?
+If you could live in any TV home, what would it be?
+What’s your favorite ice cream flavor?
+Would you rather live for a week in the past or the future?
+What’s your most embarrassing childhood memory?
+What’s your best childhood memory?
+What’s your favorite holiday?
+If you could eat only 3 foods for the rest of your life, what would they be?
+If you could be a cartoon character for a week, who would you be?
+If you could have dinner with anyone from history, who would it be?
+What’s one choice you really regret?
+What’s your favorite childhood book?
+What’s a great book you’ve read recently?
+Do you feel like a leader or a follower?
+If you could ask your pet 3 questions, what would they be?
+What’s the most courageous thing you’ve ever done?
+Who would play you in a movie of your life?
+If you could be an Olympic athlete, in what sport would you compete?
+If you had to live in a different state, what would it be?
+What living person, other than family members, do you most admire?
+What has been your favorite family vacation?
+If you could choose your own nickname, what would it be?
+Who is the funniest person you know?
+What’s your favorite thing about one of your grandparents?
+Tell the person to your right your favorite thing about them.
+Do you ever talk to yourself? When and what do you say?
+When you’re having a bad day, what do you do to make yourself feel better?
+Which TV family is most like your own?
+What’s your favorite smell in the whole world?
+What do you think is the greatest invention of all time?
+Using one word, how would you describe your family?
+Would you rather win an Olympic medal, an Academy Award or the Nobel Peace prize?
+What’s your favorite time of day?
+What’s your favorite season?
+What’s the one food you could never bring yourself to eat?
+What is the sound you love the most?
+What 3 famous people, living or dead, would you want at your fantasy dinner party?
+If you could ask the President one question, what would it be?
+If you could pick a new first name, what would it be?
+If you had to leave earth on a spaceship and take 4 friends with you, who would they be?
+What is your favorite movie quote?
+What’s your pet peeve(s)?
+Do you sleep with your sheets tucked in or out?
+Do you ever count your steps when you walk?
+What’s your favorite kind of sandwich?
+What’s your dream job?
+Cake or pie?
+Who is the kindest person you know?
+What’s the best part about having siblings?
+What is the scariest movie you’ve ever seen?
+If you could travel anywhere in the world, where would it be?
+What is your favorite family tradition?
+Who’s your celebrity crush?
+What trait do you like the most about yourself?
+What are you good at?
+What fictional character do you wish you could meet?
+If you could be great at one sport which would you choose?
+What’s the first thing you do when you get home from a trip?
+Would you rather spend five days exploring Disney or New York City?
+Whose parents do/did you wish you had?
+If you could shop for free at one store, which one would you choose?
+What personal trait has gotten you in the most trouble?
+Which celebrity chef would you most like to fix you a meal?
+Who is your favorite athlete?
+What is the best piece of advice you’ve received?
+If you had to pick a new name for yourself, what name would you pick?
+Would you rather be the most popular kid in school or the smartest kid in school?
+What do you like to do on a rainy day?
+Would you rather be the best player on a horrible team or the worst player on a great team?
+What is your favorite thing about the beach?
+If you could be anywhere else right now, where would it be?
+What is your favorite Disney movie?
+Which of the Seven Dwarfs is most like you?
+If someone made a movie of your life would it be a drama, a comedy, a romantic-comedy, action film, or science fiction?
+Name a product or service you love so much that you’d happily be that company’s spokesperson.
+If you were guaranteed to be successful in a different profession, what would you want to do?
+As a child, what did you wish to become when you grew up?
+What’s the worst thing you did as a kid?
+What is the best part of being a part of your family?
+What is your favorite day of the week?

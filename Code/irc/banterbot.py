@@ -250,7 +250,7 @@ def get_user_from_message(msg):
   except ValueError:
     return ""
 
-def listen():
+def listen(botnick):
   while 1:
 
     ircmsg = ircsock.recv(2048)
@@ -320,7 +320,7 @@ def listen():
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)
 
-    if ircmsg.find(":" + botname + ":") != -1:
+    if ircmsg.find(":" + botnick + ":") != -1:
         mug_off(channel)
 
     if ircmsg.find("PING :") != -1:
@@ -331,4 +331,4 @@ def listen():
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connect(options.server, options.channel, options.nick)
-listen()
+listen(options.nick)

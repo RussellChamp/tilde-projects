@@ -13,3 +13,13 @@ def get_puzzle():
     words.sort()
     answer = words[key]
     return [answer, puzzle]
+
+def get_anagram(maxlen = 6):
+    dict_words = [word.rstrip() for word in open(dictionary).readlines() if "'" not in word and len(word) > 2 and len(word) <= maxlen+1]
+    word = random.choice(dict_words)
+    while True:
+        anagram = ''.join(random.sample(word, len(word)))
+        if anagram != word:
+            break
+    puzzle = "Unscramble the following word: '" + anagram + "'"
+    return [word, puzzle]
