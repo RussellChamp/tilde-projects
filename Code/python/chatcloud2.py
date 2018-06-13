@@ -11,7 +11,7 @@ import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='Generate word cloud data based off of irc chat logs')
-parser.add_argument('-logfile', help='irc log file to read from', default='/home/jumblesale/Code/irc/log')
+parser.add_argument('-logfile', help='irc log file to read from', default='/home/archangelic/irc/log')
 parser.add_argument('-outfile', help='output file to write to', default='')
 
 parser.add_argument('-timeend', type=int, help='end time of the word cloud (in epoch time)', default=calendar.timegm(time.gmtime()))

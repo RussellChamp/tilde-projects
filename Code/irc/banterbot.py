@@ -204,7 +204,7 @@ def get_acronym(channel, text):
   else:
     defs = acronymFinder.get_acros(text, True, True)
     for d in defs[0:5]: #only the first five. they are already sorted by 'score'
-      ircsock.send("PRIVMSG " + channel + " :" + d + "\n")
+      ircsock.send("PRIVMSG " + channel + " :" + d.encode('utf-8') + "\n")
     if len(defs) > 5:
       ircsock.send("PRIVMSG " + channel + " :" + defs[-1] + "\n")
 
