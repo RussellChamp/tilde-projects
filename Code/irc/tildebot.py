@@ -203,7 +203,7 @@ def listen():
         show_tildescore(channel, user, name)
       elif msg.find(":!tilde") != -1 and not challenges.has_key(user):
         challenge(channel, user, name, iTime)
-      elif challenges.has_key(user):
+      elif challenges.has_key(user) and (channel == "#bots" or DEBUG):
         challenge_response(channel, user, name, iTime, messageText)
         #give_tilde(channel, user, name, iTime)
 
