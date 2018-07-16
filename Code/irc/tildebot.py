@@ -138,15 +138,15 @@ def challenge(channel, user, name, time):
         return
     global challenges;
     challenge = puzzle.make_puzzle();
-    challenges[user] = challenge[0]; #challenges[USER] = ANSWER
-    ircsock.send("PRIVMSG " + channel + " :" + name + ": " + challenge[1] + "\n");
+    challenges[user] = challenge[1:]; #challenges[USER] = [ANSWER, BONUS]
+    ircsock.send("PRIVMSG " + channel + " :" + name + ": " + challenge[0] + "\n")
 
 def challenge_response(channel, user, name, time, msg):
     global challenges
     print(msg);
     if(challenges.has_key(user)):
-        bonus = 1 if str(challenges[user]).find(',') != -1 else 0 #give a bonus for prime factoring
-        if(msg.lower() == str(challenges[user]).lower() or msg == p.number_to_words(challenges[user])):
+        answer, bonus = challenges[user]
+        if(msg.lower() == str(answer).lower() or msg == p.number_to_words(answer)):
             give_tilde(channel, user, name, time, True, bonus);
         else:
             give_tilde(channel, user, name, time, False, 0);
