@@ -32,4 +32,15 @@ def get_anagram(maxlen = 6):
         if anagram != word:
             break
     puzzle = "Unscramble the following word: '" + anagram + "'"
-    return [word, puzzle]
+
+    # Anagrams can have multiple answers, so we provide a check function that accepts all possibilities
+    def answer_checker(guess):
+        # Check for exact match
+        if guess == word:
+            return True
+        # Bail out early if they didn't even use all the same letters
+        if sorted(guess) != sorted(word):
+            return False
+        # Ok, gotta actually check if it's a word now
+        return any(guess == item for item in get_wordlist())
+    return [answer_checker, puzzle]

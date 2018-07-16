@@ -146,7 +146,7 @@ def challenge_response(channel, user, name, time, msg):
     print(msg);
     if(challenges.has_key(user)):
         answer, bonus = challenges[user]
-        if(msg.lower() == str(answer).lower() or msg == p.number_to_words(answer)):
+        if((callable(answer) and answer(msg.lower())) or (msg.lower() == str(answer).lower() or msg == p.number_to_words(answer))):
             give_tilde(channel, user, name, time, True, bonus);
         else:
             give_tilde(channel, user, name, time, False, 0);
