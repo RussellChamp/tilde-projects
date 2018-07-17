@@ -44,7 +44,12 @@ def make_puzzle(obfuscate=True):
   elif roll == 5:
       p1 = random.choice(primes)
       p2 = random.choice(primes)
-      answer = str(min(p1,p2)) + ',' + str(max(p1,p2))
+      def answer(guess):
+          # Check the the numbers entered are correct, regardless of order
+          # or surrounding whitespace.
+          attempt = sorted(word.strip() for word in guess.split(","))
+          correct = sorted([str(p1), str(p2)])
+          return attempt == correct
       bonus = 1
       puzzle += p.number_to_words(p1 * p2) + " when factored into its two primes (answer in the form of the two primes with a comma between)"
   elif roll == 6:
