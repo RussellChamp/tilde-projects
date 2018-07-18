@@ -10,6 +10,7 @@ fuzz_amount = 3
 
 def make_puzzle(obfuscate=True):
   answer = 0
+  bonus = 0
   puzzle = random.choice(["Prove you're not a robot: ", "Are you a robot?: ", "Anti-bot check: ", "Counter-cndorphant measures: ", "Cosnok countermeasures: ", "Anti-tildethief precautions: "])
   puzzle += random.choice(["What is", "How many is", "What do you get from", "What do you get with", "What is the value of", "Can you answer", "Can you tell me"])
   puzzle += " "
@@ -43,7 +44,13 @@ def make_puzzle(obfuscate=True):
   elif roll == 5:
       p1 = random.choice(primes)
       p2 = random.choice(primes)
-      answer = str(min(p1,p2)) + ',' + str(max(p1,p2))
+      def answer(guess):
+          # Check the the numbers entered are correct, regardless of order
+          # or surrounding whitespace.
+          attempt = sorted(word.strip() for word in guess.split(","))
+          correct = sorted([str(p1), str(p2)])
+          return attempt == correct
+      bonus = 1
       puzzle += p.number_to_words(p1 * p2) + " when factored into its two primes (answer in the form of the two primes with a comma between)"
   elif roll == 6:
       prime = random.choice(primes)
@@ -82,4 +89,4 @@ def make_puzzle(obfuscate=True):
       for _ in range(fuzz_amount):
           idx = random.randrange(len(puzzle)-1) #get between 0 and string length
           puzzle = ''.join([puzzle[0:idx], chr(random.randint(33,126)), puzzle[idx+1:]])
-  return [answer, puzzle]
+  return [puzzle, answer, bonus]
