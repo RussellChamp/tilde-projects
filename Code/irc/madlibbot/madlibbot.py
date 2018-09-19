@@ -59,7 +59,7 @@ def resetGlobals(channel=""):
         story[channel] = ""
         nextword[channel] = {}
 
-def get_stories(channel):
+def get_stories(channel, botnick):
     global state
     global stories
     state[channel] = State.thinking
@@ -73,11 +73,11 @@ def get_stories(channel):
         for idx, story in enumerate(stories[channel]):
             sendmsg(channel, "[{}] {} ({} words)".format(idx, story[0], story[2]))
             time.sleep(0.5 * THROTTLE_FACTOR)
-        sendmsg(channel, "Please select a story by index:")
+        sendmsg(channel, "Please select a story by index by saying '{}: <number>':".format(botnick))
         state[channel] = State.story_selection
 
 # Handle user input when the bot is directly addressed
-def handle_bot_msg(channel, msg):
+def handle_bot_msg(channel, msg, botnick):
     global state
     global stories
 
@@ -92,9 +92,9 @@ def handle_bot_msg(channel, msg):
     if saved_state != State.idle and msg == "!quit":
         quit_game(channel)
     elif saved_state == State.idle and msg == "startgame":
-        get_stories(channel)
+        get_stories(channel, botnick)
     elif saved_state == State.story_selection:
-        handle_story_selection(channel, msg)
+        handle_story_selection(channel, msg, botnick)
     elif saved_state == State.word_input:
         handle_story_step(channel, msg)
     else:
@@ -106,7 +106,7 @@ def quit_game(channel):
     sendmsg(channel, "Ok, quitting the current game.")
 
 # Handle user input when we are in story selection mode
-def handle_story_selection(channel, msg):
+def handle_story_selection(channel, msg, botnick):
     global stories
     global state
     try:
@@ -120,19 +120,19 @@ def handle_story_selection(channel, msg):
         with open(stories[channel][imsg][1], "r") as storyFile:
             story[channel] = storyFile.read()
         stories[channel] = {} # Clear out the saved selectable stories in memory
-        story_start(channel)
+        story_start(channel, botnick)
     except ValueError:
         sendmsg(channel, "Invalid selection. Try again!")
         state[channel] = State.story_selection
 
 # Handle when a story is being started
-def story_start(channel):
+def story_start(channel, botnick):
     global story
     global state
     global nextword
 
     state[channel] = State.thinking
-    sendmsg(channel, "Alright! Let's get started!")
+    sendmsg(channel, "Alright! Let's get started! Say '{}: <word>' to give me words.".format(botnick))
     nextword[channel] = madlib.find_next_word(story[channel], True)
     time.sleep(0.5 * THROTTLE_FACTOR)
     sendmsg(channel, "Give me {}:".format(nextword[channel][1]))
@@ -169,7 +169,7 @@ def finish_story(channel):
     sendmsg(channel, '=' * MAX_LINE)
     for line in story[channel].splitlines():
         for part in madlib.yield_lines(line, MAX_LINE):
-            time.sleep(0.4 * THROTTLE_FACTOR)
+            time.sleep(0.6 * THROTTLE_FACTOR)
             sendmsg(channel, part)
     padlen = (MAX_LINE - 9)/2
     mod = (MAX_LINE - 9) % 2
@@ -186,10 +186,19 @@ def sendmsg(chan , msg):
     ircsock.send("PRIVMSG {} :{}\n".format(chan, msg))
 
 def joinchan(chan):
+    global state
+    state[chan] = State.idle
     ircsock.send("JOIN {}\n".format(chan))
 
 def rollcall(channel, botnick):
-    sendmsg(channel, "Do you like MadLibs? Start a collaborative story by saying '{}: startgame'".format(botnick))
+    global state
+    if channel not in state:
+        state[channel] = State.idle
+
+    if state[channel] == State.idle:
+        sendmsg(channel, "Do you like MadLibs? Start a collaborative story by saying '{}: startgame'".format(botnick))
+    else:
+        sendmsg(channel, "A game is already in progress. Say '{}: <word>' to provide me with the next word or '{}: !quit' to stop the current game".format(botnick, botnick))
 
 def connect(server, channel, botnick):
     ircsock.connect((server, 6667))
@@ -222,7 +231,7 @@ def listen(botnick):
             rollcall(channel, botnick)
         elif message.startswith(botnick) == True:
             botmsg = botmsgre.match(message).group(1)
-            handle_bot_msg(channel, botmsg)
+            handle_bot_msg(channel, botmsg, botnick)
 
         sys.stdout.flush()
         time.sleep(1 * THROTTLE_FACTOR)

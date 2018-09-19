@@ -24,3 +24,8 @@ PRESENTATION
  - See a timeline with colored strands of when they spoke and were mentioned
 * Something that looks like the Github commit history
 * Use D3 for coolness
+
+TODO
+* Add a "sort by" dropdown
+ - name
+ - most active

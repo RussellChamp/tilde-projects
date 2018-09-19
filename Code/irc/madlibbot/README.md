@@ -40,7 +40,8 @@ and continue asking for word replacement until it runs out of words to replace.
 * Allow story writers the ability to specify that a single answer should be used multiple times in a story
   * Maybe specified like {{#a noun#}} or {{#a noun#4}}
 * Create word-munging options that can be specified for a word to modify given user input
-  * Capital - convert "foo" to "Foo"
-  * AllCaps - convert "bar" to "BAR"
-  * Numeric - convert "3" to "three"
-  * Ordinal - convert "3" to "third"
+  * title - convert "foo" to "Foo"
+  * upper - convert "bar" to "BAR"
+  * lower - convert "bAz" to "baz"
+  * numeric - convert "3" to "three"
+  * ordinal - convert "3" to "third"

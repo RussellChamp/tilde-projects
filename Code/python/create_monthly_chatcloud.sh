@@ -6,7 +6,7 @@ DATE=`date -d yesterday +%b\ %Y`
 OUT=/home/krowbar/logs/chatcloud${MONTH}.json
 DIR=/home/krowbar/public_html/data
 PAGE=/home/krowbar/public_html/chatcloud/index.html
-LINE=7
+LINE=16
 
 /usr/bin/python /home/krowbar/Code/python/chatcloud2.py -timeend $END -timestart $START -outfile $OUT
 ln -s $OUT $DIR

@@ -23,7 +23,7 @@ charset="utf-8"></script>-->
                 d = new Date(0);
                 d.setUTCSeconds((Number(time) + threeDays) % oneWeek - threeDays);
                 <!--data.push([user, d.toISOString().slice(11,16), d, d]);-->
-                data.push([user, d, d]);
+                data.push([user, d, d]); <!-- User, Start, End, score -->
                 });
               }
             });
@@ -54,13 +54,17 @@ charset="utf-8"></script>-->
 
       function drawChart() {
         var container = document.getElementById('timeline');
+        console.log('container', container);
         var chart = new google.visualization.Timeline(container);
+        console.log('chart', chart);
         var dataTable = new google.visualization.DataTable();
+        console.log('dataTable', dataTable);
 
         dataTable.addColumn({ type: 'string', id: 'User' });
         <!--dataTable.addColumn({ type: 'string', id: 'tooltip' });-->
         dataTable.addColumn({ type: 'date', id: 'Start' });
         dataTable.addColumn({ type: 'date', id: 'End' });
+        <!--dataTable.addColumn({ type: 'number', id: 'Score' });-->
         dataTable.addRows(data);
 
         chart.draw(dataTable);

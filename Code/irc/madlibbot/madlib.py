@@ -1,12 +1,16 @@
 #!/usr/bin/python
 
+import collections
 import glob
+import inflect
 import random
 import re
 
+p = inflect.engine()
 file_pattern = "/home/*/madlibs/*.madlib"
 file_regex = re.compile(r'^/home/(.*?)/.*/([^/]*)\.madlib$')
-word_regex = re.compile(r'{{(.*?)}}')
+word_regex = re.compile(r'{{(.*?)(#.*?)?(\|.*)?}}')
+word_replace_regex = re.compile(r'^(.*)#(\d*)$')
 
 # Take a file path and return a tuple with the title and original path
 def munge_story(file_name):
@@ -25,7 +29,16 @@ def find_stories(limit=999, shuffle=False):
 
 # Count the number of replacable words in the story
 def count_words(story):
-    return len(word_regex.findall(story))
+    # words that have a '#' part and match should only be counted once
+    count = 0
+    repeats = []
+    for match in re.finditer(word_regex, story):
+        if match.group(2) is None: #the '#' part
+            count += 1
+        elif match.group(1) + match.group(2) not in repeats:
+            count += 1
+            repeats.append(match.group(1) + match.group(2))
+    return count
 
 # Count the number of replacable words in the story when given a file path
 def count_words_file(storyPath):
@@ -45,10 +58,38 @@ def find_next_word(story, rand=False):
 
     return (match.group(0), match.group(1))
 
-# Replace a word and return the entire story body
+# Using a query phrase, replace a word and return the entire story body
 def replace_word(story, query, word):
-    return story.replace(query, word, 1)
-    #return re.sub(query, word, story, 1)
+    rquery = word_regex.search(query)
+    # '{{foo#bar|baz|bang}}' => ('foo', '#bar', '|baz|bang')
+    pipes = [p.lower() for p in (rquery.group(3) if rquery.group(3) is not None else '').strip('|').split('|')]
+    munged_word = process_pipes(word, pipes)
+    story = story.replace(query, munged_word, 1)
+
+    if rquery.group(2) is not None: #if there is a '#' part we replace all instances
+        print "Looking for {{" + rquery.group(1) + rquery.group(2) + ".*?}}"
+        others = re.findall(r'{{' + rquery.group(1) + rquery.group(2) + '.*?}}', story)
+        if len(others) > 0:
+            story = replace_word(story, others[0], word) #iteratively replace the next instance
+
+    return story
+
+
+# Modify user input based on certain modifying pipes
+def process_pipes(word, pipes):
+    for pipe in pipes:
+        try:
+            word = {
+                    'upper': lambda word: word.upper(),
+                    'lower': lambda word: word.lower(),
+                    'title': lambda word: word.title(),
+                    'numeric': lambda word: p.number_to_words(word),
+                    'ordinal': lambda word: p.ordinal(word),
+                    collections.defaultdict: lambda word: word
+                }[pipe](word)
+        except Exception:
+            pass # just keep going if an error occurs processing a pipe
+    return word
 
 # A helper function that will split the story up into chat-printable lengths
 def yield_lines(line, max_size):

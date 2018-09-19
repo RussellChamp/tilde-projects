@@ -187,7 +187,7 @@ def figlet(channel, text):
         lines = subprocess.Popen(["figlet", "-w140"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
         for line in lines.split('\n'):
             ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
-            time.sleep(0.3) #to avoid channel throttle due to spamming
+            time.sleep(0.4) #to avoid channel throttle due to spamming
 
 def toilet(channel, text):
     if not text:
@@ -196,7 +196,7 @@ def toilet(channel, text):
         lines = subprocess.Popen(["toilet", "-w140", "--irc"] + text.split(' '), shell=False, stdout=subprocess.PIPE).stdout.read()
         for line in lines.split('\n'):
             ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
-            time.sleep(0.3) #to avoid channel throttle due to spamming
+            time.sleep(0.4) #to avoid channel throttle due to spamming
 
 def get_acronym(channel, text):
   if not text:
@@ -222,6 +222,13 @@ def get_whosaid(channel, text):
       if len(result['data']) > 1:
         msg += ' and %s said it %d times' % (result['data'][1][0], result['data'][1][1])
     ircsock.send("PRIVMSG " + channel + " :" + msg + ".\n")
+
+def get_notice(user, channel):
+    ircsock.send("CNOTICE " + user + " " + channel + " :Notice me sempai!\n")
+
+def get_water(user, channel, msg, botnick):
+    if msg.find(botnick) == 0:
+        ircsock.send("PRIVMSG " + channel + " :Fight me, " + user + "!\n")
 
 def mug_off(channel):
     ircsock.send("PRIVMSG " + channel + " :u want some of this, m8?\n")
@@ -316,6 +323,13 @@ def listen(botnick):
 
     if ircmsg.find(":!whosaid") != -1:
         get_whosaid(channel, messageText[9:])
+
+    if ircmsg.find(":!notice") != -1:
+        get_notice(user, channel)
+
+    if ircmsg.find(":!water") != -1:
+        get_water(user, channel, messageText[7:], botnick)
+
 
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)

@@ -1,6 +1,11 @@
 <html>
 <head>
 <title>Tilder Disk Usage</title>
+<style>
+  body {
+    background-color: wheat;
+  }
+</style>
 </head>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -26,7 +31,8 @@
        title: 'Tilder Disk Usage',
        subtitle: 'in kb',
        pieHole: 0.4,
-       sliceVisibilityThreshold: 0.005
+       sliceVisibilityThreshold: 0.005,
+       backgroundColor: 'wheat'
     };
     var lineoptions = {
       title: 'Tilder Disk Usage',
@@ -34,7 +40,8 @@
       vAxis: {
         0: {title: 'kb'},
         logScale: true
-       }
+       },
+      backgroundColor: 'wheat'
     };
 
     jQuery.getJSON("/~krowbar/data/du_log.json", function(json) {
@@ -116,4 +123,7 @@
   <div id="donutchart" style="width: 700px; height: 400px;"></div>
   <input id="onlyInteresting" type="checkbox" onClick="drawCharts()">Only Interesting Data</input>
   <div id="linechart" style="width: 120%; height: 130%; margin-left: -10%"></div>
+  <div>
+    <a href="https://github.com/RussellChamp/tilde-projects/tree/master/Code/bash">(see source)</a>
+  </div>
 </body>

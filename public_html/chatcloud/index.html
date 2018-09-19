@@ -1,9 +1,21 @@
 <!DOCTYPE html>
+<html>
+  <head>
+    <title>Tilde.town Chat Cloud</title>
+    <style>
+      body {
+        background-color: wheat;
+      }
+    </style>
+  </head>
 <meta charset="utf-8">
 <body>
 <div>
 <select id="series">
   <option value="">Today</option>
+<option value="_2018_08">Aug 2018</option>
+<option value="_2018_07">Jul 2018</option>
+<option value="_2018_06">Jun 2018</option>
 <option value="_2018_05">May 2018</option>
 <option value="_2018_04">Apr 2018</option>
 <option value="_2018_03">Mar 2018</option>
@@ -61,6 +73,7 @@
   onclick="getWords('/~krowbar/data/chatcloud' + document.getElementById('series').value + '.json',
     document.getElementById('howMuch').value)"
   >Generate Cloud</button>
+<input type="checkbox" id="flat">Flat</input>
 </div>
 <div id="cloud"></div>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -105,7 +118,7 @@ jQuery.getJSON(source, function(json) {
     .size([1200, 800])
     .words(jsonWords)
     .padding(3)
-    .rotate(function() { return ~~(Math.random() * 2) * 90; })
+    .rotate(function() { return ~~(Math.random() * 2) * 90 * !document.getElementById('flat').checked; })
     .font("Impact")
     .fontSize(function(d) { return Math.sqrt(d.size) * 50 / maxSize + 6; })
     .on("end", draw);
@@ -136,4 +149,6 @@ draw = function(words) {
 }
 
 })();</script>
+<a href="https://github.com/RussellChamp/tilde-projects/tree/master/Code/python">(see source)</a>
 </body>
+</html>
