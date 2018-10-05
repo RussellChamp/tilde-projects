@@ -36,8 +36,8 @@ JACKPOT_FILE = "tildejackpot.txt"
 JACKPOT_MIN = 3
 DEBUG = False
 
-def ping():
-  ircsock.send("PONG :pingis\n")
+def ping(pong):
+  ircsock.send("PONG {}\n".format(pong))
 
 def sendmsg(chan , msg):
   ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n")
@@ -181,8 +181,8 @@ def listen():
     for msg in ircmsg.split('\n'):
       msg = msg.strip('\n\r')
 
-      if msg.find("PING :") != -1:
-        ping()
+      if msg[:4] == "PING":
+        ping(msg.split(" ")[1])
 
       formatted = formatter.format_message(msg)
 
@@ -213,8 +213,8 @@ def listen():
       if msg.find(":!rollcall") != -1:
         rollcall(channel)
 
-      if msg.find("PING :") != -1:
-        ping()
+      if msg[:4] == "PING":
+        ping(msg.split(" ")[1])
 
   sys.stdout.flush()
   time.sleep(1)
