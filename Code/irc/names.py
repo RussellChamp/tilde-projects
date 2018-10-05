@@ -1,7 +1,8 @@
 #!/usr/bin/python
 import json
 
-names_file='/home/jumblesale/Code/canonical_names/canonical_names.json'
+names_file = "/home/jumblesale/Code/canonical_names/canonical_names.json"
+
 
 def get_name(name):
     try:
@@ -12,4 +13,4 @@ def get_name(name):
             except KeyError:
                 return name
     except IOError:
-        return name # if we didn't already
+        return name  # if we didn't already

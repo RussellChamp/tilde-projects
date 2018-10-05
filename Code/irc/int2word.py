@@ -19,25 +19,25 @@ def int2word(n):
         if q < -2:
             break
         else:
-            if  q >= 0:
+            if q >= 0:
                 n3.append(int(r[:3]))
             elif q >= -1:
                 n3.append(int(r[:2]))
             elif q >= -2:
                 n3.append(int(r[:1]))
         r1 = r
-    
-    #print n3  # test
-    
+
+    # print n3  # test
+
     # break each group of 3 digits into
     # ones, tens/twenties, hundreds
     # and form a string
     nw = ""
     for i, x in enumerate(n3):
         b1 = x % 10
-        b2 = (x % 100)//10
-        b3 = (x % 1000)//100
-        #print b1, b2, b3  # test
+        b2 = (x % 100) // 10
+        b3 = (x % 1000) // 100
+        # print b1, b2, b3  # test
         if x == 0:
             continue  # skip
         else:
@@ -51,15 +51,65 @@ def int2word(n):
         if b3 > 0:
             nw = ones[b3] + "hundred " + nw
     return nw
+
+
 ############# globals ################
-ones = ["", "one ","two ","three ","four ", "five ",
-    "six ","seven ","eight ","nine "]
-tens = ["ten ","eleven ","twelve ","thirteen ", "fourteen ",
-    "fifteen ","sixteen ","seventeen ","eighteen ","nineteen "]
-twenties = ["","","twenty ","thirty ","forty ",
-    "fifty ","sixty ","seventy ","eighty ","ninety "]
-thousands = ["","thousand ","million ", "billion ", "trillion ",
-    "quadrillion ", "quintillion ", "sextillion ", "septillion ","octillion ",
-    "nonillion ", "decillion ", "undecillion ", "duodecillion ", "tredecillion ",
-    "quattuordecillion ", "sexdecillion ", "septendecillion ", "octodecillion ",
-    "novemdecillion ", "vigintillion "]
+ones = [
+    "",
+    "one ",
+    "two ",
+    "three ",
+    "four ",
+    "five ",
+    "six ",
+    "seven ",
+    "eight ",
+    "nine ",
+]
+tens = [
+    "ten ",
+    "eleven ",
+    "twelve ",
+    "thirteen ",
+    "fourteen ",
+    "fifteen ",
+    "sixteen ",
+    "seventeen ",
+    "eighteen ",
+    "nineteen ",
+]
+twenties = [
+    "",
+    "",
+    "twenty ",
+    "thirty ",
+    "forty ",
+    "fifty ",
+    "sixty ",
+    "seventy ",
+    "eighty ",
+    "ninety ",
+]
+thousands = [
+    "",
+    "thousand ",
+    "million ",
+    "billion ",
+    "trillion ",
+    "quadrillion ",
+    "quintillion ",
+    "sextillion ",
+    "septillion ",
+    "octillion ",
+    "nonillion ",
+    "decillion ",
+    "undecillion ",
+    "duodecillion ",
+    "tredecillion ",
+    "quattuordecillion ",
+    "sexdecillion ",
+    "septendecillion ",
+    "octodecillion ",
+    "novemdecillion ",
+    "vigintillion ",
+]
