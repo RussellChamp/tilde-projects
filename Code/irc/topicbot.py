@@ -30,8 +30,8 @@ parser.add_option("-n", "--nick", dest="nick", default='topicbot',
 
 p = inflect.engine()
 
-def ping():
-  ircsock.send("PONG :pingis\n")
+def ping(pong):
+  ircsock.send("PONG {}\n".format(pong))
 
 def sendmsg(chan , msg):
   ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n")
@@ -145,8 +145,8 @@ def listen():
     ircmsg = ircsock.recv(2048)
     ircmsg = ircmsg.strip('\n\r')
 
-    if ircmsg.find("PING :") != -1:
-      ping()
+    if ircmsg[:4] == "PING":
+      ping(ircmsg.split(" ")[1])
 
     formatted = formatter.format_message(ircmsg)
 
@@ -187,8 +187,8 @@ def listen():
     if ircmsg.find(":!rollcall") != -1:
       rollcall(channel)
 
-    if ircmsg.find("PING :") != -1:
-      ping()
+    if ircmsg[:4] == "PING":
+      ping(ircmsg.split(" ")[1])
 
     sys.stdout.flush()
     time.sleep(1)

@@ -22,11 +22,11 @@ parser.add_option("-n", "--nick", dest="nick", default='tilde_bot',
 
 (options, args) = parser.parse_args()
 
-def ping():
-  ircsock.send("PONG :pingis\n")  
+def ping(pong):
+  ircsock.send("PONG {}\n".format(pong))
 
 def sendmsg(chan , msg):
-  ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n") 
+  ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n")
 
 def joinchan(chan):
   ircsock.send("JOIN "+ chan +"\n")
@@ -61,14 +61,14 @@ def listen():
     ircmsg = ircsock.recv(2048)
     ircmsg = ircmsg.strip('\n\r')
 
-    if ircmsg.find("PING :") != -1:
-      ping()
-    
+    if ircmsg[:4] == "PING":
+      ping(ircmsg.split(" ")[1])
+
     formatted = formatter.format_message(ircmsg)
 
     if "" == formatted:
       continue
-    
+
     print formatted
 
     split = formatted.split("\t")
@@ -79,8 +79,8 @@ def listen():
     if ircmsg.find(":!tilde") != -1:
       tilde(options.channel, user, time)
 
-    if ircmsg.find("PING :") != -1:
-      ping()
+    if ircmsg[:4] == "PING":
+      ping(ircmsg.split(" ")[1])
 
     sys.stdout.flush()
 

@@ -25,7 +25,7 @@ class State:
 MAX_LINE = 80 # The maximum number of characters in a line
 MAX_STORIES = 5 # The maximum number of stories a user can pick from
 THROTTLE_FACTOR = 1 # A factor by which all sleep event durations will be multiplied
-# Allow madlbibbot to run multiple simultaneous stories 
+# Allow madlbibbot to run multiple simultaneous stories
 state = {} # The current state of the bot
 stories = {} # The list of stories available to users
 story = {} # The madlib story currently being worked on
@@ -179,8 +179,8 @@ def finish_story(channel):
     state[channel] = State.idle
 
 # System things
-def ping():
-    ircsock.send("PONG :pingis\n")
+def ping(pong):
+    ircsock.send("PONG {}\n".format(pong))
 
 def sendmsg(chan , msg):
     ircsock.send("PRIVMSG {} :{}\n".format(chan, msg))
@@ -212,8 +212,8 @@ def listen(botnick):
         ircmsg = ircsock.recv(2048)
         ircmsg = ircmsg.strip('\n\r')
 
-        if ircmsg.find("PING :") != -1:
-            ping()
+        if ircmsg[:4] == "PING":
+            ping(ircmsg.split(" ")[1])
 
         formatted = msgformatter.format_message(ircmsg)
         if "" == formatted:
