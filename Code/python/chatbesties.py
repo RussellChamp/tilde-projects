@@ -16,7 +16,9 @@ outfile = "/home/krowbar/logs/chatBesties.json"
 outCircle = "/home/krowbar/logs/chatcircle.json"
 timePeriod = calendar.timegm(time.gmtime()) - (2 * 7 * 24 * 60 * 60)  # 2 weeks
 
-userData = {}  # hash keyed by "user" that contains a hash of mentioned other users with count
+userData = (
+    {}
+)  # hash keyed by "user" that contains a hash of mentioned other users with count
 nameFix = {
     "jumblesal": "jumblesale",
     "hardmath1": "kc",

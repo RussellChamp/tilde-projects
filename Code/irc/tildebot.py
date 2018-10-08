@@ -10,11 +10,6 @@ from optparse import OptionParser
 import fileinput
 import random
 
-import formatter
-import get_users
-import names
-import mentions
-import pretty_date
 import inflect
 import puzzle
 import util
@@ -25,7 +20,7 @@ parser.add_option(
     "-s",
     "--server",
     dest="server",
-    default="127.0.0.1",
+    default="127.0.0.1:6667",
     help="the server to connect to",
     metavar="SERVER",
 )
@@ -54,10 +49,6 @@ SCORE_FILE = "tildescores.txt"
 JACKPOT_FILE = "tildejackpot.txt"
 JACKPOT_MIN = 3
 DEBUG = False
-
-
-def hello():
-    util.sendmsg(ircsock, channel, "Hello!")
 
 
 def too_recent(time1, time2):
@@ -197,14 +188,12 @@ def get_prize(name, isHuman, bonus=0):
     ):  # 80% of the time it's a normal prize (40% for not humans)
         return [
             prize,
-            name
-            + ": "
-            + (get_positive() if isHuman else get_negative())
-            + "! You are "
-            + get_superlative(prize)
-            + " and get "
-            + p.number_to_words(prize)
-            + " tildes!",
+            "{}: {}! You are {} and get {} tildes!".format(
+                name,
+                (get_positive() if isHuman else get_negative),
+                get_superlative(prize),
+                p.number_to_words(prize),
+            ),
         ]
     else:  # 20% of the time its a jackpot situation
         with open(JACKPOT_FILE, "r+") as jackpotfile:
@@ -220,21 +209,17 @@ def get_prize(name, isHuman, bonus=0):
                 )  # increase the jackpot by the prize size
                 return [
                     0,
-                    name
-                    + " "
-                    + get_bad_thing()
-                    + " and gets no tildes! (Jackpot is now "
-                    + str(new_jackpot)
-                    + " tildes)",
+                    "{} {} and gets no tildes! (Jackpot is now {} tildes)".format(
+                        name, get_bad_thing(), new_jackpot
+                    ),
                 ]
             else:  # hit jackpot!
                 jackpotfile.write(str(JACKPOT_MIN))
                 return [
                     jackpot,
-                    name
-                    + " hit the jackpot and won **"
-                    + p.number_to_words(jackpot)
-                    + " tildes!**",
+                    "{} hit the jackpot and won **{}**".format(
+                        name, p.number_to_words(jackpot)
+                    ),
                 ]
 
 
@@ -268,13 +253,8 @@ def give_tilde(channel, user, name, time, human, bonus=0):
                     )
                 else:
                     prize = get_prize(name, human, bonus)
-                    score = (
-                        person[0]
-                        + "&^%"
-                        + str(int(person[1]) + prize[0])
-                        + "&^%"
-                        + time
-                        + "\n"
+                    score = "{}&^%{}&^%{}\n".format(
+                        person[0], int(person[1] + prize[0]), time
                     )
                     util.sendmsg(ircsock, channel, prize[1])
             scorefile.write(score)
@@ -287,7 +267,7 @@ def give_tilde(channel, user, name, time, human, bonus=0):
                     p.number_to_words(prize[0] + 1)
                 ),
             )
-            scorefile.write(user + "&^%" + str(prize[0] + 1) + "&^%" + time + "\n")
+            scorefile.write("{}&^%{}&^%{}\n".format(user, str(prize[0] + 1), time))
 
 
 def show_tildescore(channel, user, name):
@@ -344,7 +324,8 @@ def rollcall(channel):
 
 
 def connect(server, channel, botnick):
-    ircsock.connect((server, 6667))
+    server, port = server.split(":")
+    ircsock.connect((server, port))
     ircsock.send("USER {0} {0} {0} :krowbar\r\n".format(botnick))  # user authentication
     ircsock.send("NICK {}\r\n".format(botnick))
     ircsock.send("MODE +B {}\r\n".format(botnick))
@@ -372,21 +353,17 @@ def listen():
 
             if msg[:4] == "PING":
                 util.ping(ircsock, msg)
+                continue
 
-            formatted = formatter.format_message(msg)
+            formatted = util.format_message(msg)
 
             if "" == formatted:
                 continue
 
             # print formatted
 
-            split = formatted.split("\t")
-            iTime = split[0]
-            user = split[1]
-            name = names.get_name(user)
-            command = split[2]
-            channel = split[3]
-            messageText = split[4]
+            iTime, user, command, channel, messageText = formatted.split("\t")
+            name = util.get_name(user)
 
             if msg.find(":!tildescore") != -1:
                 show_tildescore(channel, user, name)
@@ -394,7 +371,6 @@ def listen():
                 challenge(channel, user, name, iTime)
             elif challenges.has_key(user) and (channel == "#bots" or DEBUG):
                 challenge_response(channel, user, name, iTime, messageText)
-                # give_tilde(channel, user, name, iTime)
 
             if msg.find(":!jackpot") != -1:
                 show_jackpot(channel)
@@ -402,13 +378,10 @@ def listen():
             if msg.find(":!rollcall") != -1:
                 rollcall(channel)
 
-            if msg[:4] == "PING":
-                util.ping(ircsock, msg)
-
     sys.stdout.flush()
     time.sleep(1)
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connect(options.server, options.channel, options.nick)
+util.connect(ircsock, options)
 listen()

@@ -22,7 +22,9 @@ nameFix = {
 
 def whoSaid(word):
     word = word.lower()
-    userData = {}  # hash keyed by "user" that contains a hash of mentioned other users with count
+    userData = (
+        {}
+    )  # hash keyed by "user" that contains a hash of mentioned other users with count
     # Get a list of all user names by checking the logs for people who have said things
     with open(logfile, "r") as log:
         for line in log:

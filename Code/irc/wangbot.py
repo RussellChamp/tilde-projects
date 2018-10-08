@@ -12,11 +12,8 @@ import time
 import re
 import operator
 
-import formatter
-import get_users
-import mentions
-import pretty_date
 import inflect
+import util
 
 parser = OptionParser()
 
@@ -24,7 +21,7 @@ parser.add_option(
     "-s",
     "--server",
     dest="server",
-    default="127.0.0.1",
+    default="127.0.0.1:6667",
     help="the server to connect to",
     metavar="SERVER",
 )
@@ -75,64 +72,41 @@ def resetGlobals():
     currentScores.clear()
 
 
-def ping(pong):
-    ircsock.send("PONG {}\n".format(pong))
-
-
-def sendmsg(chan, msg):
-    ircsock.send("PRIVMSG " + chan + " :" + msg + "\n")
-
-
-def joinchan(chan):
-    ircsock.send("JOIN " + chan + "\n")
-
-
-def hello():
-    ircsock.send("PRIVMSG " + channel + " :Hello!\n")
-
-
 def start_numberwang(channel, user):
     if channel != "#bots":
-        ircsock.send(
-            "PRIVMSG "
-            + channel
-            + " :Numberwang has been disabled for "
-            + channel
-            + " due to spamminess. Please join "
-            + GOOD_CHAN
-            + " to start a game.\n"
+        util.sendmsg(
+            ircsock,
+            channel,
+            "Numberwang has been disabled in {} due to spamminess. Please join {} to start a game.".format(
+                channel, GOOD_CHAN
+            ),
         )
         return
 
     print(user + " started a game")
     resetGlobals()
-    ircsock.send("PRIVMSG " + channel + " :It's time for Numberwang!\n")
+    util.sendmsg(ircsock, channel, "It's time for Numberwang!")
     time.sleep(1)
-    ircsock.send("PRIVMSG " + channel + " :Here's how to play:\n")
+    util.sendmsg(ircsock, channel, "Here's how to play:")
 
-    ircsock.send("PRIVMSG " + channel + " :1. There are 10 rounds\n")
-    ircsock.send(
-        "PRIVMSG "
-        + channel
-        + " :2. Each round lasts 10 seconds. You're up against the clock!\n"
+    util.sendmsg(ircsock, channel, "1. There are 10 rounds")
+    util.sendmsg(
+        ircsock, channel, "2. Each round lasts 10 seconds. You're up against the clock!"
     )
-    ircsock.send(
-        "PRIVMSG "
-        + channel
-        + " :3. Play your numbers, as long as they're between 0 and 99.\n"
+    util.sendmsg(
+        ircsock, channel, "3. Play your numbers, as long as they're between 0 and 99."
     )
-    ircsock.send("PRIVMSG " + channel + " :4. That's Numberwang!\n")
+    util.sendmsg(ircsock, channel, "4. That's Numberwang!")
     time.sleep(2)
-    ircsock.send("PRIVMSG " + channel + " :Let's get started!\n")
+    util.sendmsg(ircsock, channel, "Let's get started!")
     global roundsLeft
     global bonusRound
     roundsLeft = random.randint(MIN_ROUNDS, MAX_ROUNDS)
     bonusRound = random.randint(2, roundsLeft - 1)
     print(
-        "There will be "
-        + str(roundsLeft)
-        + " rounds with the bonus on round "
-        + str(roundsLeft - bonusRound + 1)
+        "There will be {} rounds with the bonus on round {}".format(
+            str(roundsLeft), str(roundsLeft - bonusRound + 1)
+        )
     )
 
 
@@ -141,14 +115,14 @@ def print_scores(channel):
     first = True
     for name in currentScores:
         scoreStrs.append(
-            name
-            + " is "
-            + ("also " if not first and random.randint(1, 3) == 3 else "")
-            + "on "
-            + str(currentScores[name])
+            "{} is {} on {}".format(
+                name,
+                ("also " if not first and random.randint(1, 3) == 3 else ""),
+                currentScores[name],
+            )
         )
         first = False
-    ircsock.send("PRIVMSG " + channel + " :" + p.join(scoreStrs) + "!\n")
+    util.sendmsg(ircsock, channel, p.join(scoreStrs))
 
 
 def guess_numberwang(channel, user, messageText):
@@ -162,12 +136,10 @@ def guess_numberwang(channel, user, messageText):
     )  # must have a number in the first 'word'
     if guess:
         if LIMIT_GUESSING and user == lastGuesser:
-            ircsock.send(
-                "PRIVMSG "
-                + channel
-                + " :"
-                + user
-                + ", you just guessed! Give another player a try!\n"
+            util.sendmsg(
+                ircsock,
+                channel,
+                "{}, you just guessed! Give another player a try!".format(user),
             )
         else:
             guesses += 1
@@ -178,9 +150,7 @@ def guess_numberwang(channel, user, messageText):
             ):  # the more guesses, the higher the probability
                 guesses = 0
                 lastGuesser = ""
-                ircsock.send(
-                    "PRIVMSG " + channel + " :" + user + ": THAT'S NUMBERWANG!\n"
-                )
+                util.sendmsg(ircsock, channel, "{}: THAT'S NUMBERWANG!".format(user))
                 points = random.randint(2, 10) * (
                     random.randint(2, 4) if roundsLeft == bonusRound else 1
                 )
@@ -191,12 +161,12 @@ def guess_numberwang(channel, user, messageText):
                 roundsLeft -= 1
                 time.sleep(2)
                 if roundsLeft == 0:
-                    ircsock.send(
-                        "PRIVMSG "
-                        + channel
-                        + " :Numberwang is now over. Thank you for playing!\n"
+                    util.sendmsg(
+                        ircsock,
+                        channel,
+                        "Numberwang is now over. Thank you for playing!",
                     )
-                    ircsock.send("PRIVMSG " + channel + " :Final scores:\n")
+                    util.sendmsg(ircsock, channel, "Final scores:")
                     print_scores(channel)
                     save_scores()
                 else:
@@ -210,43 +180,41 @@ def guess_numberwang(channel, user, messageText):
                         newRoundStr += "New Round!"
                     if random.randint(1, 10) > 8:
                         newRoundStr += " Let's rotate the board!"
-                    ircsock.send(
-                        "PRIVMSG " + channel + " :" + newRoundStr + " Start guessing!\n"
+                    util.sendmsg(
+                        ircsock, channel, "{} Start guessing!".format(newRoundStr)
                     )
 
             ###INCORRECT GUESS###
             else:
-                ircsock.send(
-                    "PRIVMSG "
-                    + channel
-                    + " :"
-                    + random.choice(["Sorry", "I'm sorry", "No", "Nope"])
-                    + ", "
-                    + user
-                    + ", "
-                    + random.choice(
-                        [
-                            "that's not",
-                            "that is not",
-                            "that isn't",
-                            "that is not",
-                            "that won't make",
-                            "that will not make",
-                        ]
-                    )
-                    + " Numberwang!\n"
+                util.sendmsg(
+                    ircsock,
+                    channel,
+                    "{}, {}, {} Numberwang!".format(
+                        random.choice(["Sorry", "I'm sorry", "No", "Nope"]),
+                        user,
+                        random.choice(
+                            [
+                                "that's not",
+                                "that is not",
+                                "that isn't",
+                                "that is not",
+                                "that won't make",
+                                "that will not make",
+                            ]
+                        ),
+                    ),
                 )
 
 
 def stop_numberwang(channel, user):
     print(user + " stopped a game")
     resetGlobals()
-    ircsock.send(
-        "PRIVMSG "
-        + channel
-        + " :Numberwang has been stopped. No points have been awarded. "
-        + user
-        + " is such a party pooper!\n"
+    util.sendmsg(
+        ircsock,
+        channel,
+        "Numberwang has been stopped. No points have been awarded. {} is such a party pooper!".format(
+            user
+        ),
     )
 
 
@@ -259,19 +227,15 @@ def save_scores():
             for name in currentScores:
                 score = line.strip("\n").split("&^%")
                 if score[0] == name:
-                    line = (
-                        score[0]
-                        + "&^%"
-                        + str(int(score[1]) + currentScores[name])
-                        + "\n"
+                    line = "{}&^%{}\n".format(
+                        score[0], int(score[1]) + currentScores[name]
                     )
                     del currentScores[name]
                     break
             scorefile.write(line)
 
         for name in currentScores:  # new wangers
-            line = name + "&^%" + str(currentScores[name]) + "\n"
-            scorefile.write(line)
+            scorefile.write("{}&^%{}\n".format(name, currentScores[name]))
 
 
 def show_highscores(channel):
@@ -282,16 +246,10 @@ def show_highscores(channel):
             scores.append((int(sline[1]), sline[0]))
         scores = sorted(scores, reverse=True)[:SHOW_TOP_NUM]
 
-        ircsock.send("PRIVMSG " + channel + " :   ====TOP WANGERS====\n")
+        util.sendmsg(ircsock, channel, "====TOP WANGERS====")
         for score in scores:
-            ircsock.send(
-                "PRIVMSG "
-                + channel
-                + " :== ~"
-                + score[1]
-                + " ("
-                + str(score[0])
-                + " points!) ==\n"
+            util.sendmsg(
+                ircsock, channel, " :== ~{} ({} points!) ==".format(score[1], score[0])
             )
 
 
@@ -300,43 +258,24 @@ def show_user_score(channel, user):
         for line in scorefile.readlines():
             score = line.strip("\n").split("&^%")
             if user == score[0]:
-                ircsock.send(
-                    "PRIVMSG "
-                    + channel
-                    + " :"
-                    + user
-                    + ": Your global numberwang score is "
-                    + str(score[1])
-                    + "!\n"
+                util.sendmsg(
+                    ircsock,
+                    channel,
+                    "{}: Your global numberwang score is {}!".format(user, score[1]),
                 )
                 return
         # if we don't find a score line
-        ircsock.send(
-            "PRIVMSG "
-            + channel
-            + " :"
-            + user
-            + ": You haven't scored any points yet!\n"
+        util.sendmsg(
+            ircsock, channel, "{} You haven't scored any points yet!".format(user)
         )
 
 
 def rollcall(channel):
-    ircsock.send(
-        "PRIVMSG "
-        + channel
-        + " :Is it time for Numberwang? It might be! Start a new game with !numberwang or stop a current game with !wangernumb Get your score with !myscore and the list of top wangers with !topwangers\n"
+    util.sendmsg(
+        ircsock,
+        channel,
+        " :Is it time for Numberwang? It might be! Start a new game with !numberwang or stop a current game with !wangernumb Get your score with !myscore and the list of top wangers with !topwangers",
     )
-
-
-def connect(server, channel, botnick):
-    ircsock.connect((server, 6667))
-    ircsock.send(
-        "USER " + botnick + " " + botnick + " " + botnick + " :krowbar\n"
-    )  # user authentication
-    ircsock.send("NICK " + botnick + "\n")
-
-    joinchan(channel)
-    joinchan(GOOD_CHAN)
 
 
 def get_user_from_message(msg):
@@ -357,19 +296,14 @@ def listen():
         if ircmsg[:4] == "PING":
             ping(ircmsg.split(" ")[1])
 
-        formatted = formatter.format_message(ircmsg)
+        formatted = util.format_message(ircmsg)
 
         if "" == formatted:
             continue
 
         # print formatted
 
-        split = formatted.split("\t")
-        time = split[0]
-        user = split[1]
-        command = split[2]
-        channel = split[3]
-        messageText = split[4]
+        time, user, command, channel, messageText = formatted.split("\t")
 
         if ircmsg.find(":!numberwang") != -1 and roundsLeft == 0:
             start_numberwang(channel, user)
@@ -388,13 +322,10 @@ def listen():
         if ircmsg.find(":!rollcall") != -1:
             rollcall(channel)
 
-        if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
-
         sys.stdout.flush()
         time.sleep(1)
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connect(options.server, options.channel, options.nick)
+util.connect(ircsock, options)
 listen()

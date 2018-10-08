@@ -7,9 +7,7 @@ import os
 import sys
 from optparse import OptionParser
 
-import get_users
-import mentions
-import formatter
+import util
 
 parser = OptionParser()
 
@@ -17,7 +15,7 @@ parser.add_option(
     "-s",
     "--server",
     dest="server",
-    default="127.0.0.1",
+    default="127.0.0.1:6667",
     help="the server to connect to",
     metavar="SERVER",
 )
@@ -41,48 +39,16 @@ parser.add_option(
 (options, args) = parser.parse_args()
 
 
-def ping(pong):
-    ircsock.send("PONG {}\n".format(pong))
-
-
-def sendmsg(chan, msg):
-    ircsock.send("PRIVMSG " + chan + " :" + msg + "\n")
-
-
-def joinchan(chan):
-    ircsock.send("JOIN " + chan + "\n")
-
-
-def hello():
-    ircsock.send("PRIVMSG " + channel + " :Hello!\n")
-
-
 def random_quote(channel):
     quote = os.popen("/home/frs/quotes/randquote.py").read()
     if len(quote) >= 256:
         quote = quote[:253] + "..."
-    ircsock.send("PRIVMSG " + channel + " :" + quote + "\n")
+    util.sendmsg(ircsock, channel, quote)
 
 
 def haiku(channel):
     h = os.popen("haiku").read().replace("\n", " // ")
-    ircsock.send("PRIVMSG " + channel + " :" + h + "\n")
-
-
-def connect(server, channel, botnick):
-    ircsock.connect((server, 6667))
-    ircsock.send(
-        "USER "
-        + botnick
-        + " "
-        + botnick
-        + " "
-        + botnick
-        + " :This bot is a result of a tutoral covered on http://shellium.org/wiki.\n"
-    )  # user authentication
-    ircsock.send("NICK " + botnick + "\n")
-
-    joinchan(channel)
+    util.sendmsg(ircsock, channel, h)
 
 
 def get_user_from_message(msg):
@@ -114,7 +80,7 @@ def say_chatty(channel):
     chattyOut = os.popen("/home/karlen/bin/chatty").read().split("\n")
     for line in chattyOut:
         if line:
-            ircsock.send("PRIVMSG " + channel + " :" + line + "\n")
+            util.sendmsg(ircsock, channel, line)
 
 
 def listen():
@@ -123,20 +89,14 @@ def listen():
         ircmsg = ircsock.recv(2048)
         ircmsg = ircmsg.strip("\n\r")
 
-        if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
-
-        formatted = formatter.format_message(ircmsg)
+        formatted = util.format_message(ircmsg)
 
         if "" == formatted:
             continue
 
         print(formatted)
 
-        split = formatted.split("\t")
-        time = split[0]
-        user = split[1]
-        messageText = split[2]
+        time, user, messageText = formatted.split("\t")
 
         if ircmsg.find(":!quote") != -1:
             random_quote(options.channel)
@@ -158,5 +118,5 @@ def listen():
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connect(options.server, options.channel, options.nick)
+util.connect(ircsock, options)
 listen()

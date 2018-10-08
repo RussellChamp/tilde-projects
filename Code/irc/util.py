@@ -1,5 +1,11 @@
+import json
 import time
+import random
 import re
+
+
+def hello(ircsock, chan):
+    sendmsg(ircsock, chan, "Hello!")
 
 
 def ping(pong):
@@ -11,7 +17,17 @@ def sendmsg(ircsock, chan, msg):
 
 
 def joinchan(ircsock, chan):
-    ircsock.send("JOIN {}\n".format(chan))
+    ircsock.send("JOIN {}\r\n".format(chan))
+
+
+def connect(ircsock, options):
+    server, channel, botnick = options
+    server, port = server.split(":")
+    ircsock.connect((server, port))
+    ircsock.send("USER {0} {0} {0} :krowbar".format(botnick))
+    ircsock.send("NICK {}\r\n".format(botnick))
+    ircsock.send("MODE +B {}\r\n".format(botnick))
+    joinchan(channel)
 
 
 # integer number to english word conversion
@@ -158,6 +174,19 @@ def get_users():
     return users
 
 
+def get_name(name):
+    names_file = "/home/jumblesale/Code/canonical_names/canonical_names.json"
+    try:
+        with open(names_file) as names_data:
+            names = json.load(names_data)
+            try:
+                return names[name]["userName"]
+            except KeyError:
+                return name
+    except IOError:
+        return name  # if we didn't already
+
+
 def pretty_date(time=False):
     """
   Get a datetime object or a int() Epoch timestamp and return a
@@ -201,3 +230,21 @@ def pretty_date(time=False):
     if day_diff < 365:
         return str(day_diff / 30) + " months ago"
     return str(day_diff / 365) + " years ago"
+
+
+def makeRainbow(word):
+
+    word = word or "RAINBOW"
+    output = ""
+    rb = ["5", "7", "8", "3", "12", "13", "6"]
+    bg = "01"
+    idx = random.randrange(0, len(rb))
+
+    for l in word:
+        if l == " ":
+            output += " "
+        else:
+            output += "\x03" + rb[idx % len(rb)] + "," + bg + l
+            idx += 1
+
+    return output

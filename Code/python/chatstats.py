@@ -9,7 +9,9 @@ import re
 logfile = "/home/archangelic/irc/log"
 # logfile = "/home/jumblesale/Code/irc/log"
 outfile = "/home/krowbar/logs/chatStats.json"
-userData = {}  # hash keyed by "user" that contains a start timestamp, last timestamp, last said string, chat count, letter count, and word count
+userData = (
+    {}
+)  # hash keyed by "user" that contains a start timestamp, last timestamp, last said string, chat count, letter count, and word count
 # also now happy emotes and sad emotes
 rejectRegexp = "http[s]?://|[0-9]{2}[;:][0-9]{2}"
 happyRegexp = ":[-]?[])}]"

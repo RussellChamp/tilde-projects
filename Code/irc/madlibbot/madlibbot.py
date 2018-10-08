@@ -41,7 +41,7 @@ parser.add_option(
     "-s",
     "--server",
     dest="server",
-    default="127.0.0.1",
+    default="127.0.0.1:6667",
     help="the server to connect to",
     metavar="SERVER",
 )
@@ -223,14 +223,6 @@ def finish_story(channel):
 
 
 # System things
-def ping(pong):
-    ircsock.send("PONG {}\n".format(pong))
-
-
-def sendmsg(chan, msg):
-    ircsock.send("PRIVMSG {} :{}\n".format(chan, msg))
-
-
 def joinchan(chan):
     global state
     state[chan] = State.idle
@@ -256,15 +248,6 @@ def rollcall(channel, botnick):
                 botnick, botnick
             ),
         )
-
-
-def connect(server, channel, botnick):
-    ircsock.connect((server, 6667))
-    ircsock.send(
-        "USER {} {} {} :krowbar\n".format(botnick, botnick, botnick)
-    )  # user authentication
-    ircsock.send("NICK {}\n".format(botnick))
-    joinchan(channel)
 
 
 def listen(botnick):
@@ -304,5 +287,5 @@ def listen(botnick):
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connect(options.server, options.channel, options.nick)
+util.connect(ircsock, options)
 listen(options.nick)
