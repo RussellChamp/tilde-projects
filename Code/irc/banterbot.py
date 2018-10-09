@@ -28,6 +28,7 @@ import tumblr
 import xkcdApropos
 import wikiphilosophy
 import acronymFinder
+import util
 from whosaid import whoSaid
 
 parser = OptionParser()
@@ -266,7 +267,7 @@ def listen(botnick):
     if ircmsg[:4] == "PING":
       ping(ircmsg.split(" ")[1])
 
-    formatted = formatter.format_message(ircmsg)
+    formatted = util.format_message(ircmsg)
 
     if "" == formatted:
       continue

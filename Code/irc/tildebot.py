@@ -17,6 +17,7 @@ import mentions
 import pretty_date
 import inflect
 import puzzle
+import util
 
 parser = OptionParser()
 
@@ -36,23 +37,11 @@ JACKPOT_FILE = "tildejackpot.txt"
 JACKPOT_MIN = 3
 DEBUG = False
 
-def ping(pong):
-  ircsock.send("PONG {}\n".format(pong))
-
-def sendmsg(chan , msg):
-  ircsock.send("PRIVMSG "+ chan +" :"+ msg +"\n")
-
-def joinchan(chan):
-  ircsock.send("JOIN "+ chan +"\n")
-
 def hello():
-  ircsock.send("PRIVMSG "+ channel +" :Hello!\n")
+  util.sendmsg(ircsock, channel, "Hello!")
 
 def too_recent(time1, time2):
-    if(int(time1) - int(time2) < 60*60):
-        return True
-    else:
-        return False
+    return int(time1) - int(time2) < 60*60
 
 def get_positive():
     return random.choice(['Yes', 'Yep', 'Yeppers', 'Correct','You got it', 'Yeah', 'Right on', 'Uh-huh', 'Positive', 'Totally right', 'Close enough', 'That\'s it'])
@@ -98,7 +87,7 @@ def get_prize(name, isHuman, bonus=0):
 def show_jackpot(channel):
     with open(JACKPOT_FILE, "r") as jackpotfile:
         jackpot = int(jackpotfile.readline().strip("\n"))
-        ircsock.send("PRiVMSG " + channel + " :The jackpot is currently " + p.number_to_words(jackpot) + " tildes!\n")
+        util.sendmsg(ircsock, channel, "The jackpot is currently {} tildes!".format(p.number_to_words(jackpot)))
 
 def give_tilde(channel, user, name, time, human, bonus=0):
     found = False
@@ -111,15 +100,15 @@ def give_tilde(channel, user, name, time, human, bonus=0):
             if(person[0] == user):
                 found = True
                 if(too_recent(time, person[2]) and not DEBUG):
-                    ircsock.send("PRIVMSG " + channel + " :" + name + " asked for a tilde too recently and " + get_bad_thing() + ". Try again later.\n")
+                    util.sendmsg(ircsock, channel, "{} asked for a tilde too recently and {}. Try again later.".format(name, get_bad_thing()))
                 else:
                     prize = get_prize(name, human, bonus)
                     score = person[0] + "&^%" + str(int(person[1]) + prize[0]) + "&^%" + time + "\n"
-                    ircsock.send("PRIVMSG " + channel + " :" + prize[1] + "\n")
+                    util.sendmsg(ircsock, channel, prize[1])
             scorefile.write(score)
         if(not found):
             prize = get_prize(name, True, bonus)
-            ircsock.send("PRIVMSG " + channel + " :Welcome to the tilde game! Here's " + p.number_to_words(prize[0]+1) + " free tilde(s) to start you off.\n")
+            util.sendmsg(ircsock, channel, "Welcome to the tilde game! Here's {} free tilde(s) to start you off.".format(p.number_to_words(prize[0]+1)))
             scorefile.write(user + "&^%" + str(prize[0]+1) + "&^%" + time + "\n")
 
 def show_tildescore(channel, user, name):
@@ -127,19 +116,19 @@ def show_tildescore(channel, user, name):
         for idx,score in enumerate(scorefile):
             person = score.strip("\n").split("&^%")
             if(person[0] == user):
-                ircsock.send("PRIVMSG " + channel + " :" + name + " has " + p.number_to_words(person[1]) + " tildes!\n")
+                util.sendmsg(ircsock, channel, "{} has {} tildes!".format(name, p.number_to_words(person[1])))
                 return
         #person has not played yet
-        ircsock.send("PRIVMSG " + channel + " :" + name + " has no tildes yet!\n")
+        util.sendmsg(ircsock, channel, "{} has no tildes yet!".format(name))
 
 def challenge(channel, user, name, time):
     if(channel != "#bots" and not DEBUG):
-        ircsock.send("PRIVMSG " + channel + " :" + name + " is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**\n")
+        util.sendmsg(ircsock, channel, "{} is a meanie and gets no tildes. **Tildebot now only gives out tildes in the #bots channel.**".format(name))
         return
     global challenges;
     challenge = puzzle.make_puzzle();
     challenges[user] = challenge[1:]; #challenges[USER] = [ANSWER, BONUS]
-    ircsock.send("PRIVMSG " + channel + " :" + name + ": " + challenge[0] + "\n")
+    util.sendmsg(ircsock, channel, "{}: {}".format(name, challenge[1]))
 
 def challenge_response(channel, user, name, time, msg):
     global challenges
@@ -155,12 +144,13 @@ def challenge_response(channel, user, name, time, msg):
 
 
 def rollcall(channel):
-  ircsock.send("PRIVMSG "+ channel +" :tildebot reporting! I respond to !tilde !tildescore\n")
+  util.sendmsg(ircsock, channel, "tildebot reporting! I respond to !tilde !tildescore")
 
 def connect(server, channel, botnick):
   ircsock.connect((server, 6667))
-  ircsock.send("USER "+ botnick +" "+ botnick +" "+ botnick +" :krowbar\n") # user authentication
-  ircsock.send("NICK "+ botnick +"\n")
+  ircsock.send("USER {0} {0} {0} :krowbar\r\n".format(botnick)) # user authentication
+  ircsock.send("NICK {}\r\n".format(botnick))
+  ircsock.send("MODE +B {}\r\n".format(botnick))
 
   joinchan(channel)
   if(not DEBUG):
@@ -182,7 +172,7 @@ def listen():
       msg = msg.strip('\n\r')
 
       if msg[:4] == "PING":
-        ping(msg.split(" ")[1])
+        util.ping(ircsock, msg)
 
       formatted = formatter.format_message(msg)
 
@@ -214,7 +204,7 @@ def listen():
         rollcall(channel)
 
       if msg[:4] == "PING":
-        ping(msg.split(" ")[1])
+        util.ping(ircsock, msg)
 
   sys.stdout.flush()
   time.sleep(1)

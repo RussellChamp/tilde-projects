@@ -12,7 +12,7 @@ import time
 import re
 import operator
 
-import msgformatter
+from .. import util
 import madlib
 
 class State:
@@ -215,7 +215,7 @@ def listen(botnick):
         if ircmsg[:4] == "PING":
             ping(ircmsg.split(" ")[1])
 
-        formatted = msgformatter.format_message(ircmsg)
+        formatted = util.format_message(ircmsg)
         if "" == formatted:
             continue
         # print formatted
