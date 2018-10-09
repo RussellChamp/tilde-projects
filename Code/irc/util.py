@@ -4,30 +4,44 @@ import random
 import re
 
 
-def hello(ircsock, chan):
-    sendmsg(ircsock, chan, "Hello!")
-
-
-def ping(pong):
-    ircsock.send("PONG {}\n".format(pong.split(" ")[1]))
+def ping(ircsock, msg):
+    ircsock.send("PONG {}\n".format(msg.split(" ")[1]).encode())
 
 
 def sendmsg(ircsock, chan, msg):
-    ircsock.send("PRIVMSG {} :{}\r\n".format(chan, msg))
+    print("sending {} to {}".format(msg, chan))
+    ircsock.send("PRIVMSG {} :{}\r\n".format(chan, msg).encode())
 
 
 def joinchan(ircsock, chan):
-    ircsock.send("JOIN {}\r\n".format(chan))
+    print("joining {}".format(chan))
+    ircsock.send("JOIN {}\r\n".format(chan).encode())
+
+
+def get_user_from_message(msg):
+    try:
+        i1 = msg.index(":") + 1
+        i2 = msg.index("!")
+        return msg[i1:i2]
+    except ValueError:
+        return ""
 
 
 def connect(ircsock, options):
-    server, channel, botnick = options
-    server, port = server.split(":")
-    ircsock.connect((server, port))
-    ircsock.send("USER {0} {0} {0} :krowbar".format(botnick))
-    ircsock.send("NICK {}\r\n".format(botnick))
-    ircsock.send("MODE +B {}\r\n".format(botnick))
-    joinchan(channel)
+    print(options)
+    server, port = options.server.split(":")
+    ircsock.connect((server, int(port)))
+    print(ircsock)
+    nick = "NICK {}\r\n".format(options.nick).encode()
+    print(nick)
+    ircsock.send(nick)
+    login = "USER {0} {0} {0} {0}".format(options.nick).encode()
+    print(login)
+    ircsock.send(login)
+    mode = "MODE +B {}\r\n".format(options.nick).encode()
+    print(mode)
+    ircsock.send(mode)
+    joinchan(ircsock, options.channel)
 
 
 # integer number to english word conversion

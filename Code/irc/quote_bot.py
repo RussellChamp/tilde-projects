@@ -31,7 +31,7 @@ parser.add_option(
     "-n",
     "--nick",
     dest="nick",
-    default="quote_bot",
+    default="quotebot",
     help="the nick to use",
     metavar="NICK",
 )
@@ -51,19 +51,10 @@ def haiku(channel):
     util.sendmsg(ircsock, channel, h)
 
 
-def get_user_from_message(msg):
-    try:
-        i1 = msg.index(":") + 1
-        i2 = msg.index("!")
-        return msg[i1:i2]
-    except ValueError:
-        return ""
-
-
 def say_mentions(user, message):
-    nick = get_user_from_message(message)
+    nick = util.get_user_from_message(message)
     menschns = (
-        os.popen("/home/karlen/bin/mensch -u %s -t 24 -z +0" % (user))
+        os.popen("/home/karlen/bin/mensch -u {} -t 24 -z +0".format(user))
         .read()
         .replace("\t", ": ")
         .split("\n")
@@ -86,8 +77,8 @@ def say_chatty(channel):
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048)
-        ircmsg = ircmsg.strip("\n\r")
+        ircmsg = ircsock.recv(2048).decode()
+        ircmsg = ircmsg.strip("\r\n")
 
         formatted = util.format_message(ircmsg)
 
@@ -96,7 +87,7 @@ def listen():
 
         print(formatted)
 
-        time, user, messageText = formatted.split("\t")
+        user = formatted.split("\t")[1]
 
         if ircmsg.find(":!quote") != -1:
             random_quote(options.channel)
@@ -111,10 +102,10 @@ def listen():
             haiku(options.channel)
 
         if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
+            util.ping(ircsock, ircmsg)
 
         sys.stdout.flush()
-        time.sleep(1)
+        # time.sleep(1)
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

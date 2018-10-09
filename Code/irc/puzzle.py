@@ -43,54 +43,46 @@ def make_puzzle(obfuscate=True):
 
     if roll == 0:
         answer = var1 + var2
-        puzzle += (
-            p.number_to_words(var1)
-            + " "
-            + random.choice(["and", "plus", "sum", "add"])
-            + " "
-            + p.number_to_words(var2)
+        puzzle += "{} {} {}".format(
+            p.number_to_words(var1),
+            random.choice(["and", "plus", "sum", "add"]),
+            p.number_to_words(var2),
         )
 
     elif roll == 1:
         answer = var1 * var2
-        puzzle += (
-            p.number_to_words(var1)
-            + " "
-            + random.choice(["times", "multiply", "multiplied by", "product"])
-            + " "
-            + p.number_to_words(var2)
+        puzzle += "{} {} {}".format(
+            p.number_to_words(var1),
+            random.choice(["times", "multiply", "multiplied by", "product"]),
+            p.number_to_words(var2),
         )
+
     elif roll == 2:
         if var2 > var1:
             var1, var2 = var2, var1
         answer = var1 - var2
-        puzzle += (
-            p.number_to_words(var1)
-            + " "
-            + random.choice(["minus", "subtract", "take away", "less"])
-            + " "
-            + p.number_to_words(var2)
+        puzzle += "{} {} {}".format(
+            p.number_to_words(var1),
+            random.choice(["minus", "subtract", "take away", "less"]),
+            p.number_to_words(var2),
         )
+
     elif roll == 3:
         if var2 > var1:
             var1, var2 = var2, var1
         answer = var1 * 2 / var2
-        puzzle += (
-            p.number_to_words(var1 * 2)
-            + " "
-            + random.choice(["divided by", "over"])
-            + " "
-            + p.number_to_words(var2)
-            + " (no remainder)"
+        puzzle += "{} {} {} (no remainder)".format(
+            p.number_to_words(var1 * 2),
+            random.choice(["divided by", "over"]),
+            p.number_to_words(var2),
         )
+
     elif roll == 4:
         answer = var1 ** var2
-        puzzle += (
-            p.number_to_words(var1)
-            + " to the "
-            + p.ordinal(p.number_to_words(var2))
-            + " power"
+        puzzle += "{} to the {} power".format(
+            p.number_to_words(var1), p.ordinal(p.number_to_words(var2))
         )
+
     elif roll == 5:
         p1 = random.choice(primes)
         p2 = random.choice(primes)
@@ -103,10 +95,10 @@ def make_puzzle(obfuscate=True):
             return attempt == correct
 
         bonus = 1
-        puzzle += (
+        puzzle += "{} when factored into its two primes (answer in the form of the two primes with a comma between)".format(
             p.number_to_words(p1 * p2)
-            + " when factored into its two primes (answer in the form of the two primes with a comma between)"
         )
+
     elif roll == 6:
         prime = random.choice(primes)
         answer = prime % var1
@@ -115,57 +107,43 @@ def make_puzzle(obfuscate=True):
         if let1_ord + var1 > ord("z"):
             let1_ord -= var1
         answer = chr(let1_ord + var1)
-        puzzle = (
-            "What letter comes "
-            + p.number_to_words(var1)
-            + " letters after '"
-            + chr(let1_ord)
-            + "'"
+        puzzle += "What letter comes {} letters after '{}'".format(
+            p.number_to_words(var1), chr(let1_ord)
         )
+
         obfuscate = False
     elif roll == 8:
         if let1_ord - var1 < ord("a"):
             let1_ord += var1
         answer = chr(let1_ord - var1)
-        puzzle = (
-            "What letter comes "
-            + p.number_to_words(var1)
-            + " letters before '"
-            + chr(let1_ord)
-            + "'"
+        puzzle += "What letter comes {} letters before '{}'".format(
+            p.number_to_words(var1), chr(let1_ord)
         )
+
         obfuscate = False
     elif roll == 9:
         answer, puzzle = quote_puzzle.get_quote()
         obfuscate = False
     elif roll == 10:
         answer = str(min(var1, var2, var3, var4))
-        puzzle = (
-            "What is the "
-            + random.choice(["smallest", "lowest"])
-            + " of "
-            + p.number_to_words(var1)
-            + ", "
-            + p.number_to_words(var2)
-            + ", "
-            + p.number_to_words(var3)
-            + ", and "
-            + p.number_to_words(var4)
+        puzzle += "What is the {} of {}, {}, {}, and {}".format(
+            random.choice(["smallest", "lowest"]),
+            p.number_to_words(var1),
+            p.number_to_words(var2),
+            p.number_to_words(var3),
+            p.number_to_words(var4),
         )
+
     elif roll == 11:
         answer = str(max(var1, var2, var3, var4))
-        puzzle = (
-            "What is the "
-            + random.choice(["biggest", "largest"])
-            + " of "
-            + p.number_to_words(var1)
-            + ", "
-            + p.number_to_words(var2)
-            + ", "
-            + p.number_to_words(var3)
-            + ", and "
-            + p.number_to_words(var4)
+        puzzle += "What is the {} of {}, {}, {}, and {}".format(
+            random.choice(["biggest", "largest"]),
+            p.number_to_words(var1),
+            p.number_to_words(var2),
+            p.number_to_words(var3),
+            p.number_to_words(var4),
         )
+
     elif roll <= 14:  # 12-14
         answer, puzzle = dict_puzzle.get_puzzle()
         obfuscate = False

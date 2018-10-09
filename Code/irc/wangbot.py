@@ -37,7 +37,7 @@ parser.add_option(
     "-n",
     "--nick",
     dest="nick",
-    default="numberwang_bot",
+    default="wangbot",
     help="the nick to use",
     metavar="NICK",
 )
@@ -274,27 +274,18 @@ def rollcall(channel):
     util.sendmsg(
         ircsock,
         channel,
-        " :Is it time for Numberwang? It might be! Start a new game with !numberwang or stop a current game with !wangernumb Get your score with !myscore and the list of top wangers with !topwangers",
+        "Is it time for Numberwang? It might be! Start a new game with !numberwang or stop a current game with !wangernumb Get your score with !myscore and the list of top wangers with !topwangers",
     )
-
-
-def get_user_from_message(msg):
-    try:
-        i1 = msg.index(":") + 1
-        i2 = msg.index("!")
-        return msg[i1:i2]
-    except ValueError:
-        return ""
 
 
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048)
+        ircmsg = ircsock.recv(2048).decode()
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
+            util.ping(ircsock, ircmsg)
 
         formatted = util.format_message(ircmsg)
 
@@ -303,7 +294,7 @@ def listen():
 
         # print formatted
 
-        time, user, command, channel, messageText = formatted.split("\t")
+        _time, user, _command, channel, messageText = formatted.split("\t")
 
         if ircmsg.find(":!numberwang") != -1 and roundsLeft == 0:
             start_numberwang(channel, user)

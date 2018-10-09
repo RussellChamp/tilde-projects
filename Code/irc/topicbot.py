@@ -10,12 +10,8 @@ import fileinput
 import random
 import time
 
-import formatter
-import get_users
-import mentions
-import pretty_date
 import inflect
-import names
+import util
 
 parser = OptionParser()
 
@@ -23,7 +19,7 @@ parser.add_option(
     "-s",
     "--server",
     dest="server",
-    default="127.0.0.1",
+    default="127.0.0.1:6667",
     help="the server to connect to",
     metavar="SERVER",
 )
@@ -49,22 +45,6 @@ parser.add_option(
 p = inflect.engine()
 
 
-def ping(pong):
-    ircsock.send("PONG {}\n".format(pong))
-
-
-def sendmsg(chan, msg):
-    ircsock.send("PRIVMSG " + chan + " :" + msg + "\n")
-
-
-def joinchan(chan):
-    ircsock.send("JOIN " + chan + "\n")
-
-
-def hello():
-    ircsock.send("PRIVMSG " + channel + " :Hello!\n")
-
-
 def get_topic(channel, user, time):
     # topic scores are saved as <USER>&^%<GETS SCORE>&^%<SETS SCORE>
     with open("topicscores.txt", "r") as scorefile:
@@ -84,19 +64,16 @@ def get_topic(channel, user, time):
 
     with open("topics_" + channel + ".txt", "r") as topics:
         topic = topics.readlines()[-1].strip("\n").split("&^%", 3)
-        byuser = names.get_name(topic[1])
-        ircsock.send(
-            "PRIVMSG "
-            + channel
-            + " :I've told you "
-            + p.number_to_words(userscore)
-            + " times! It's \""
-            + topic[2]
-            + '" (Set by '
-            + byuser
-            + " "
-            + pretty_date.pretty_date(int(topic[0]))
-            + ")\n"
+        byuser = util.get_name(topic[1])
+        util.sendmsg(
+            ircsock,
+            channel,
+            "I've told you {} times! It's \"{}\" (set by {} {})".format(
+                p.number_to_words(userscore),
+                topic[2],
+                byuser,
+                util.pretty_date(int(topic[0])),
+            ),
         )
 
 
@@ -117,14 +94,10 @@ def count_topic(channel, user, time, msg):
         scorefile.writelines(scores)
         if not found:
             scorefile.write(user + "&^%0&^%1")
-    ircsock.send(
-        "PRIVMSG "
-        + channel
-        + " :"
-        + user
-        + " has changed the topic "
-        + p.number_to_words(userscore)
-        + " times!\n"
+    util.sendmsg(
+        ircsock,
+        channel,
+        "{} has changed the topic {} times!".format(user, p.number_to_words(userscore)),
     )
 
 
@@ -139,29 +112,29 @@ def random_topic(channel, user, time, setTopic=False):
         if setTopic:
             set_topic(channel, user, time, msg)
         else:
-            ircsock.send("PRIVMSG " + channel + " :Suggested Topic: " + msg + "\n")
+            util.sendmsg(ircsock, channel, "Suggested Topic: {}".format(msg))
 
 
 def rollcall(channel):
-    ircsock.send(
-        "PRIVMSG "
-        + channel
-        + " :topicbot reporting! I respond to !topic !settopic !suggesttopic !thistory\n"
+    util.sendmsg(
+        ircsock,
+        channel,
+        "topicbot reporting! I respond to !topic !settopic !suggesttopic !thistory",
     )
 
 
 def topic_score(channel):
-    ircsock.send("PRIVMSG " + channel + " :Not implemented yet")
+    util.sendmsg(ircsock, channel, "Not implemented yet")
 
 
 def topic_scores(channel):
-    ircsock.send("PRIVMSG " + channel + " :Not implemented yet")
+    util.sendmsg(ircsock, channel, "Not implemented yet")
 
 
 def topic_history(channel, user, count):
     try:
         iCount = int(count.split()[1])
-    except (ValueError, IndexError) as e:
+    except (ValueError, IndexError):
         iCount = 3
     if iCount > 10:
         iCount = 10
@@ -169,73 +142,40 @@ def topic_history(channel, user, count):
         iCount = 3
     with open("topics_" + channel + ".txt", "r") as topicsfile:
         # topics = topicsfile.readlines()[-iCount:].reverse()
-        ircsock.send(
-            "PRIVMSG "
-            + channel
-            + " :Ok, here were the last "
-            + p.number_to_words(iCount)
-            + " topics\n"
+        util.sendmsg(
+            ircsock,
+            channel,
+            "Ok, here are the last {} topics".format(p.number_to_words(iCount)),
         )
         for idx, topic in enumerate(reversed(topicsfile.readlines()[-iCount:])):
             topic = topic.strip("\n").split("&^%", 3)
-            byuser = names.get_name(topic[1])
-            ircsock.send(
-                "PRIVMSG "
-                + channel
-                + " :"
-                + str(idx + 1)
-                + ': "'
-                + topic[2]
-                + '" (Set by '
-                + byuser
-                + " "
-                + pretty_date.pretty_date(int(topic[0]))
-                + ")\n"
+            byuser = util.get_name(topic[1])
+            util.sendmsg(
+                ircsock,
+                channel,
+                "{}: {} (set by {} {})".format(
+                    str(idx + 1), topic[2], byuser, util.pretty_date(int(topic[0]))
+                ),
             )
-
-
-def connect(server, channel, botnick):
-    ircsock.connect((server, 6667))
-    ircsock.send(
-        "USER " + botnick + " " + botnick + " " + botnick + " :krowbar\n"
-    )  # user authentication
-    ircsock.send("NICK " + botnick + "\n")
-
-    joinchan(channel)
-    joinchan("#bots")
-
-
-def get_user_from_message(msg):
-    try:
-        i1 = msg.index(":") + 1
-        i2 = msg.index("!")
-        return msg[i1:i2]
-    except ValueError:
-        return ""
 
 
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048)
+        ircmsg = ircsock.recv(2048).decode()
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
+            util.ping(ircsock, ircmsg)
 
-        formatted = formatter.format_message(ircmsg)
+        formatted = util.format_message(ircmsg)
 
         if "" == formatted:
             continue
 
         # print formatted
 
-        split = formatted.split("\t")
-        msgtime = split[0]
-        user = split[1]
-        command = split[2]
-        channel = split[3]
-        messageText = split[4]
+        msgtime, user, command, channel, messageText = formatted.split("\t")
 
         if command == "TOPIC" and user != options.nick:
             count_topic(channel, user, msgtime, messageText)
@@ -262,13 +202,10 @@ def listen():
         if ircmsg.find(":!rollcall") != -1:
             rollcall(channel)
 
-        if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
-
         sys.stdout.flush()
         time.sleep(1)
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connect(options.server, options.channel, options.nick)
+util.connect(ircsock, options)
 listen()

@@ -5,7 +5,7 @@ import random
 
 def define(word):
     defs = []
-    url = "http://www.merriam-webster.com/dictionary/%s" % word
+    url = "http://www.merriam-webster.com/dictionary/{}".format(word)
     soup = BeautifulSoup(urllib.urlopen(url).read(), "html.parser")
     head = soup.find("div", id="headword")
     if head:
@@ -19,9 +19,8 @@ key = open("/home/krowbar/.secret/key").readline().rstrip()
 
 def defWord(word, short=True):
     defs = []
-    url = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/%s?key=%s" % (
-        word,
-        key,
+    url = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/{}?key={}".format(
+        word, key
     )
     soup = BeautifulSoup(urllib.urlopen(url).read(), "html5lib")
     entry = soup.find("entry")

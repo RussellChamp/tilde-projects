@@ -1,5 +1,5 @@
+import requests
 import urllib
-import urllib2
 import json as j
 import sys
 
@@ -50,12 +50,9 @@ def query(
     encparams = urllib.urlencode(params)
     url = "http://api.duckduckgo.com/?" + encparams
 
-    request = urllib2.Request(url, headers={"User-Agent": useragent})
-    response = urllib2.urlopen(request)
-    json = j.loads(response.read())
-    response.close()
+    request = requests.get(url, headers={"User-Agent": useragent})
 
-    return Results(json)
+    return Results(request.json())
 
 
 class Results(object):

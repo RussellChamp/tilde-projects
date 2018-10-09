@@ -10,6 +10,7 @@ import fileinput
 import random
 import re
 import subprocess
+import textwrap
 import time
 import datetime
 
@@ -17,7 +18,6 @@ import inflect
 from rhymesWith import getRhymes
 from rhymesWith import rhymeZone
 from defineWord import defWord
-from rainbow import makeRainbow
 import welch
 import evil
 import tumblr
@@ -49,7 +49,7 @@ parser.add_option(
     "-n",
     "--nick",
     dest="nick",
-    default="tildebot",
+    default="banterbot",
     help="the nick to use",
     metavar="NICK",
 )
@@ -200,7 +200,7 @@ def define_word(channel, user, text):
 
 
 def make_rainbow(channel, user, text):
-    rbword = makeRainbow(text[9:])
+    rbword = util.makeRainbow(text[9:])
     util.sendmsg(ircsock, channel, rbword)
 
 
@@ -320,37 +320,28 @@ def mug_off(channel):
 
 
 def rollcall(channel):
-    util.sendmsg(
-        ircsock,
-        channel,
-        """
+    text = """
         U wot m8? I score all the top drawer #banter and #bantz on this channel!
         Find new top-shelf banter with !newbanter, !rhymes, and !define.
         Look up things with !acronym and !whosaid.
         Make your chatter #legend with !rainbow, !toilet, and !figlet.
         Find interesting things with !xkcd and !wiki-philosophy.
         Get jokes with !welch and !evil
-        """,
-    )
-
-
-def get_user_from_message(msg):
-    try:
-        i1 = msg.index(":") + 1
-        i2 = msg.index("!")
-        return msg[i1:i2]
-    except ValueError:
-        return ""
+    """
+    for line in textwrap.dedent(text).split("\n"):
+        if line == "":
+            continue
+        util.sendmsg(ircsock, channel, line)
 
 
 def listen(botnick):
     while 1:
 
-        ircmsg = ircsock.recv(2048)
+        ircmsg = ircsock.recv(2048).decode()
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
+            util.ping(ircsock, ircmsg)
 
         formatted = util.format_message(ircmsg)
 
@@ -359,7 +350,7 @@ def listen(botnick):
 
         # print formatted
 
-        time, user, command, channel, messageText = formatted.split("\t")
+        _time, user, _command, channel, messageText = formatted.split("\t")
 
         if ircmsg.find("#banter") != -1 or ircmsg.find("#bantz") != -1:
             score_banter(channel, user, messageText)
@@ -418,7 +409,7 @@ def listen(botnick):
             mug_off(channel)
 
         if ircmsg[:4] == "PING":
-            util.ping(ircsock, msg)
+            util.ping(ircsock, ircmsg)
 
         sys.stdout.flush()
         time.sleep(1)

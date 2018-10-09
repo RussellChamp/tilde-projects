@@ -48,7 +48,7 @@ challenges = {}
 SCORE_FILE = "tildescores.txt"
 JACKPOT_FILE = "tildejackpot.txt"
 JACKPOT_MIN = 3
-DEBUG = False
+DEBUG = True
 
 
 def too_recent(time1, time2):
@@ -190,7 +190,7 @@ def get_prize(name, isHuman, bonus=0):
             prize,
             "{}: {}! You are {} and get {} tildes!".format(
                 name,
-                (get_positive() if isHuman else get_negative),
+                (get_positive() if isHuman else get_negative()),
                 get_superlative(prize),
                 p.number_to_words(prize),
             ),
@@ -240,10 +240,10 @@ def give_tilde(channel, user, name, time, human, bonus=0):
         scorefile.seek(0)
         scorefile.truncate()
         for score in scores:
-            person = score.strip("\n").split("&^%")
-            if person[0] == user:
+            name, score_on_file, timestamp = score.strip("\n").split("&^%")
+            if name == user:
                 found = True
-                if too_recent(time, person[2]) and not DEBUG:
+                if too_recent(time, timestamp) and not DEBUG:
                     util.sendmsg(
                         ircsock,
                         channel,
@@ -252,22 +252,22 @@ def give_tilde(channel, user, name, time, human, bonus=0):
                         ),
                     )
                 else:
-                    prize = get_prize(name, human, bonus)
+                    prizevalue, prizetext = get_prize(name, human, bonus)
                     score = "{}&^%{}&^%{}\n".format(
-                        person[0], int(person[1] + prize[0]), time
+                        name, str(int(score_on_file) + prizevalue), time
                     )
-                    util.sendmsg(ircsock, channel, prize[1])
+                    util.sendmsg(ircsock, channel, prizetext)
             scorefile.write(score)
         if not found:
-            prize = get_prize(name, True, bonus)
+            prizevalue, prizetext = get_prize(name, True, bonus)
             util.sendmsg(
                 ircsock,
                 channel,
-                "Welcome to the tilde game! Here's {} free tilde(s) to start you off.".format(
-                    p.number_to_words(prize[0] + 1)
+                "Welcome to the tilde game! Here's {} free tildes to start you off.".format(
+                    p.number_to_words(prizevalue + 1)
                 ),
             )
-            scorefile.write("{}&^%{}&^%{}\n".format(user, str(prize[0] + 1), time))
+            scorefile.write("{}&^%{}&^%{}\n".format(user, str(prizevalue + 1), time))
 
 
 def show_tildescore(channel, user, name):
@@ -298,14 +298,13 @@ def challenge(channel, user, name, time):
     global challenges
     challenge = puzzle.make_puzzle()
     challenges[user] = challenge[1:]
-    # challenges[USER] = [ANSWER, BONUS]
-    util.sendmsg(ircsock, channel, "{}: {}".format(name, challenge[1]))
+    util.sendmsg(ircsock, channel, "{}: {}".format(name, challenge[0]))
 
 
 def challenge_response(channel, user, name, time, msg):
     global challenges
     print(msg)
-    if challenges.has_key(user):
+    if user in challenges:
         answer, bonus = challenges[user]
         if (callable(answer) and answer(msg.lower())) or (
             msg.lower() == str(answer).lower() or msg == p.number_to_words(answer)
@@ -323,31 +322,10 @@ def rollcall(channel):
     )
 
 
-def connect(server, channel, botnick):
-    server, port = server.split(":")
-    ircsock.connect((server, port))
-    ircsock.send("USER {0} {0} {0} :krowbar\r\n".format(botnick))  # user authentication
-    ircsock.send("NICK {}\r\n".format(botnick))
-    ircsock.send("MODE +B {}\r\n".format(botnick))
-
-    joinchan(channel)
-    if not DEBUG:
-        joinchan("#bots")
-
-
-def get_user_from_message(msg):
-    try:
-        i1 = msg.index(":") + 1
-        i2 = msg.index("!")
-        return msg[i1:i2]
-    except ValueError:
-        return ""
-
-
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048)
+        ircmsg = ircsock.recv(2048).decode()
         for msg in ircmsg.split("\n"):
             msg = msg.strip("\n\r")
 
@@ -356,20 +334,19 @@ def listen():
                 continue
 
             formatted = util.format_message(msg)
+            print(formatted)
 
             if "" == formatted:
                 continue
-
-            # print formatted
 
             iTime, user, command, channel, messageText = formatted.split("\t")
             name = util.get_name(user)
 
             if msg.find(":!tildescore") != -1:
                 show_tildescore(channel, user, name)
-            elif msg.find(":!tilde") != -1 and not challenges.has_key(user):
+            elif msg.find(":!tilde") != -1 and user not in challenges:
                 challenge(channel, user, name, iTime)
-            elif challenges.has_key(user) and (channel == "#bots" or DEBUG):
+            elif user in challenges and (channel == "#bots" or DEBUG):
                 challenge_response(channel, user, name, iTime, messageText)
 
             if msg.find(":!jackpot") != -1:
