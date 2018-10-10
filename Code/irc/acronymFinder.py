@@ -9,10 +9,8 @@ dict = "/usr/share/dict/american-english"
 
 def get_acros(word, silly, short):
     acros = []
-    url = "http://www.stands4.com/services/v2/abbr.php?uid=%s&tokenid=%s&term=%s" % (
-        userId,
-        token,
-        word,
+    url = "http://www.stands4.com/services/v2/abbr.php?uid={}&tokenid={}&term={}".format(
+        userId, token, word
     )
     soup = BeautifulSoup(urllib.urlopen(url).read(), "html5lib")
     results = soup.find_all("result")
@@ -56,8 +54,7 @@ def get_acros(word, silly, short):
         else:
             acros.append(
                 (
-                    '%s: "%s" (%s, score: %s)'
-                    % (
+                    '{}: "{}" ({}, score: {})'.format(
                         d["term"],
                         d["definition"],
                         ", ".join(d["categories"]),
@@ -85,8 +82,9 @@ def get_acros(word, silly, short):
             else:
                 acros.append(
                     (
-                        '%s: "%s" (%s, score: %s)'
-                        % (word.upper(), newWord, "Tilde.town Original", "0")
+                        '{}: "{}" ({}, score: {})'.format(
+                            word.upper(), newWord, "Tilde.town Original", "0"
+                        )
                     ).encode("ascii", "ignore")
                 )
         except IndexError:

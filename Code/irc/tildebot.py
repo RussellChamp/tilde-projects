@@ -48,7 +48,7 @@ challenges = {}
 SCORE_FILE = "tildescores.txt"
 JACKPOT_FILE = "tildejackpot.txt"
 JACKPOT_MIN = 3
-DEBUG = True
+DEBUG = False
 
 
 def too_recent(time1, time2):
@@ -217,7 +217,7 @@ def get_prize(name, isHuman, bonus=0):
                 jackpotfile.write(str(JACKPOT_MIN))
                 return [
                     jackpot,
-                    "{} hit the jackpot and won **{}**".format(
+                    "{} hit the jackpot and won **{}** tildes!".format(
                         name, p.number_to_words(jackpot)
                     ),
                 ]
@@ -272,7 +272,7 @@ def give_tilde(channel, user, name, time, human, bonus=0):
 
 def show_tildescore(channel, user, name):
     with open(SCORE_FILE, "r") as scorefile:
-        for idx, score in enumerate(scorefile):
+        for _idx, score in enumerate(scorefile):
             person = score.strip("\n").split("&^%")
             if person[0] == user:
                 util.sendmsg(
@@ -339,7 +339,7 @@ def listen():
             if "" == formatted:
                 continue
 
-            iTime, user, command, channel, messageText = formatted.split("\t")
+            iTime, user, _command, channel, messageText = formatted.split("\t")
             name = util.get_name(user)
 
             if msg.find(":!tildescore") != -1:

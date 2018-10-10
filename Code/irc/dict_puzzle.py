@@ -50,5 +50,4 @@ def get_anagram(maxlen=6):
         # Ok, gotta actually check if it's a word now
         return any(guess == item for item in gen_wordlist())
 
-    challenge_text = "Unscramble the following word: '{}'".format(anagram)
-    return [answer_checker, challenge_text]
+    return [answer_checker, "Unscramble the following word: '{}'".format(anagram)]
