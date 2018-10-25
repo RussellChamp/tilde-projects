@@ -256,3 +256,5 @@
 1534119128&^%vilmibm&^%<3 | for more about this chat, see https://tilde.town/wiki/irc.html or run `wiki get irc`
 1534311634&^%vilmibm&^%welcome! to learn more about this chat, check out https://tilde.town/wiki/irc.html or run `wiki get irc`
 1535572794&^%vilmibm&^%weechat has been updated! quit and run `chat` to get the new version if you want | to learn more about this chat, check out https://tilde.town/wiki/irc.html or run `wiki get irc`
+1537388473&^%vilmibm&^%to learn more about this chat, check out https://tilde.town/wiki/irc.html or run `wiki get irc`
+1538600484&^%vilmibm&^%for chat info, check out https://tilde.town/wiki/socializing/irc or run `wiki get socializing/irc`
