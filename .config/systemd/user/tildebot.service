@@ -1,0 +1,15 @@
+[Unit]
+Description=tildebot daemon
+After=tildebot.service
+
+[Service]
+Type=simple
+ExecStart=/home/krowbar/Code/irc/tildebot.py -s 127.0.0.1:6667 -n tildebot -c #bots
+WorkingDirectory=/home/krowbar/Code/irc/
+Restart=always
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target

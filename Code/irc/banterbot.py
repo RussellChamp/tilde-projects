@@ -1,11 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
+# using python3 because of unicode and crap
 # http://wiki.shellium.org/w/Writing_an_IRC_bot_in_Python
 
 # Import some necessary libraries.
+import argparse
 import socket
 import os
 import sys
-from optparse import OptionParser
 import fileinput
 import random
 import re
@@ -27,9 +28,9 @@ import acronymFinder
 import util
 from whosaid import whoSaid
 
-parser = OptionParser()
+parser = argparse.ArgumentParser()
 
-parser.add_option(
+parser.add_argument(
     "-s",
     "--server",
     dest="server",
@@ -37,15 +38,16 @@ parser.add_option(
     help="the server to connect to",
     metavar="SERVER",
 )
-parser.add_option(
+parser.add_argument(
     "-c",
-    "--channel",
-    dest="channel",
-    default="#bot_test",
-    help="the channel to join",
-    metavar="CHANNEL",
+    "--channels",
+    dest="channels",
+    nargs="+",
+    default=["#bot_test"],
+    help="the channels to join",
+    metavar="CHANNELS",
 )
-parser.add_option(
+parser.add_argument(
     "-n",
     "--nick",
     dest="nick",
@@ -54,13 +56,14 @@ parser.add_option(
     metavar="NICK",
 )
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 p = inflect.engine()
 
 
 def joinchan(chan):
     ircsock.send("JOIN " + chan + "\r\n")
+    ircsock.send("JOIN #bots\r\n")
 
 
 def hello():
@@ -122,9 +125,9 @@ def score_banter(channel, user, messageText):
 
 def get_new_banter(channel, user):
     with open("/usr/share/dict/words", "r") as dict:
-        words = filter(lambda word: re.search(r"^[^']*$", word), dict.readlines())
+        words = list(filter(lambda word: re.search(r"^[^']*$", word), dict.readlines()))
         if random.randint(0, 1):  # look for *ant words
-            words = filter(lambda word: re.search(r"ant", word), words)
+            words = list(filter(lambda word: re.search(r"ant", word), words))
             random.shuffle(words)
             word = words[0].strip("\n")
             start = word.find("ant")
@@ -136,7 +139,7 @@ def get_new_banter(channel, user):
                 else:  # replace the letter with 'b'
                     word = word[: start - 1] + "b" + word[start:]
         else:  # look for ban* words
-            words = filter(lambda word: re.search(r"ban", word), words)
+            words = list(filter(lambda word: re.search(r"ban", word), words))
             random.shuffle(words)
             word = words[0].strip("\n")
             end = word.find("ban") + 3
@@ -225,8 +228,6 @@ def get_xkcd(channel, text):
     joined_links = ", ".join(links)
     for line in [joined_links[i : i + 400] for i in range(0, len(joined_links), 400)]:
         util.sendmsg(ircsock, channel, line)
-    # res = xkcdApropos.xkcd(text[6:])
-    # ircsock.send("PRIVMSG " + channel + " :" + res + "\n")
 
 
 def get_wphilosophy(channel, text):
@@ -251,7 +252,7 @@ def figlet(channel, text):
     else:
         lines = subprocess.Popen(
             ["figlet", "-w140"] + text.split(" "), shell=False, stdout=subprocess.PIPE
-        ).stdout.read()
+        ).stdout.read().decode("utf-8")
         for line in lines.split("\n"):
             util.sendmsg(ircsock, channel, line)
             time.sleep(0.4)  # to avoid channel throttle due to spamming
@@ -265,7 +266,7 @@ def toilet(channel, text):
             ["toilet", "-w140", "--irc"] + text.split(" "),
             shell=False,
             stdout=subprocess.PIPE,
-        ).stdout.read()
+        ).stdout.read().decode("utf-8")
         for line in lines.split("\n"):
             util.sendmsg(ircsock, channel, line)
             time.sleep(0.4)  # to avoid channel throttle due to spamming
@@ -277,7 +278,7 @@ def get_acronym(channel, text):
     else:
         defs = acronymFinder.get_acros(text, True, True)
         for d in defs[0:5]:  # only the first five. they are already sorted by 'score'
-            util.sendmsg(ircsock, channel, d.encode("utf-8"))
+            util.sendmsg(ircsock, channel, d)
         if len(defs) > 5:
             util.sendmsg(ircsock, channel, defs[-1])
 
@@ -337,7 +338,7 @@ def rollcall(channel):
 def listen(botnick):
     while 1:
 
-        ircmsg = ircsock.recv(2048).decode()
+        ircmsg = ircsock.recv(2048).decode('utf-8')
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":
@@ -416,5 +417,5 @@ def listen(botnick):
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-util.connect(ircsock, options)
-listen(options.nick)
+util.connect(ircsock, args)
+listen(args.nick)

@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import duckduckgo
 import urllib
 from bs4 import BeautifulSoup
@@ -10,7 +11,7 @@ def xkcd(query):
         title = BeautifulSoup(urllib.urlopen(res).read(), "html.parser").title.text
     except:
         pass  # just swallow the error. maybe the result wasn't a url or something else bad happened
-    return [(((title + " - ") if title else "") + res).encode("ascii", "ignore")]
+    return [(((title + " - ") if title else "") + res)]
 
 
 # never mind, blocked by ddg
@@ -19,7 +20,8 @@ def xkcd(query):
 #    soup = BeautifulSoup(urllib.urlopen(url).read(), 'html.parser')
 #    items = soup.find_all("a", class_="result__a")
 #    print items
-#    items = filter(lambda i: i[0:8] == 'xkcd.com', [i.find(class_="result__title").text.strip() for i in items])
+#    items = list(filter(lambda i: i[0:8] == 'xkcd.com',
+#    [i.find(class_="result__title").text.strip() for i in items]))
 #    print items
 #    def pretty_link(item):
 #         url = item.find(class_="result__url").text.strip()

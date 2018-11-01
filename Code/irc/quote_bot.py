@@ -77,7 +77,7 @@ def say_chatty(channel):
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048).decode()
+        ircmsg = ircsock.recv(2048).decode("utf-8")
         ircmsg = ircmsg.strip("\r\n")
 
         formatted = util.format_message(ircmsg)

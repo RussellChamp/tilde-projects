@@ -1,0 +1,15 @@
+[Unit]
+Description=madlibbot daemon
+After=madlibbot.service
+
+[Service]
+Type=simple
+ExecStart=/home/krowbar/Code/irc/madlibbot/madlibbot.py -s 127.0.0.1:6667 -n madlibbot -c #bots #madlibs
+WorkingDirectory=/home/krowbar/Code/irc/
+Restart=always
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target

@@ -1,21 +1,21 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # http://wiki.shellium.org/w/Writing_an_IRC_bot_in_Python
 
 # Import some necessary libraries.
 import socket
 import os
 import sys
-from optparse import OptionParser
 import fileinput
 import random
 import time
+import argparse
 
 import inflect
 import util
 
-parser = OptionParser()
+parser = argparse.ArgumentParser()
 
-parser.add_option(
+parser.add_argument(
     "-s",
     "--server",
     dest="server",
@@ -23,15 +23,16 @@ parser.add_option(
     help="the server to connect to",
     metavar="SERVER",
 )
-parser.add_option(
+parser.add_argument(
     "-c",
-    "--channel",
-    dest="channel",
-    default="#bot_test",
-    help="the channel to join",
-    metavar="CHANNEL",
+    "--channels",
+    dest="channels",
+    nargs="+",
+    default=["#bot_test"],
+    help="the channels to join",
+    metavar="CHANNELS",
 )
-parser.add_option(
+parser.add_argument(
     "-n",
     "--nick",
     dest="nick",
@@ -40,7 +41,7 @@ parser.add_option(
     metavar="NICK",
 )
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 p = inflect.engine()
 
@@ -162,7 +163,7 @@ def topic_history(channel, user, count):
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048).decode()
+        ircmsg = ircsock.recv(2048).decode("utf-8")
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":
@@ -177,7 +178,7 @@ def listen():
 
         msgtime, user, command, channel, messageText = formatted.split("\t")
 
-        if command == "TOPIC" and user != options.nick:
+        if command == "TOPIC" and user != args.nick:
             count_topic(channel, user, msgtime, messageText)
 
         if ircmsg.find(":!topic") != -1:
@@ -207,5 +208,5 @@ def listen():
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-util.connect(ircsock, options)
+util.connect(ircsock, args)
 listen()
