@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import fileinput
 import time
 import calendar
@@ -7,7 +7,7 @@ import operator
 
 MAX_NODES = 5
 
-logfile = "/home/jumblesale/Code/irc/log"
+logfile = "/home/archangelic/irc/log"
 timeCutoff = calendar.timegm(time.gmtime()) - (3 * 7 * 24 * 60 * 60)  # 3 weeks
 
 nameFix = {
@@ -31,7 +31,7 @@ def whoSaid(word):
             try:
                 time, user, message = line.split("\t", 3)
                 time = int(time)
-                if nameFix.has_key(user):
+                if user in nameFix:
                     user = nameFix[user]
                 else:
                     user = user.lower()
