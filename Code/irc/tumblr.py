@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import urllib
 from bs4 import BeautifulSoup
 import random
@@ -6,7 +7,7 @@ import re
 
 def tumble(url):
     # Find the max pages
-    soup = BeautifulSoup(urllib.urlopen(url).read(), "html.parser")
+    soup = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
     pages = soup.findAll("span", "page-numbers")[0].text.split("/")[
         1
     ]  # this could totally fail several ways
@@ -17,7 +18,7 @@ def tumble(url):
 
             # Parse a page
             soup = BeautifulSoup(
-                urllib.urlopen(url + "/page/" + str(page)).read(), "html.parser"
+                urllib.request.urlopen(url + "/page/" + str(page)).read(), "html.parser"
             )
             article = random.choice(soup.findAll("article"))
             quote = article.find("blockquote").text.replace("\n", "")

@@ -6,7 +6,7 @@ import socket
 import os
 import sys
 import time
-from optparse import OptionParser
+import argparse
 import fileinput
 import random
 
@@ -14,9 +14,9 @@ import inflect
 import puzzle
 import util
 
-parser = OptionParser()
+parser = argparse.ArgumentParser()
 
-parser.add_option(
+parser.add_argument(
     "-s",
     "--server",
     dest="server",
@@ -24,15 +24,16 @@ parser.add_option(
     help="the server to connect to",
     metavar="SERVER",
 )
-parser.add_option(
+parser.add_argument(
     "-c",
-    "--channel",
-    dest="channel",
-    default="#bot_test",
-    help="the channel to join",
-    metavar="CHANNEL",
+    "--channels",
+    dest="channels",
+    nargs="+",
+    default=["#bot_test"],
+    help="the channels to join",
+    metavar="CHANNELS",
 )
-parser.add_option(
+parser.add_argument(
     "-n",
     "--nick",
     dest="nick",
@@ -41,7 +42,7 @@ parser.add_option(
     metavar="NICK",
 )
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 p = inflect.engine()
 challenges = {}
@@ -325,7 +326,7 @@ def rollcall(channel):
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048).decode()
+        ircmsg = ircsock.recv(2048).decode("utf-8")
         for msg in ircmsg.split("\n"):
             msg = msg.strip("\n\r")
 
@@ -334,7 +335,7 @@ def listen():
                 continue
 
             formatted = util.format_message(msg)
-            print(formatted)
+            # print(formatted)
 
             if "" == formatted:
                 continue
@@ -360,5 +361,5 @@ def listen():
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-util.connect(ircsock, options)
+util.connect(ircsock, args)
 listen()
