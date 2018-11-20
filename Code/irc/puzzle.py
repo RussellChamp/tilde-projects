@@ -20,17 +20,26 @@ def make_puzzle(obfuscate=True):
             "Counter-cnd0rphant measures: ",
             "Cosn0k countermeasures: ",
             "Anti-tilde7hief precautions: ",
+            "Pro-l0gin challenge: ",
+            "Riddle me this: ",
+            "Would you like to play a game? ",
+            "How about this? "
         ]
     )
     puzzle += random.choice(
         [
             "What is",
-            "How many is",
             "What do you get from",
             "What do you get with",
             "What is the value of",
             "Can you answer",
             "Can you tell me",
+            "Ask wiz3bot what is",
+            "Does anybody know",
+            "Who knows",
+            "Guess what",
+            "Calculate",
+            "Find out"
         ]
     )
     puzzle += " "
@@ -107,7 +116,7 @@ def make_puzzle(obfuscate=True):
         if let1_ord + var1 > ord("z"):
             let1_ord -= var1
         answer = chr(let1_ord + var1)
-        puzzle += "What letter comes {} letters after '{}'".format(
+        puzzle += "letter comes {} letters after '{}'".format(
             p.number_to_words(var1), chr(let1_ord)
         )
 
@@ -116,7 +125,7 @@ def make_puzzle(obfuscate=True):
         if let1_ord - var1 < ord("a"):
             let1_ord += var1
         answer = chr(let1_ord - var1)
-        puzzle += "What letter comes {} letters before '{}'".format(
+        puzzle += "letter comes {} letters before '{}'".format(
             p.number_to_words(var1), chr(let1_ord)
         )
 
@@ -126,7 +135,7 @@ def make_puzzle(obfuscate=True):
         obfuscate = False
     elif roll == 10:
         answer = str(min(var1, var2, var3, var4))
-        puzzle += "What is the {} of {}, {}, {}, and {}".format(
+        puzzle += "the {} of {}, {}, {}, and {}".format(
             random.choice(["smallest", "lowest"]),
             p.number_to_words(var1),
             p.number_to_words(var2),
@@ -136,7 +145,7 @@ def make_puzzle(obfuscate=True):
 
     elif roll == 11:
         answer = str(max(var1, var2, var3, var4))
-        puzzle += "What is the {} of {}, {}, {}, and {}".format(
+        puzzle += "the {} of {}, {}, {}, and {}".format(
             random.choice(["biggest", "largest"]),
             p.number_to_words(var1),
             p.number_to_words(var2),
@@ -151,10 +160,13 @@ def make_puzzle(obfuscate=True):
         answer, puzzle = dict_puzzle.get_anagram()
         obfuscate = False
 
-    puzzle += "?"
+    # Add a question mark on the end of the question
+    if puzzle[-1] != "?":
+        puzzle += "?"
+
     if obfuscate == True:
         for _ in range(fuzz_amount):
-            idx = random.randrange(len(puzzle) - 1)  # get between 0 and string length
+            idx = random.randrange(len(puzzle) - 2)  # get between 0 and string length (except the ? mark)
             puzzle = "".join(
                 [puzzle[0:idx], chr(random.randint(33, 126)), puzzle[idx + 1 :]]
             )
