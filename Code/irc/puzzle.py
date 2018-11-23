@@ -12,7 +12,7 @@ fuzz_amount = 3
 def make_puzzle(obfuscate=True):
     answer = 0
     bonus = 0
-    puzzle_beginning = random.choice(
+    puzzle = random.choice(
         [
             "Prove you're not a robot: ",
             "Are you a robot?: ",
@@ -26,7 +26,7 @@ def make_puzzle(obfuscate=True):
             "How about this? "
         ]
     )
-    puzzle_question = random.choice(
+    puzzle += random.choice(
         [
             "What is",
             "What do you get from",
@@ -37,13 +37,12 @@ def make_puzzle(obfuscate=True):
             "Ask wiz3bot what is",
             "Does anybody know",
             "Who knows",
-            "Guess what is",
+            "Guess what",
             "Calculate",
             "Find out"
         ]
     )
-    puzzle_question += " "
-    puzzle = puzzle_beginning + puzzle_question
+    puzzle += " "
     roll = random.randrange(0, 18)
     var1 = random.randrange(1, 10)
     var2 = random.randrange(1, 10)
@@ -117,31 +116,6 @@ def make_puzzle(obfuscate=True):
         if let1_ord + var1 > ord("z"):
             let1_ord -= var1
         answer = chr(let1_ord + var1)
-        puzzle_question = random.choice(
-        	[
-        		"Which",
-        		"What",
-            	"Can you answer",
-            	"Can you tell me",
-            	"Ask wiz3bot",
-            	"Does anybody know",
-            	"Who knows",
-            	"Guess",
-            	"Calculate",
-            	"Find out"
-        	]
-   		);
-   		if puzzle_question != "Which" and puzzle_question != "What":
-   			puzzle_question += " ";
-   			puzzle_question += random.choice(
-   				[
-   					"which",
-   					"what"
-   				]
-   			);
-   		puzzle_question += " ";
-
-        puzzle = puzzle_beginning + puzzle_question;
         puzzle += "letter comes {} letters after '{}'".format(
             p.number_to_words(var1), chr(let1_ord)
         )
