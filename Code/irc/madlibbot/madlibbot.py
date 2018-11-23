@@ -1,18 +1,18 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # http://wiki.shellium.org/w/Writing_an_IRC_bot_in_Python
 
 # Import some necessary libraries.
 import socket
 import os
 import sys
-from optparse import OptionParser
+import argparse
 import fileinput
 import random
 import time
 import re
 import operator
 
-from .. import util
+import util
 import madlib
 
 
@@ -35,9 +35,9 @@ stories = {}  # The list of stories available to users
 story = {}  # The madlib story currently being worked on
 nextword = {}  # The word that the bot is currently expecting data for
 
-parser = OptionParser()
+parser = argparse.ArgumentParser()
 
-parser.add_option(
+parser.add_argument(
     "-s",
     "--server",
     dest="server",
@@ -45,15 +45,16 @@ parser.add_option(
     help="the server to connect to",
     metavar="SERVER",
 )
-parser.add_option(
+parser.add_argument(
     "-c",
-    "--channel",
-    dest="channel",
-    default="#madlibs",
-    help="the channel to join",
-    metavar="CHANNEL",
+    "--channels",
+    nargs="+",
+    dest="channels",
+    default=["#madlibs"],
+    help="the channels to join",
+    metavar="CHANNELS",
 )
-parser.add_option(
+parser.add_argument(
     "-n",
     "--nick",
     dest="nick",
@@ -62,7 +63,7 @@ parser.add_option(
     metavar="NICK",
 )
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 
 def resetGlobals(channel=""):
@@ -88,16 +89,17 @@ def get_stories(channel, botnick):
     global stories
     state[channel] = State.thinking
     stories[channel] = madlib.find_stories(MAX_STORIES, True)
-    if len(stories[channel]) == 0:
-        sendmsg(channel, "Uh oh! There are no stories!")
+    if len(list(stories[channel])) == 0:
+        util.sendmsg(ircsock, channel, "Uh oh! There are no stories!")
         state[channel] = State.idle
     else:
-        sendmsg(channel, "Here are a couple good stories:")
+        util.sendmsg(ircsock, channel, "Here are a couple good stories:")
         time.sleep(1 * THROTTLE_FACTOR)
         for idx, story in enumerate(stories[channel]):
-            sendmsg(channel, "[{}] {} ({} words)".format(idx, story[0], story[2]))
+            util.sendmsg(ircsock, channel, "[{}] {} ({} words)".format(idx, story[0], story[2]))
             time.sleep(0.5 * THROTTLE_FACTOR)
-        sendmsg(
+        util.sendmsg(
+            ircsock,
             channel,
             "Please select a story by index by saying '{}: <number>':".format(botnick),
         )
@@ -132,7 +134,7 @@ def handle_bot_msg(channel, msg, botnick):
 # Handle how to quit the game
 def quit_game(channel):
     resetGlobals(channel)
-    sendmsg(channel, "Ok, quitting the current game.")
+    util.sendmsg(ircsock, channel, "Ok, quitting the current game.")
 
 
 # Handle user input when we are in story selection mode
@@ -141,12 +143,12 @@ def handle_story_selection(channel, msg, botnick):
     global state
     try:
         imsg = int(msg)
-        if imsg < 0 or imsg > len(stories[channel]):
-            sendmsg(channel, "Selection out of bounds. Try again!")
+        if imsg < 0 or imsg > len(list(stories[channel])):
+            util.sendmsg(ircsock, channel, "Selection out of bounds. Try again!")
             return
         time.sleep(1 * THROTTLE_FACTOR)
-        sendmsg(
-            channel, "Give me a second to load up {}".format(stories[channel][imsg][0])
+        util.sendmsg(
+            ircsock, channel, "Give me a second to load up {}".format(stories[channel][imsg][0])
         )
 
         with open(stories[channel][imsg][1], "r") as storyFile:
@@ -154,7 +156,7 @@ def handle_story_selection(channel, msg, botnick):
         stories[channel] = {}  # Clear out the saved selectable stories in memory
         story_start(channel, botnick)
     except ValueError:
-        sendmsg(channel, "Invalid selection. Try again!")
+        util.sendmsg(ircsock, channel, "Invalid selection. Try again!")
         state[channel] = State.story_selection
 
 
@@ -165,7 +167,8 @@ def story_start(channel, botnick):
     global nextword
 
     state[channel] = State.thinking
-    sendmsg(
+    util.sendmsg(
+        ircsock,
         channel,
         "Alright! Let's get started! Say '{}: <word>' to give me words.".format(
             botnick
@@ -173,7 +176,7 @@ def story_start(channel, botnick):
     )
     nextword[channel] = madlib.find_next_word(story[channel], True)
     time.sleep(0.5 * THROTTLE_FACTOR)
-    sendmsg(channel, "Give me {}:".format(nextword[channel][1]))
+    util.sendmsg(ircsock, channel, "Give me {}:".format(nextword[channel][1]))
     state[channel] = State.word_input
 
 
@@ -196,7 +199,8 @@ def handle_story_step(channel, msg):
         return
     # else
     count = madlib.count_words(story[channel])
-    sendmsg(
+    util.sendmsg(
+        ircsock,
         channel,
         "Thanks! Now give me {} ({} words left)".format(nextword[channel][1], count),
     )
@@ -208,15 +212,15 @@ def finish_story(channel):
     global state
     global story
 
-    sendmsg(channel, "Ok, here's the story...")
-    sendmsg(channel, "=" * MAX_LINE)
+    util.sendmsg(ircsock, channel, "Ok, here's the story...")
+    util.sendmsg(ircsock, channel, "=" * MAX_LINE)
     for line in story[channel].splitlines():
         for part in madlib.yield_lines(line, MAX_LINE):
             time.sleep(0.6 * THROTTLE_FACTOR)
-            sendmsg(channel, part)
-    padlen = (MAX_LINE - 9) / 2
+            util.sendmsg(ircsock, channel, part)
+    padlen = int((MAX_LINE - 9) / 2)
     mod = (MAX_LINE - 9) % 2
-    sendmsg(channel, "=" * padlen + " THE END " + "=" * (padlen + mod))
+    util.sendmsg(ircsock, channel, "=" * padlen + " THE END " + "=" * (padlen + mod))
 
     story[channel] = ""
     state[channel] = State.idle
@@ -235,14 +239,16 @@ def rollcall(channel, botnick):
         state[channel] = State.idle
 
     if state[channel] == State.idle:
-        sendmsg(
+        util.sendmsg(
+            ircsock,
             channel,
             "Do you like MadLibs? Start a collaborative story by saying '{}: startgame'".format(
                 botnick
             ),
         )
     else:
-        sendmsg(
+        util.sendmsg(
+            ircsock,
             channel,
             "A game is already in progress. Say '{}: <word>' to provide me with the next word or '{}: !quit' to stop the current game".format(
                 botnick, botnick
@@ -255,11 +261,11 @@ def listen(botnick):
         "^{}\:?\s*(.*)$".format(botnick)
     )  # re to strip the bot's name from a message
     while 1:
-        ircmsg = ircsock.recv(2048)
+        ircmsg = ircsock.recv(2048).decode("utf-8")
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":
-            ping(ircmsg.split(" ")[1])
+            util.ping(ircsock, ircmsg)
 
         formatted = util.format_message(ircmsg)
         if "" == formatted:
@@ -287,5 +293,5 @@ def listen(botnick):
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-util.connect(ircsock, options)
-listen(options.nick)
+util.connect(ircsock, args)
+listen(args.nick)

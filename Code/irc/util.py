@@ -41,7 +41,11 @@ def connect(ircsock, options):
     mode = "MODE +B {}\r\n".format(options.nick).encode()
     print(mode)
     ircsock.send(mode)
-    joinchan(ircsock, options.channel)
+    if 'channels' in options:
+        for channel in options.channels:
+            joinchan(ircsock, channel)
+    else:
+        joinchan(ircsock, options.channel)
 
 
 # integer number to english word conversion

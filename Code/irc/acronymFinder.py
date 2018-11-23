@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import urllib
 from bs4 import BeautifulSoup
 import random
@@ -12,7 +13,7 @@ def get_acros(word, silly, short):
     url = "http://www.stands4.com/services/v2/abbr.php?uid={}&tokenid={}&term={}".format(
         userId, token, word
     )
-    soup = BeautifulSoup(urllib.urlopen(url).read(), "html5lib")
+    soup = BeautifulSoup(urllib.request.urlopen(url).read(), "html5lib")
     results = soup.find_all("result")
     # there are lots of cases where the same definition is repeated multiple times under different categories. this is dumb so we should do a little more work
     defs = []
@@ -60,7 +61,7 @@ def get_acros(word, silly, short):
                         ", ".join(d["categories"]),
                         d["score"],
                     )
-                ).encode("ascii", "ignore")
+                )
             )
     if silly is True:
         newDef = []
@@ -68,11 +69,11 @@ def get_acros(word, silly, short):
         try:
             for idx, letter in enumerate(word):
                 newWord = random.choice(
-                    filter(
+                    list(filter(
                         lambda w: (idx is 0 or not w.strip().lower().endswith("'s"))
                         and w.lower().startswith(letter.lower()),
                         words,
-                    )
+                    ))
                 ).strip()
                 print(str(idx) + " -> " + newWord)
                 newDef.append(newWord)
@@ -85,7 +86,7 @@ def get_acros(word, silly, short):
                         '{}: "{}" ({}, score: {})'.format(
                             word.upper(), newWord, "Tilde.town Original", "0"
                         )
-                    ).encode("ascii", "ignore")
+                    )
                 )
         except IndexError:
             acros.append("Future hazy, try again later: Tilde.town Error")

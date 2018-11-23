@@ -281,7 +281,7 @@ def rollcall(channel):
 def listen():
     while 1:
 
-        ircmsg = ircsock.recv(2048).decode()
+        ircmsg = ircsock.recv(2048).decode("utf-8")
         ircmsg = ircmsg.strip("\n\r")
 
         if ircmsg[:4] == "PING":

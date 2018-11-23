@@ -1,0 +1,15 @@
+[Unit]
+Description=banterbot daemon
+After=banterbot.service
+
+[Service]
+Type=simple
+ExecStart=/home/krowbar/Code/irc/banterbot.py -s 127.0.0.1:6667 -n banterbot -c #tildetown #bots
+WorkingDirectory=/home/krowbar/Code/irc/
+Restart=always
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import collections
 import glob
@@ -30,7 +30,7 @@ def find_stories(limit=999, shuffle=False):
         files = random.sample(files, max(1, min(limit, len(files))))
     else:
         files = files[:limit]
-    return map(munge_story, files)
+    return list(map(munge_story, files))
 
 
 # Count the number of replacable words in the story

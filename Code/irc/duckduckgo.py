@@ -47,7 +47,7 @@ def query(
         "d": meanings,
     }
     params.update(kwargs)
-    encparams = urllib.urlencode(params)
+    encparams = urllib.parse.urlencode(params)
     url = "http://api.duckduckgo.com/?" + encparams
 
     request = requests.get(url, headers={"User-Agent": useragent})

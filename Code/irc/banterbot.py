@@ -1,11 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
+# using python3 because of unicode and crap
 # http://wiki.shellium.org/w/Writing_an_IRC_bot_in_Python
 
 # Import some necessary libraries.
+import argparse
 import socket
 import os
 import sys
-from optparse import OptionParser
 import fileinput
 import random
 import re
@@ -27,9 +28,9 @@ import acronymFinder
 import util
 from whosaid import whoSaid
 
-parser = OptionParser()
+parser = argparse.ArgumentParser()
 
-parser.add_option(
+parser.add_argument(
     "-s",
     "--server",
     dest="server",
@@ -37,15 +38,16 @@ parser.add_option(
     help="the server to connect to",
     metavar="SERVER",
 )
-parser.add_option(
+parser.add_argument(
     "-c",
-    "--channel",
-    dest="channel",
-    default="#bot_test",
-    help="the channel to join",
-    metavar="CHANNEL",
+    "--channels",
+    dest="channels",
+    nargs="+",
+    default=["#bot_test"],
+    help="the channels to join",
+    metavar="CHANNELS",
 )
-parser.add_option(
+parser.add_argument(
     "-n",
     "--nick",
     dest="nick",
@@ -54,14 +56,9 @@ parser.add_option(
     metavar="NICK",
 )
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 p = inflect.engine()
-
-
-def joinchan(chan):
-    ircsock.send("JOIN " + chan + "\r\n")
-
 
 def hello():
     util.sendmsg(ircsoc, channel, "Hello!")
@@ -122,9 +119,9 @@ def score_banter(channel, user, messageText):
 
 def get_new_banter(channel, user):
     with open("/usr/share/dict/words", "r") as dict:
-        words = filter(lambda word: re.search(r"^[^']*$", word), dict.readlines())
+        words = list(filter(lambda word: re.search(r"^[^']*$", word), dict.readlines()))
         if random.randint(0, 1):  # look for *ant words
-            words = filter(lambda word: re.search(r"ant", word), words)
+            words = list(filter(lambda word: re.search(r"ant", word), words))
             random.shuffle(words)
             word = words[0].strip("\n")
             start = word.find("ant")
@@ -136,7 +133,7 @@ def get_new_banter(channel, user):
                 else:  # replace the letter with 'b'
                     word = word[: start - 1] + "b" + word[start:]
         else:  # look for ban* words
-            words = filter(lambda word: re.search(r"ban", word), words)
+            words = list(filter(lambda word: re.search(r"ban", word), words))
             random.shuffle(words)
             word = words[0].strip("\n")
             end = word.find("ban") + 3
@@ -225,8 +222,6 @@ def get_xkcd(channel, text):
     joined_links = ", ".join(links)
     for line in [joined_links[i : i + 400] for i in range(0, len(joined_links), 400)]:
         util.sendmsg(ircsock, channel, line)
-    # res = xkcdApropos.xkcd(text[6:])
-    # ircsock.send("PRIVMSG " + channel + " :" + res + "\n")
 
 
 def get_wphilosophy(channel, text):
@@ -251,7 +246,7 @@ def figlet(channel, text):
     else:
         lines = subprocess.Popen(
             ["figlet", "-w140"] + text.split(" "), shell=False, stdout=subprocess.PIPE
-        ).stdout.read()
+        ).stdout.read().decode("utf-8")
         for line in lines.split("\n"):
             util.sendmsg(ircsock, channel, line)
             time.sleep(0.4)  # to avoid channel throttle due to spamming
@@ -265,7 +260,7 @@ def toilet(channel, text):
             ["toilet", "-w140", "--irc"] + text.split(" "),
             shell=False,
             stdout=subprocess.PIPE,
-        ).stdout.read()
+        ).stdout.read().decode("utf-8")
         for line in lines.split("\n"):
             util.sendmsg(ircsock, channel, line)
             time.sleep(0.4)  # to avoid channel throttle due to spamming
@@ -277,7 +272,7 @@ def get_acronym(channel, text):
     else:
         defs = acronymFinder.get_acros(text, True, True)
         for d in defs[0:5]:  # only the first five. they are already sorted by 'score'
-            util.sendmsg(ircsock, channel, d.encode("utf-8"))
+            util.sendmsg(ircsock, channel, d)
         if len(defs) > 5:
             util.sendmsg(ircsock, channel, defs[-1])
 
@@ -335,86 +330,88 @@ def rollcall(channel):
 
 
 def listen(botnick):
-    while 1:
+    while 1: # loop forever
+        try:
+            ircmsg = ircsock.recv(2048).decode('utf-8')
+            ircmsg = ircmsg.strip("\n\r")
 
-        ircmsg = ircsock.recv(2048).decode()
-        ircmsg = ircmsg.strip("\n\r")
+            if ircmsg[:4] == "PING":
+                util.ping(ircsock, ircmsg)
+                continue
 
-        if ircmsg[:4] == "PING":
-            util.ping(ircsock, ircmsg)
+            formatted = util.format_message(ircmsg)
 
-        formatted = util.format_message(ircmsg)
+            if "" == formatted:
+                continue
 
-        if "" == formatted:
-            continue
+            # print formatted
 
-        # print formatted
+            _time, user, _command, channel, messageText = formatted.split("\t")
 
-        _time, user, _command, channel, messageText = formatted.split("\t")
+            if ircmsg.find("#banter") != -1 or ircmsg.find("#bantz") != -1:
+                score_banter(channel, user, messageText)
 
-        if ircmsg.find("#banter") != -1 or ircmsg.find("#bantz") != -1:
-            score_banter(channel, user, messageText)
+            if ircmsg.find(":!newbanter") != -1:
+                get_new_banter(channel, user)
 
-        if ircmsg.find(":!newbanter") != -1:
-            get_new_banter(channel, user)
+            if ircmsg.find(":!rhymes") != -1:
+                get_rhymes(channel, user, messageText)
 
-        if ircmsg.find(":!rhymes") != -1:
-            get_rhymes(channel, user, messageText)
+            if ircmsg.find(":!define") != -1:
+                define_word(channel, user, messageText)
 
-        if ircmsg.find(":!define") != -1:
-            define_word(channel, user, messageText)
+            if ircmsg.find(":!rainbow") != -1:
+                make_rainbow(channel, user, messageText)
 
-        if ircmsg.find(":!rainbow") != -1:
-            make_rainbow(channel, user, messageText)
+            if ircmsg.find(":!welch") != -1:
+                get_welch(channel)
 
-        if ircmsg.find(":!welch") != -1:
-            get_welch(channel)
+            if ircmsg.find(":!evil") != -1:
+                get_evil(channel)
 
-        if ircmsg.find(":!evil") != -1:
-            get_evil(channel)
+            if ircmsg.find(":!kjp") != -1:
+                get_tumble("http://kingjamesprogramming.tumblr.com", channel)
 
-        if ircmsg.find(":!kjp") != -1:
-            get_tumble("http://kingjamesprogramming.tumblr.com", channel)
+            if ircmsg.find(":!help") != -1:
+                get_tumble("http://thedoomthatcametopuppet.tumblr.com", channel)
 
-        if ircmsg.find(":!help") != -1:
-            get_tumble("http://thedoomthatcametopuppet.tumblr.com", channel)
+            if ircmsg.find(":!xkcd") != -1:
+                get_xkcd(channel, messageText)
+            if ircmsg.find(":!wiki-philosophy") != -1:
+                get_wphilosophy(channel, messageText)
 
-        if ircmsg.find(":!xkcd") != -1:
-            get_xkcd(channel, messageText)
-        if ircmsg.find(":!wiki-philosophy") != -1:
-            get_wphilosophy(channel, messageText)
+            if ircmsg.find(":!figlet") != -1:
+                figlet(channel, messageText[8:])
 
-        if ircmsg.find(":!figlet") != -1:
-            figlet(channel, messageText[8:])
+            if ircmsg.find(":!toilet") != -1:
+                toilet(channel, messageText[8:])
 
-        if ircmsg.find(":!toilet") != -1:
-            toilet(channel, messageText[8:])
+            if ircmsg.find(":!acronym") != -1:
+                get_acronym(channel, messageText[9:])
 
-        if ircmsg.find(":!acronym") != -1:
-            get_acronym(channel, messageText[9:])
+            if ircmsg.find(":!whosaid") != -1:
+                get_whosaid(channel, messageText[9:])
 
-        if ircmsg.find(":!whosaid") != -1:
-            get_whosaid(channel, messageText[9:])
+            if ircmsg.find(":!notice") != -1:
+                get_notice(user, channel)
 
-        if ircmsg.find(":!notice") != -1:
-            get_notice(user, channel)
+            if ircmsg.find(":!water") != -1:
+                get_water(user, channel, messageText[7:], botnick)
 
-        if ircmsg.find(":!water") != -1:
-            get_water(user, channel, messageText[7:], botnick)
+            if ircmsg.find(":!rollcall") != -1:
+                rollcall(channel)
 
-        if ircmsg.find(":!rollcall") != -1:
-            rollcall(channel)
+            if ircmsg.find(":" + botnick + ":") != -1:
+                mug_off(channel)
 
-        if ircmsg.find(":" + botnick + ":") != -1:
-            mug_off(channel)
+            sys.stdout.flush()
+            time.sleep(1)
 
-        if ircmsg[:4] == "PING":
-            util.ping(ircsock, ircmsg)
-
-        sys.stdout.flush()
-        time.sleep(1)
+        except socket.timeout:
+            return # ABORT! We got kicked or something else weird happened
 
 
-ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-util.connect(ircsock, options)
-listen(options.nick)
+# ROOT: i commented this out until it stops pegging the CPU.
+#ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#util.connect(ircsock, args)
+#listen(args.nick)
