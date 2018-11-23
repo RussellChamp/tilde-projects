@@ -3,15 +3,28 @@ import time
 import random
 import re
 
+MAX_LINE = 400
+
 
 def ping(ircsock, msg):
     ircsock.send("PONG {}\n".format(msg.split(" ")[1]).encode())
 
 
 def sendmsg(ircsock, chan, msg):
-    print("sending {} to {}".format(msg, chan))
-    ircsock.send("PRIVMSG {} :{}\r\n".format(chan, msg).encode())
+    print("sending {} to {}".format(msg, chan)[0:MAX_LINE])
+    ircsock.send("PRIVMSG {} :{}\r\n".format(chan, msg).encode()[0:MAX_LINE])
 
+def notice(ircsock, user, chan, msg):
+    print("sending notice {} to {} in {}".format(msg, user, chan)[0:MAX_LINE])
+    ircsock.send("CNOTICE {} {} :{}\r\n".format(user, chan, msg).encode()[0:MAX_LINE])
+
+def part(ircsock, chan, msg="Bye!"):
+    print("leaving channel {}".format(chan))
+    ircsock.send("PART {} {}\r\n".format(chan, msg).encode())
+
+def quit(ircsock, msg="Quitting!"):
+    print("!! quitting !!")
+    ircsock.send("QUIT {}".format(msg).encode())
 
 def joinchan(ircsock, chan):
     print("joining {}".format(chan))

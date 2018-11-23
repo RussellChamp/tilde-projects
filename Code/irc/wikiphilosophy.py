@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import urllib
 from bs4 import BeautifulSoup
 import random
@@ -9,7 +10,7 @@ def get_philosophy(word, max_steps=20):
 
     url = "https://en.wikipedia.org/wiki/%s" % word
     while steps < max_steps:
-        soup = BeautifulSoup(urllib.urlopen(url).read(), "html.parser")
+        soup = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
         title = soup.find("h1", id="firstHeading")
         content = soup.find("div", id="mw-content-text")
         if not content:
@@ -49,7 +50,7 @@ def get_philosophy_lower(word, max_steps=20):
 
     url = "https://en.wikipedia.org/wiki/%s" % word
     while steps < max_steps:
-        soup = BeautifulSoup(urllib.urlopen(url).read(), "html.parser")
+        soup = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
         title = soup.find("h1", id="firstHeading")
         content = soup.find("div", id="mw-content-text")
         if not content:

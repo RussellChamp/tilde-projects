@@ -55,6 +55,14 @@ parser.add_argument(
     help="the nick to use",
     metavar="NICK",
 )
+parser.add_argument(
+    "-o",
+    "--owner",
+    dest="owner",
+    default="krowbar",
+    help="the owner of this bot",
+    metavar="OWNER",
+)
 
 args = parser.parse_args()
 
@@ -225,7 +233,8 @@ def get_xkcd(channel, text):
 
 
 def get_wphilosophy(channel, text):
-    steps = wikiphilosophy.get_philosophy_lower(text[17:])
+    util.sendmsg(ircsock, channel, "Ok, give me a minute while I look up '{}'".format(text))
+    steps = wikiphilosophy.get_philosophy_lower(text)
     if not steps:
         util.sendmsg(
             ircsock, channel, "Couldn't find a wikipedia entry for {}".format(text)
@@ -302,7 +311,7 @@ def get_whosaid(channel, text):
 
 
 def get_notice(user, channel):
-    ircsock.send("CNOTICE " + user + " " + channel + " :Notice me senpai!\r\n")
+    util.notice(ircsock, user, channel, "Notice me senpai!")
 
 
 def get_water(user, channel, msg, botnick):
@@ -316,12 +325,9 @@ def mug_off(channel):
 
 def rollcall(channel):
     text = """
-        U wot m8? I score all the top drawer #banter and #bantz on this channel!
-        Find new top-shelf banter with !newbanter, !rhymes, and !define.
-        Look up things with !acronym and !whosaid.
-        Make your chatter #legend with !rainbow, !toilet, and !figlet.
-        Find interesting things with !xkcd and !wiki-philosophy.
-        Get jokes with !welch and !evil
+        U wot m8? I score all the top drawer #banter and #bantz on this channel! / Find new top-shelf banter with !newbanter, !rhymes, and !define.
+        Look up things with !acronym and !whosaid / Make your chatter #legend with !rainbow, !toilet, and !figlet.
+        Find interesting things with !xkcd and !wiki-philosophy / Get jokes with !welch !evil !kjp and !help
     """
     for line in textwrap.dedent(text).split("\n"):
         if line == "":
@@ -337,6 +343,7 @@ def listen(botnick):
 
             if ircmsg[:4] == "PING":
                 util.ping(ircsock, ircmsg)
+                print("** " + ircmsg)
                 continue
 
             formatted = util.format_message(ircmsg)
@@ -344,65 +351,76 @@ def listen(botnick):
             if "" == formatted:
                 continue
 
-            # print formatted
+            print(formatted)
 
             _time, user, _command, channel, messageText = formatted.split("\t")
 
-            if ircmsg.find("#banter") != -1 or ircmsg.find("#bantz") != -1:
+            if messageText.find("#banter") != -1 or messageText.find("#bantz") != -1:
                 score_banter(channel, user, messageText)
 
-            if ircmsg.find(":!newbanter") != -1:
+            if messageText.startswith("!newbanter"):
                 get_new_banter(channel, user)
 
-            if ircmsg.find(":!rhymes") != -1:
+            if messageText.startswith("!rhymes"):
                 get_rhymes(channel, user, messageText)
 
-            if ircmsg.find(":!define") != -1:
+            if messageText.startswith("!define"):
                 define_word(channel, user, messageText)
 
-            if ircmsg.find(":!rainbow") != -1:
+            if messageText.startswith("!rainbow"):
                 make_rainbow(channel, user, messageText)
 
-            if ircmsg.find(":!welch") != -1:
+            if messageText.startswith("!welch"):
                 get_welch(channel)
 
-            if ircmsg.find(":!evil") != -1:
+            if messageText.startswith("!evil"):
                 get_evil(channel)
 
-            if ircmsg.find(":!kjp") != -1:
+            if messageText.startswith("!kjp"):
                 get_tumble("http://kingjamesprogramming.tumblr.com", channel)
 
-            if ircmsg.find(":!help") != -1:
+            if messageText.startswith("!help"):
                 get_tumble("http://thedoomthatcametopuppet.tumblr.com", channel)
 
-            if ircmsg.find(":!xkcd") != -1:
+            if messageText.startswith("!xkcd"):
                 get_xkcd(channel, messageText)
-            if ircmsg.find(":!wiki-philosophy") != -1:
-                get_wphilosophy(channel, messageText)
 
-            if ircmsg.find(":!figlet") != -1:
+            if messageText.startswith("!wiki-philosophy"):
+                get_wphilosophy(channel, messageText[17:])
+
+            if messageText.startswith("!figlet"):
                 figlet(channel, messageText[8:])
 
-            if ircmsg.find(":!toilet") != -1:
+            if messageText.startswith("!toilet"):
                 toilet(channel, messageText[8:])
 
-            if ircmsg.find(":!acronym") != -1:
+            if messageText.startswith("!acronym"):
                 get_acronym(channel, messageText[9:])
 
-            if ircmsg.find(":!whosaid") != -1:
+            if messageText.startswith("!whosaid"):
                 get_whosaid(channel, messageText[9:])
 
-            if ircmsg.find(":!notice") != -1:
+            if messageText.startswith("!notice"):
                 get_notice(user, channel)
 
-            if ircmsg.find(":!water") != -1:
+            if messageText.startswith("!water"):
                 get_water(user, channel, messageText[7:], botnick)
 
-            if ircmsg.find(":!rollcall") != -1:
+            if messageText.startswith("!rollcall"):
                 rollcall(channel)
 
-            if ircmsg.find(":" + botnick + ":") != -1:
+            if messageText.startswith(botnick + ":"):
                 mug_off(channel)
+
+            if messageText.startswith("!join") and user == args.owner:
+                util.joinchan(ircsock, messageText[6:])
+
+            if messageText.startswith("!part") and user == args.owner:
+                util.part(ircsock, messageText[6:])
+
+            if messageText.startswith("!quit") and user == args.owner:
+                util.part(ircsock, "Later chumps!")
+                return
 
             sys.stdout.flush()
             time.sleep(1)
@@ -412,6 +430,6 @@ def listen(botnick):
 
 
 # ROOT: i commented this out until it stops pegging the CPU.
-#ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#util.connect(ircsock, args)
-#listen(args.nick)
+ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+util.connect(ircsock, args)
+listen(args.nick)

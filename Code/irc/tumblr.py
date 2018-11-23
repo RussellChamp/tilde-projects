@@ -41,7 +41,7 @@ def tumble(url):
                 )
                 # just the date and notes
 
-            return quote.encode("ascii", "ignore")
+            return quote
         except:  # sometimes we fail. let's retry a few times
             if tries == 0:
                 return ""
