@@ -337,16 +337,16 @@ def rollcall(channel):
 
 def listen(botnick):
     while 1: # loop forever
-        try:
-            ircmsg = ircsock.recv(2048).decode('utf-8')
-            ircmsg = ircmsg.strip("\n\r")
 
-            if ircmsg[:4] == "PING":
-                util.ping(ircsock, ircmsg)
-                print("** " + ircmsg)
+        ircmsg = ircsock.recv(2048).decode('utf-8')
+        for msg in ircmsg.split("\n"):
+            msg = msg.strip("\n\r")
+
+            if msg[:4] == "PING":
+                util.ping(ircsock, msg)
                 continue
 
-            formatted = util.format_message(ircmsg)
+            formatted = util.format_message(msg)
 
             if "" == formatted:
                 continue
@@ -419,17 +419,16 @@ def listen(botnick):
                 util.part(ircsock, messageText[6:])
 
             if messageText.startswith("!quit") and user == args.owner:
-                util.part(ircsock, "Later chumps!")
+                util.quit(ircsock, "Later chumps!")
                 return
 
-            sys.stdout.flush()
-            time.sleep(1)
-
-        except socket.timeout:
-            return # ABORT! We got kicked or something else weird happened
+        sys.stdout.flush()
+        time.sleep(1)
 
 
 # ROOT: i commented this out until it stops pegging the CPU.
+# ~krowbar: this has the same logic loop as tildebot but for whatever reason
+# it is banterbot that gets booted from IRC then rage-thrashes the machine
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 util.connect(ircsock, args)
 listen(args.nick)
