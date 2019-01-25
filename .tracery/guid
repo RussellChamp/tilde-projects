@@ -1,0 +1,8 @@
+{
+  "origin": ["#guid#"],
+  "guid": ["#eightchar#-#fourchar#-#fourchar#-#twelvechar#"],
+  "fourchar": ["#char##char##char##char#"],
+  "eightchar": ["#fourchar##fourchar#"],
+  "twelvechar": ["#eightchar##fourchar#"],
+  "char": ["1","2","3","4","5","6","7","8","9","0","a","b","c","d","e","f"]
+}

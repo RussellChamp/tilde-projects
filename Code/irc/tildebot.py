@@ -71,6 +71,9 @@ def get_positive():
             "Totally right",
             "Close enough",
             "That's it",
+            "Winner, winner",
+            "Bingo",
+            "Affirmative",
         ]
     )
 
@@ -88,10 +91,13 @@ def get_negative():
             "Not today",
             "Try again",
             "Maybe later",
+            "Maybe next time",
             "Probably not",
             "Answer hazy",
             "Not quite",
             "Not even close",
+            "Not for you",
+            "I think not"
         ]
     )
 
@@ -152,6 +158,7 @@ def get_superlative(score):
                 "my friend",
                 "probably not a robot",
                 "valuable to the team",
+                "now trending",
             ]
         )
 
@@ -161,15 +168,17 @@ def get_bad_thing():
         [
             "is a meanie",
             "mugs me right off",
+            "miffed me off",
             "is worse than a horse",
             "smells like a ghost",
             "probably didn't bathe today",
+            "probably shakes babies",
             "didn't guess hard enough",
             "isn't lucky",
             "smells of elderberries",
             "should reconsider their life choices",
             "did't believe in the heart of the tilde",
-            "came to the wrong chat channel",
+            "came to the wrong side of town",
             "should have stopped while they were ahead",
             "requires annotations from an authoratative source",
             "could have been a contender",
@@ -177,6 +186,26 @@ def get_bad_thing():
             "drank my milkshake",
             "is probably cheating",
             "is trying too hard",
+            "didn't really try",
+            "should try harder",
+            "caught me in a bad mood",
+            "should have gone with their first choice",
+            "did not receive IFR clearance from tower",
+            "was tardy for class",
+            "is on double secret probation",
+            "forgot their keys",
+            "forgot to bribe me",
+            "forgot to close the door",
+            "waited too long",
+            "doesn't call me on my cellphone",
+            "isn't wearing a seatbelt",
+            "didn't courtesy flush",
+            "asked a bot for answers",
+            "was right but I didn't feel like it",
+            "is right on opposite day",
+            "actually answered the last question",
+            "has their pants on backwards",
+            "forgot their own name",
         ]
     )
 

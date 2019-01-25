@@ -13,24 +13,26 @@
 <div>
 <select id="series">
   <option value="">Today</option>
-<option value="_2018_11">Nov 2018</option>
-<option value="_2018_10">Oct 2018</option>
-<option value="_2018_09">Sep 2018</option>
-<option value="_2018_08">Aug 2018</option>
-<option value="_2018_07">Jul 2018</option>
-<option value="_2018_06">Jun 2018</option>
-<option value="_2018_05">May 2018</option>
-<option value="_2018_04">Apr 2018</option>
-<option value="_2018_03">Mar 2018</option>
-<option value="_2018_02">Feb 2018</option>
-<option value="_2018_01">Jan 2018</option>
-<option value="_2017_12">Dec 2017</option>
-<option value="_2017_11">Nov 2017</option>
-<option value="_2017_10">Oct 2017</option>
-<option value="_2017_09">Sep 2017</option>
-<option value="_2017_08">Aug 2017</option>
-<option value="_2017_07">Jul 2017</option>
-<option value="_2017_06">Jun 2017</option>
+<option value="_2019_01">Jan 2019</option>
+  <option value="_2018_12">Dec 2018</option>
+  <option value="_2018_11">Nov 2018</option>
+  <option value="_2018_10">Oct 2018</option>
+  <option value="_2018_09">Sep 2018</option>
+  <option value="_2018_08">Aug 2018</option>
+  <option value="_2018_07">Jul 2018</option>
+  <option value="_2018_06">Jun 2018</option>
+  <option value="_2018_05">May 2018</option>
+  <option value="_2018_04">Apr 2018</option>
+  <option value="_2018_03">Mar 2018</option>
+  <option value="_2018_02">Feb 2018</option>
+  <option value="_2018_01">Jan 2018</option>
+  <option value="_2017_12">Dec 2017</option>
+  <option value="_2017_11">Nov 2017</option>
+  <option value="_2017_10">Oct 2017</option>
+  <option value="_2017_09">Sep 2017</option>
+  <option value="_2017_08">Aug 2017</option>
+  <option value="_2017_07">Jul 2017</option>
+  <option value="_2017_06">Jun 2017</option>
   <option value="_2017_06">Jun 2017</option>
   <option value="_2017_05">May 2017</option>
   <option value="_2017_04">Apr 2017</option>
@@ -121,7 +123,8 @@ jQuery.getJSON(source, function(json) {
     .size([1200, 800])
     .words(jsonWords)
     .padding(3)
-    .rotate(function() { return ~~(Math.random() * 2) * 90 * !document.getElementById('flat').checked; })
+    // Never rotate the largest item. It is most likely the date
+    .rotate(function(d) { return ~~(Math.random() * 2) * 90 * (!document.getElementById('flat').checked && d.size != maxCount); })
     .font("Impact")
     .fontSize(function(d) { return Math.sqrt(d.size) * 50 / maxSize + 6; })
     .on("end", draw);

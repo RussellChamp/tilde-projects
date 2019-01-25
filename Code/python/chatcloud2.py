@@ -7,6 +7,7 @@ import re
 import shutil
 import argparse
 import logging, sys
+import math
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
@@ -54,6 +55,12 @@ parser.add_argument(
     help="the minimum occurence of a word to include it in the cloud",
     default=3,
 )
+parser.add_argument(
+    "-timestamp",
+    help="what kind of time stamp should be inserted into the chat cloud. valid values are none, start, end, month, and full",
+    default="none"
+)
+
 
 args = parser.parse_args()
 
@@ -75,16 +82,22 @@ bannedWords = open(args.bannedWordsFile).read().splitlines()
 bannedUsers = open(args.bannedUsersFile).read().splitlines()
 
 with open(args.logfile, "r") as log:
+    firstTime = None # track these for the timestamp we may do later
+    lastTime = None
     for line in log:
         try:
-            time, user, message = line.split("\t", 3)
-            time = int(time)
+            mtime, user, message = line.split("\t", 3)
+            mtime = int(mtime)
         except ValueError:
             continue  # There are some bad lines in the log file that we'll ignore if we can't parse
         if user in bannedUsers:
             continue  # We don't care what they say
-        if time >= args.timestart and time <= args.timeend:
-            # print "Processing line from " + user + " at " + str(time)
+        if mtime >= args.timestart and mtime <= args.timeend:
+            # print "Processing line from " + user + " at " + str(mtime)
+            if firstTime is None:
+                firstTime = mtime
+            lastTime = mtime
+
             for word in (
                 re.sub("['\"\`\/\\;:,.?!*&^\-()<>\{\}|_\[\]0-9]", " ", message)
                 .lower()
@@ -103,9 +116,26 @@ with open(args.logfile, "r") as log:
 wordData = {i: wordData[i] for i in wordData if wordData[i] >= args.minOccurrence}
 if len(wordData) == 0:
     wordData = {"NOTHING": 1, "INTERESTING": 1, "TODAY": 1}
+elif args.timestamp is not "none":
+    stamp = "DATE";
+    if args.timestamp == "start":
+        stamp = time.strftime("%B %d, %Y", time.gmtime(firstTime))
+    elif args.timestamp == "end":
+        stamp = time.strftime("%B %d, %Y", time.gmtime(lastTime))
+    elif args.timestamp == "full":
+        stamp = "{} to {}".format(time.strftime("%b %d, %Y", time.gmtime(firstTime)), time.strftime("%b %d, %Y", time.gmtime(lastTime)))
+    elif args.timestamp == "month":
+        # use the month of one day before the last day
+        stamp = time.strftime("%B %Y", time.gmtime(lastTime - 86400))
+    # make the timestamp a bit bigger than everything else
+    size = int(math.ceil(wordData[max(wordData, key=wordData.get)] * 1.3)) + 1
+    wordData[stamp] = size
+    print("Added timestamp \"{}\" of size {}".format(stamp, size))
+
 if args.outfile == "":
     print(json.dumps(wordData))
 else:
     with open(args.outfile + ".tmp", "w") as tmpFile:
         tmpFile.write(json.dumps(wordData))
     shutil.move(args.outfile + ".tmp", args.outfile)
+    print("Dumped {} words to {}".format(len(wordData), args.outfile))

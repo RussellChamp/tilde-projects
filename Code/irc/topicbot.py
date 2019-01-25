@@ -164,47 +164,50 @@ def listen():
     while 1:
 
         ircmsg = ircsock.recv(2048).decode("utf-8")
-        ircmsg = ircmsg.strip("\n\r")
+        for msg in ircmsg.split("\n"):
+            msg = msg.strip("\n\r")
 
-        if ircmsg[:4] == "PING":
-            util.ping(ircsock, ircmsg)
+            if msg[:4] == "PING":
+                util.ping(ircsock, msg)
+                continue
 
-        formatted = util.format_message(ircmsg)
+            formatted = util.format_message(msg)
 
-        if "" == formatted:
-            continue
+            if "" == formatted:
+                time.sleep(1)
+                continue
 
-        # print formatted
+            # print formatted
 
-        msgtime, user, command, channel, messageText = formatted.split("\t")
+            msgtime, user, command, channel, messageText = formatted.split("\t")
 
-        if command == "TOPIC" and user != args.nick:
-            count_topic(channel, user, msgtime, messageText)
+            if command == "TOPIC" and user != args.nick:
+                count_topic(channel, user, msgtime, messageText)
 
-        if ircmsg.find(":!topic") != -1:
-            get_topic(channel, user, msgtime)
+            if msg.find(":!topic") != -1:
+                get_topic(channel, user, msgtime)
 
-        if ircmsg.find(":!settopic") != -1:
-            set_topic(channel, user, msgtime, messageText[10:])
+            if msg.find(":!settopic") != -1:
+                set_topic(channel, user, msgtime, messageText[10:])
 
-        if ircmsg.find(":!tscores") != -1:
-            topic_scores(channel)
-        elif ircmsg.find(":!tscores") != -1:
-            topic_score(channel)
+            if msg.find(":!tscores") != -1:
+                topic_scores(channel)
+            elif msg.find(":!tscores") != -1:
+                topic_score(channel)
 
-        if ircmsg.find(":!randomtopic") != -1:
-            random_topic(channel, user, msgtime, True)
-        if ircmsg.find(":!suggesttopic") != -1:
-            random_topic(channel, user, msgtime, False)
+            if msg.find(":!randomtopic") != -1:
+                random_topic(channel, user, msgtime, True)
+            if msg.find(":!suggesttopic") != -1:
+                random_topic(channel, user, msgtime, False)
 
-        if ircmsg.find(":!thistory") != -1:
-            topic_history(channel, user, messageText)
+            if msg.find(":!thistory") != -1:
+                topic_history(channel, user, messageText)
 
-        if ircmsg.find(":!rollcall") != -1:
-            rollcall(channel)
+            if msg.find(":!rollcall") != -1:
+                rollcall(channel)
 
-        sys.stdout.flush()
-        time.sleep(1)
+            sys.stdout.flush()
+            time.sleep(1)
 
 
 ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

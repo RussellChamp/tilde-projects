@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-import urllib
 from bs4 import BeautifulSoup
 import random
+import requests
 
 
 def get_philosophy(word, max_steps=20):
@@ -10,7 +10,8 @@ def get_philosophy(word, max_steps=20):
 
     url = "https://en.wikipedia.org/wiki/%s" % word
     while steps < max_steps:
-        soup = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+        print("url: {}".format(url))
+        soup = BeautifulSoup(requests.get(url).content, "html.parser")
         title = soup.find("h1", id="firstHeading")
         content = soup.find("div", id="mw-content-text")
         if not content:
@@ -35,7 +36,7 @@ def get_philosophy(word, max_steps=20):
         ][0]
         step_words.append(item.get("title"))
         # print item.get('title') + "\n"
-        url = "https://en.wikipedia.org%s" % item.get("href")
+        url = "https://en.wikipedia.org{}".format(item.get("href"))
         steps += 1
     return step_words
 
@@ -48,9 +49,15 @@ def get_philosophy_lower(word, max_steps=20):
     step_words = [word]
     steps = 0
 
-    url = "https://en.wikipedia.org/wiki/%s" % word
+    url = "https://en.wikipedia.org/wiki/{}".format(word.replace(" ", "%20"))
     while steps < max_steps:
-        soup = BeautifulSoup(urllib.request.urlopen(url).read(), "html.parser")
+        print("url: {}".format(url))
+        soup = BeautifulSoup(requests.get(url).content, "html.parser")
+
+        if soup.find(id="noarticletext"):
+            step_words.append("(not found)")
+            break
+
         title = soup.find("h1", id="firstHeading")
         content = soup.find("div", id="mw-content-text")
         if not content:

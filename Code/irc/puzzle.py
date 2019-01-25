@@ -1,15 +1,17 @@
 #!/usr/bin/python
 import random
+import hashlib
 import inflect
 import quote_puzzle
 import dict_puzzle
+import textcaptcha
 
 p = inflect.engine()
 primes = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71]
 fuzz_amount = 3
 
 
-def make_puzzle(obfuscate=True):
+def make_puzzle(obfuscate=True, roll=None):
     answer = 0
     bonus = 0
     puzzle = random.choice(
@@ -43,7 +45,7 @@ def make_puzzle(obfuscate=True):
         ]
     )
     puzzle += " "
-    roll = random.randrange(0, 18)
+    roll = roll or random.randrange(0, 21)
     var1 = random.randrange(1, 10)
     var2 = random.randrange(1, 10)
     var3 = random.randrange(1, 20)
@@ -159,6 +161,16 @@ def make_puzzle(obfuscate=True):
     elif roll <= 17:  # 15-17
         answer, puzzle = dict_puzzle.get_anagram()
         obfuscate = False
+    elif roll == 18:
+        answer, puzzle = quote_puzzle.get_chuck()
+        obfuscate = False
+    elif roll <= 20: #19-20
+        captcha = textcaptcha.get_captcha()
+        puzzle = captcha['q'] # the question part of the captcha
+        print(captcha)
+        answer = lambda a : hashlib.md5(a.encode()).hexdigest() in captcha['a'] # check if the answer is correct
+        obfuscate = False
+        bonus = 1
 
     # Add a question mark on the end of the question
     if puzzle[-1] != "?":

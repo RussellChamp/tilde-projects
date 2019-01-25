@@ -7,7 +7,7 @@ MAX_LINE = 400
 
 
 def ping(ircsock, msg):
-    print("{} => PONG {}".format(msg, msg.split(" ")[1]))
+    # print("{} => PONG {}".format(msg, msg.split(" ")[1]))
     ircsock.send("PONG {}\n".format(msg.split(" ")[1]).encode())
 
 
