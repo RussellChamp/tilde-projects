@@ -1,8 +1,9 @@
 #!/bin/bash
-if [[ ! `pidof -sx tildebot.py` ]]; then
+# check if the bot is already running
+if [[ ! `pidof -sx bot_launcher.py` || ! `ps -p $(pidof -sx bot_launcher.py) -o args | grep "\-n tildebot"` ]]; then
   echo "Starting tildebot"
-  nohup ./tildebot.py -s 127.0.0.1:6667 -n tildebot -c \#tildetown \#bots >> tildelog 2>> tildelog &
-  #nohup ./tildebot.py -s 127.0.0.1:6667 -n tildebot -c \#bots >> tildelog 2>> tildelog &
+  /home/krowbar/Code/irc/bot_launcher.py -n tildebot -s 127.0.0.1 -p 6667 -c \#bots
+  # nohup /home/krowbar/Code/irc/bot_launcher.py -n tildebot -s 127.0.0.1:6667 -c \#bot_test
 else
   echo "Tildebot has already been started"
 fi

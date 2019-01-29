@@ -4,7 +4,7 @@ After=topicbot.service
 
 [Service]
 Type=simple
-ExecStart=/home/krowbar/Code/irc/topicbot.py -s 127.0.0.1:6667 -n topicbot -c #tildetown #bots
+ExecStart=/home/krowbar/Code/irc/banterbot.py -s 127.0.0.1 -p 6667 -n topicbot -c #bot_test
 WorkingDirectory=/home/krowbar/Code/irc/
 Restart=always
 RestartSec=5

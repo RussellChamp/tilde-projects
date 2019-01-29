@@ -4,7 +4,7 @@ After=tildebot.service
 
 [Service]
 Type=simple
-ExecStart=/home/krowbar/Code/irc/tildebot.py -s 127.0.0.1:6667 -n tildebot -c #bots
+ExecStart=/home/krowbar/Code/irc/bot_launcher.py -n tildebot -s 127.0.0.1 -p 6667 -c #bots
 WorkingDirectory=/home/krowbar/Code/irc/
 Restart=always
 RestartSec=5
