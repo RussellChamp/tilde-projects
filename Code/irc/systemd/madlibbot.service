@@ -1,10 +1,10 @@
 [Unit]
-Description=tildebot daemon
-After=tildebot.service
+Description=madlibbot daemon
+After=madlibbot.service
 
 [Service]
 Type=simple
-ExecStart=/home/krowbar/Code/irc/bot_launcher.py -n tildebot -s 127.0.0.1 -p 6667 -c #bots
+ExecStart=/home/krowbar/Code/irc/madlibbot/madlibbot.py -s 127.0.0.1:6667 -n madlibbot -c #bots #madlibs
 WorkingDirectory=/home/krowbar/Code/irc/
 Restart=always
 RestartSec=5

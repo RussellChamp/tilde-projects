@@ -45,11 +45,12 @@ parser.add_argument(
 )
 parser.add_argument(
     "-o",
-    "--owner",
-    dest="owner",
-    default="krowbar",
-    help="the owner of this bot",
-    metavar="OWNER",
+    "--owners",
+    dest="owners",
+    nargs="+",
+    default=["krowbar"],
+    help="the owners of this bot",
+    metavar="OWNERS",
 )
 
 args = parser.parse_args()
@@ -58,7 +59,7 @@ print(args)
 bot = Bot(
         channels = args.channels,
         nickname = args.nick,
-        ops = [ args.owner ],
+        ops = args.owners,
         plugin_dir = "{}_plugins".format(args.nick),
         server = args.server,
         port = args.port

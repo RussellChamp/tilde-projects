@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import pinhook.plugin
+import random
 from util import rhymesWith
 
 poetic_file = "/home/nossidge/poems/words_poetic.txt"

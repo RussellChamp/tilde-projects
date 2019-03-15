@@ -1,10 +1,10 @@
 [Unit]
-Description=tildebot daemon
-After=tildebot.service
+Description=banterbot daemon
+After=banterbot.service
 
 [Service]
 Type=simple
-ExecStart=/home/krowbar/Code/irc/bot_launcher.py -n tildebot -s 127.0.0.1 -p 6667 -c #bots
+ExecStart=/home/krowbar/Code/irc/bot_launcher.py -s 127.0.0.1 -p 6667 -n banterbot -c #tildetown #bots
 WorkingDirectory=/home/krowbar/Code/irc/
 Restart=always
 RestartSec=5

@@ -2,6 +2,7 @@
 
 # Import some necessary libraries.
 import random
+import re
 import inflect
 import util.puzzle
 
@@ -58,7 +59,13 @@ def get_negative():
             "Not quite",
             "Not even close",
             "Not for you",
-            "I think not"
+            "I think not",
+            "Wait... uh maybe?",
+            "It could have been",
+            "It should have been",
+            "Whoops",
+            "SegFault: Insufficient Tildes",
+            "Wait, what did you guess?"
         ]
     )
 
@@ -83,6 +90,8 @@ def get_superlative(score):
                 "worth twice their weight in gold",
                 "the hero we need",
                 "no ordinary townie",
+                "the bot whisperer",
+                "probably predicting rng",
             ]
         )
     elif score > 2:
@@ -95,13 +104,18 @@ def get_superlative(score):
                 "radical",
                 "intense",
                 "pretty lucky",
-                "knows the territory",
-                "has what it takes",
-                "has mad skillz",
+                #"knows the territory",
+                #"has what it takes",
+                #"has mad skillz",
                 "going the distance",
                 "a hard worker",
                 "my sunshine",
                 "ready to rumble",
+                "better than sliced bread",
+                "main protagonist material",
+                "right as rain",
+                "a puzzle prophet",
+                "a counter-captcha expert",
             ]
         )
     else:
@@ -120,6 +134,13 @@ def get_superlative(score):
                 "probably not a robot",
                 "valuable to the team",
                 "now trending",
+                "on your way up",
+                "credit to team",
+                "a net positive",
+                "groovy",
+                "competent",
+                "not wrong",
+                "on the right track",
             ]
         )
 
@@ -167,6 +188,7 @@ def get_bad_thing():
             "actually answered the last question",
             "has their pants on backwards",
             "forgot their own name",
+            "got me really confused"
         ]
     )
 
@@ -264,6 +286,16 @@ def challenge(channel, user, time):
     challenges[user] = challenge[1:]
     return "{}: {}".format(user, challenge[0])
 
+def valid_answer(answer, guess):
+    guess = guess.lower();
+    if callable(answer):
+        return answer(guess)
+    else:
+        # convert the guess and answer to just alphanumeric values. some
+        # "answers" acidentally have punctuation or other things in them
+        guess = re.sub(r'\W+', '', guess)
+        answer = re.sub(r'\w+', '', str(answer).lower())
+        return (msg == answer or msg == p.number_to_words(answer))
 
 def challenge_response(user, time, msg):
     global challenges
@@ -271,9 +303,7 @@ def challenge_response(user, time, msg):
     response = ""
     if user in challenges:
         answer, bonus = challenges[user]
-        if (callable(answer) and answer(msg.lower())) or (
-            msg.lower() == str(answer).lower() or msg == p.number_to_words(answer)
-        ):
+        if valid_answer(answer, msg):
             response = give_tilde(user, time, True, bonus)
         else:
             response = give_tilde(user, time, False, 0)
