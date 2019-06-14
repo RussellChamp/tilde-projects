@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import util.duckduckgo
 
 def xkcd(query):
-    res = util.duckduckgo.get_zci("site:xkcd.com " + query)
+    res = util.duckduckgo.get_zci("site:m.xkcd.com " + query)
     title = ""
     try:  # ddg returns a url for these searches. i want a title as well
         title = BeautifulSoup(requests.get(res).content, "html.parser").title.text
