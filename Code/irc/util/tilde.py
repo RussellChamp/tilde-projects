@@ -294,7 +294,7 @@ def valid_answer(answer, guess):
         # convert the guess and answer to just alphanumeric values. some
         # "answers" acidentally have punctuation or other things in them
         guess = re.sub(r'\W+', '', guess)
-        answer = re.sub(r'\w+', '', str(answer).lower())
+        answer = re.sub(r'\W+', '', str(answer).lower())
         return (guess == answer or guess == p.number_to_words(answer))
 
 def challenge_response(user, time, msg):
