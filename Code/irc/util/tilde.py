@@ -188,7 +188,8 @@ def get_bad_thing():
             "actually answered the last question",
             "has their pants on backwards",
             "forgot their own name",
-            "got me really confused"
+            "got me really confused",
+            "is a gambler"
         ]
     )
 

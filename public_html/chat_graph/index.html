@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>Tilde Chat Frequency</title>
+<style>
+  body {
+    background-color: wheat;
+  }
+</style>
+</head>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+<script type="text/javascript" src="https://momentjs.com/downloads/moment.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', { packages: ['corechart', 'line' ]});
+  google.charts.setOnLoadCallback(drawLineChart);
+
+  function drawLineChart() {
+    var data = new google.visualization.DataTable();
+
+    jQuery.getJSON("/~krowbar/data/chatcloud_aggregate.json", function(json) {
+      var words = [];
+      json.columns.slice(1).forEach(function(col, idx) {
+        words.push({ 'word': col, 'index': idx + 1, 'value': _.reduce(json.data, function(sum, row) { return sum + row[idx + 1]; }, 0) });
+      });
+      // sort them
+      words = _.orderBy(words, ['value', 'word'], ['desc', 'asc']);
+      // only take the top 100
+      START_IDX = 0;
+      MAX_SIZE = 100;
+      words = words.slice(START_IDX, MAX_SIZE);
+
+      data.addColumn('date', 'Month');
+      words.forEach(function(col) {
+        data.addColumn('number', col.word);
+      });
+
+      var goodIdxs = _.map(words, function(item) { return item.index; });
+      var mungedData = _.map(json.data, function(row) {
+        var data = [moment(row[0], "YYYY_MM").toDate()];
+        goodIdxs.forEach(function(idx) {
+          data.push(row[idx]);
+        });
+        return data;
+      });
+
+      data.addRows(mungedData);
+
+      var options = {
+        chart: {
+          title: 'Tilde Town Chat Word Frequency',
+          subtitle: 'across time and space'
+        },
+        vAxis: {
+          logScale: true
+        },
+        width: 1200,
+        height: 600
+      };
+      var chart = new google.charts.Line(document.getElementById('linechart'));
+      chart.draw(data, google.charts.Line.convertOptions(options));
+    });
+  }
+
+</script>
+<body>
+  <div id="linechart"></div>
+  <div>
+    <a href="https://github.com/RussellChamp/tilde-projects/tree/master/Code/bash">(see source)</a>
+  </div>
+</body>

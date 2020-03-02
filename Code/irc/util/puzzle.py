@@ -163,9 +163,10 @@ def make_puzzle(obfuscate=True, roll=None):
     elif roll <= 17:  # 15-17
         answer, puzzle = util.dict_puzzle.get_anagram()
         obfuscate = False
-    elif roll == 18:
-        answer, puzzle = util.quote_puzzle.get_chuck()
-        obfuscate = False
+    #elif roll == 18:
+    #    answer, puzzle = util.quote_puzzle.get_chuck()
+    #    # these were just getting too nasty
+    #    obfuscate = False
     elif roll <= 20: #19-20
         captcha = util.textcaptcha.get_captcha()
         puzzle = captcha['q'] # the question part of the captcha
